@@ -5,6 +5,141 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Mon Setup</title>
   <style>
+
+    # Lire le contenu actuel de index.html
+with open('index.html', 'r') as f:
+    html_content = f.read()
+
+# Code JavaScript pour l'animation du ciel étoilé
+js_animation_code = """
+<script>
+(function() {
+    const canvas = document.createElement('canvas');
+    canvas.id = 'starfield';
+    canvas.style.cssText = 'position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1;';
+    document.body.prepend(canvas); // Add canvas as the first child of body
+
+    const ctx = canvas.getContext('2d');
+    let stars = [];
+    let shootingStars = [];
+    const numStars = 100; // Nombre de petites étoiles
+    const numShootingStars = 3; // Nombre d'étoiles filantes
+
+    function resizeCanvas() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+    }
+
+    class Star {
+        constructor() {
+            this.x = Math.random() * canvas.width;
+            this.y = Math.random() * canvas.height;
+            this.radius = Math.random() * 1.5; // Taille des étoiles
+            this.alpha = Math.random(); // Opacité initiale
+            this.velocity = Math.random() * 0.5 + 0.1; // Vitesse de déplacement vers le bas
+        }
+
+        draw() {
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2, false);
+            ctx.fillStyle = `rgba(255, 255, 255, ${this.alpha})`;
+            ctx.fill();
+        }
+
+        update() {
+            this.y += this.velocity; // Déplacement des étoiles vers le bas
+            if (this.y > canvas.height) {
+                this.y = 0; // Réinitialiser en haut de l'écran
+                this.x = Math.random() * canvas.width;
+            }
+            this.draw();
+        }
+    }
+
+    class ShootingStar {
+        constructor() {
+            this.reset();
+        }
+
+        reset() {
+            this.x = Math.random() * canvas.width; // Position de départ aléatoire en X
+            this.y = -Math.random() * canvas.height; // Démarrer au-dessus de l'écran
+            this.len = Math.random() * 200 + 50; // Longueur de la traînée
+            this.speed = Math.random() * 8 + 4; // Vitesse de l'étoile filante
+            this.alpha = 1; // Opacité initiale
+            this.angle = Math.PI / 4; // Angle de 45 degrés pour la chute
+        }
+
+        draw() {
+            ctx.save();
+            ctx.translate(this.x, this.y);
+            ctx.rotate(this.angle);
+            ctx.beginPath();
+            ctx.moveTo(0, 0);
+            ctx.lineTo(this.len, 0);
+            ctx.strokeStyle = `rgba(255, 255, 255, ${this.alpha})`;
+            ctx.lineWidth = 2;
+            ctx.stroke();
+            ctx.restore();
+        }
+
+        update() {
+            this.x += this.speed * Math.cos(this.angle);
+            this.y += this.speed * Math.sin(this.angle);
+            this.alpha -= 0.01; // Fade out
+
+            // Réinitialiser si l'étoile filante sort de l'écran ou a totalement disparu
+            if (this.y > canvas.height + this.len || this.x > canvas.width + this.len || this.alpha <= 0) {
+                this.reset();
+            }
+            this.draw();
+        }
+    }
+
+    function init() {
+        resizeCanvas();
+        for (let i = 0; i < numStars; i++) {
+            stars.push(new Star());
+        }
+        for (let i = 0; i < numShootingStars; i++) {
+            shootingStars.push(new ShootingStar());
+        }
+    }
+
+    function animate() {
+        requestAnimationFrame(animate);
+        ctx.clearRect(0, 0, canvas.width, canvas.height); // Effacer le canevas
+
+        // Dessiner le fond sombre pour le canevas
+        ctx.fillStyle = '#07090e'; // Correspond à la couleur --bg de votre CSS
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        stars.forEach(star => star.update());
+        shootingStars.forEach(sStar => sStar.update());
+    }
+
+    window.addEventListener('resize', resizeCanvas);
+    init();
+    animate();
+})();
+</script>
+"""
+
+# Insérer le canevas juste après la balise <body> et le script avant </body>
+# Note: Utiliser `prepend` pour le canevas dans le JS pour qu'il soit le premier enfant du body
+body_start_tag = '<body>'
+body_end_tag = '</body>'
+
+if body_start_tag in html_content and body_end_tag in html_content:
+    # La balise <canvas> sera ajoutée dynamiquement par le JS `prepend`
+    # Nous insérons directement le script JS avant la balise </body>
+    modified_html_content = html_content.replace(body_end_tag, js_animation_code + body_end_tag)
+else:
+    print("Erreur: Les balises <body> ou </body> n'ont pas été trouvées.")
+    modified_html_content = html_content
+
+print("Contenu HTML modifié avec l'animation.")
+  
     :root {
       --bg: #07090e;
       --card-bg: #0f141d;
@@ -16,14 +151,14 @@
     }
 
     * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; }
-    body {
-      background-color: var(--bg);
-      color: var(--text);
-      min-height: 100vh;
-      display: flex;
+    body { 
+      background-color: var(--bg); 
+      color: var(--text); 
+      min-height: 100vh; 
+      display: flex; 
       flex-direction: column;
-      align-items: center;
-      padding: 30px 15px;
+      align-items: center; 
+      padding: 30px 15px; 
       gap: 30px;
     }
 
@@ -364,7 +499,7 @@
     /* 2. INDICATION POUR LES ÉCOUTEURS (FiiO FH7) */
     .media-preview.earphones img {
       object-fit: cover;
-      object-position: center 20%;
+      object-position: center 20%; 
       transform: scale(1.10);
     }
 
@@ -614,9 +749,10 @@
         images: [
           'https://assets.corsair.com/image/upload/c_pad,q_85,h_1100,w_1100,f_auto/products/air-5400/RS-R-WHITE/gallery/AIR_5400_RS-R_ARGB_White_Artboard01_AA.webp',
           'https://assets.corsair.com/image/upload/c_pad,q_85,h_1100,w_1100,f_auto/products/air-5400/RS-R-WHITE/gallery/AIR_5400_RS-R_ARGB_White_Artboard03_AA.webp',
-          'https://www.corsair.com/wp-content/uploads/2025/10/AIR_5400_PR_Image03.png'
+          'https://www.corsair.com/wp-content/uploads/2025/10/AIR_5400_PR_Image03.png',
+          'https://www.awd-it.co.uk/media/wysiwyg/AIR_5400_RS-R_ARGB_BLACK_14_AIRFLOW_GPU.png'
         ],
-        desc: 'Boîtier moyen-tour double chambre conçu pour un flux d’air optimal. Panneau panoramique en verre trempé offrant une vue dégagée sur l’ensemble des composants.'
+        desc: 'Boîtier moyen-tour double chambre conçu pour un flux d’air optimal. Panneau panoramique en verre trempé offrant une vue dégagée sur l’ensemble des composants.' 
       },
       'fans-top': { type: 'Ventilateurs Haut (x3)', title: 'Corsair RS120 ARGB Blanc', img: 'https://assets.corsair.com/image/upload/c_pad,q_85,h_1100,w_1100,f_auto/products/Fans/base-rs-argb-series-config/gallery/120/triple/white/RS120_ARGB_WHT_TRPL_01.webp', desc: 'Set de 3 ventilateurs PWM de 120 mm installés en extraction supérieure avec LED ARGB adressables.' },
       'aio': { type: 'Watercooling', title: 'Corsair 360 AIO Nautilus Blanc', img: 'https://assets.corsair.com/image/upload/c_pad,q_85,h_1100,w_1100,f_auto/products/Liquid-Cooling/nautilus/Gallery/CW-9060095-WW/CW-9060095-WW_01.webp', desc: 'Système AIO avec radiateur de 360 mm et pompe haute performance à faible bruit.' },
@@ -631,8 +767,8 @@
         images: [
           'https://static.gigabyte.com/StaticFile/Image/Global/ed71caf62ebb565841883f77562c5273/ProductRemoveBg/45267/webp/2000',
           'https://files.pccasegear.com/images/B850-A-STEALTH-ICE-add2.jpg'
-        ],
-        desc: 'Carte mère AM5 blanche Stealth avec connecteurs arrière et support PCIe 5.0.'
+        ], 
+        desc: 'Carte mère AM5 blanche Stealth avec connecteurs arrière et support PCIe 5.0.' 
       }
     };
 
@@ -748,9 +884,3 @@
   </script>
 </body>
 </html>
-"""
-
-with open('index.html', 'w') as f:
-    f.write(html_content)
-
-print("Fichier index.html créé.")
