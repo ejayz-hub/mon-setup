@@ -1,3 +1,5 @@
+
+
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -5,141 +7,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Mon Setup</title>
   <style>
-
-    # Lire le contenu actuel de index.html
-with open('index.html', 'r') as f:
-    html_content = f.read()
-
-# Code JavaScript pour l'animation du ciel étoilé
-js_animation_code = """
-<script>
-(function() {
-    const canvas = document.createElement('canvas');
-    canvas.id = 'starfield';
-    canvas.style.cssText = 'position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1;';
-    document.body.prepend(canvas); // Add canvas as the first child of body
-
-    const ctx = canvas.getContext('2d');
-    let stars = [];
-    let shootingStars = [];
-    const numStars = 100; // Nombre de petites étoiles
-    const numShootingStars = 3; // Nombre d'étoiles filantes
-
-    function resizeCanvas() {
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
-    }
-
-    class Star {
-        constructor() {
-            this.x = Math.random() * canvas.width;
-            this.y = Math.random() * canvas.height;
-            this.radius = Math.random() * 1.5; // Taille des étoiles
-            this.alpha = Math.random(); // Opacité initiale
-            this.velocity = Math.random() * 0.5 + 0.1; // Vitesse de déplacement vers le bas
-        }
-
-        draw() {
-            ctx.beginPath();
-            ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2, false);
-            ctx.fillStyle = `rgba(255, 255, 255, ${this.alpha})`;
-            ctx.fill();
-        }
-
-        update() {
-            this.y += this.velocity; // Déplacement des étoiles vers le bas
-            if (this.y > canvas.height) {
-                this.y = 0; // Réinitialiser en haut de l'écran
-                this.x = Math.random() * canvas.width;
-            }
-            this.draw();
-        }
-    }
-
-    class ShootingStar {
-        constructor() {
-            this.reset();
-        }
-
-        reset() {
-            this.x = Math.random() * canvas.width; // Position de départ aléatoire en X
-            this.y = -Math.random() * canvas.height; // Démarrer au-dessus de l'écran
-            this.len = Math.random() * 200 + 50; // Longueur de la traînée
-            this.speed = Math.random() * 8 + 4; // Vitesse de l'étoile filante
-            this.alpha = 1; // Opacité initiale
-            this.angle = Math.PI / 4; // Angle de 45 degrés pour la chute
-        }
-
-        draw() {
-            ctx.save();
-            ctx.translate(this.x, this.y);
-            ctx.rotate(this.angle);
-            ctx.beginPath();
-            ctx.moveTo(0, 0);
-            ctx.lineTo(this.len, 0);
-            ctx.strokeStyle = `rgba(255, 255, 255, ${this.alpha})`;
-            ctx.lineWidth = 2;
-            ctx.stroke();
-            ctx.restore();
-        }
-
-        update() {
-            this.x += this.speed * Math.cos(this.angle);
-            this.y += this.speed * Math.sin(this.angle);
-            this.alpha -= 0.01; // Fade out
-
-            // Réinitialiser si l'étoile filante sort de l'écran ou a totalement disparu
-            if (this.y > canvas.height + this.len || this.x > canvas.width + this.len || this.alpha <= 0) {
-                this.reset();
-            }
-            this.draw();
-        }
-    }
-
-    function init() {
-        resizeCanvas();
-        for (let i = 0; i < numStars; i++) {
-            stars.push(new Star());
-        }
-        for (let i = 0; i < numShootingStars; i++) {
-            shootingStars.push(new ShootingStar());
-        }
-    }
-
-    function animate() {
-        requestAnimationFrame(animate);
-        ctx.clearRect(0, 0, canvas.width, canvas.height); // Effacer le canevas
-
-        // Dessiner le fond sombre pour le canevas
-        ctx.fillStyle = '#07090e'; // Correspond à la couleur --bg de votre CSS
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-        stars.forEach(star => star.update());
-        shootingStars.forEach(sStar => sStar.update());
-    }
-
-    window.addEventListener('resize', resizeCanvas);
-    init();
-    animate();
-})();
-</script>
-"""
-
-# Insérer le canevas juste après la balise <body> et le script avant </body>
-# Note: Utiliser `prepend` pour le canevas dans le JS pour qu'il soit le premier enfant du body
-body_start_tag = '<body>'
-body_end_tag = '</body>'
-
-if body_start_tag in html_content and body_end_tag in html_content:
-    # La balise <canvas> sera ajoutée dynamiquement par le JS `prepend`
-    # Nous insérons directement le script JS avant la balise </body>
-    modified_html_content = html_content.replace(body_end_tag, js_animation_code + body_end_tag)
-else:
-    print("Erreur: Les balises <body> ou </body> n'ont pas été trouvées.")
-    modified_html_content = html_content
-
-print("Contenu HTML modifié avec l'animation.")
-  
     :root {
       --bg: #07090e;
       --card-bg: #0f141d;
@@ -151,14 +18,14 @@ print("Contenu HTML modifié avec l'animation.")
     }
 
     * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; }
-    body { 
-      background-color: var(--bg); 
-      color: var(--text); 
-      min-height: 100vh; 
-      display: flex; 
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
       flex-direction: column;
-      align-items: center; 
-      padding: 30px 15px; 
+      align-items: center;
+      padding: 30px 15px;
       gap: 30px;
     }
 
@@ -499,7 +366,7 @@ print("Contenu HTML modifié avec l'animation.")
     /* 2. INDICATION POUR LES ÉCOUTEURS (FiiO FH7) */
     .media-preview.earphones img {
       object-fit: cover;
-      object-position: center 20%; 
+      object-position: center 20%;
       transform: scale(1.10);
     }
 
@@ -592,7 +459,7 @@ print("Contenu HTML modifié avec l'animation.")
 
       <div class="cards-container">
         <div class="component-card" id="card-psu" data-hs="hs-psu" data-path="path-psu" onclick="selectComponent('psu')">
-          <div class="thumb-box"><img src="https://www.cybenetics.com/photos/models/common/2880_0.jpg" alt="Alimentation"></div>
+          <div class="thumb-box"><img src="https://ejayz-hub.github.io/mon-setup/A.png" alt="Alimentation"></div>
           <div class="info-box"><span class="comp-type">Alimentation</span><span class="comp-name">HyperX PS-4122-2 1200W</span></div>
         </div>
         <div class="component-card" id="card-case" data-hs="hs-case" data-path="path-case" onclick="selectComponent('case')">
@@ -608,7 +475,7 @@ print("Contenu HTML modifié avec l'animation.")
           <div class="info-box"><span class="comp-type">Watercooling</span><span class="comp-name">Corsair 360 AIO Nautilus</span></div>
         </div>
         <div class="component-card" id="card-ram" data-hs="hs-ram" data-path="path-ram" onclick="selectComponent('ram')">
-          <div class="thumb-box"><img src="https://media.rueducommerce.fr/r500/ld/products/00/05/95/90/LD0005959023_0005959075_0005959091.jpg" alt="RAM"></div>
+          <div class="thumb-box"><img src="https://ejayz-hub.github.io/mon-setup/R.png" alt="RAM"></div>
           <div class="info-box"><span class="comp-type">Mémoire RAM</span><span class="comp-name">16x2 Go DDR5 HP60U40S8HA-16FRE</span></div>
         </div>
         <div class="component-card" id="card-cpu" data-hs="hs-cpu" data-path="path-cpu" onclick="selectComponent('cpu')">
@@ -620,7 +487,7 @@ print("Contenu HTML modifié avec l'animation.")
           <div class="info-box"><span class="comp-type">Carte Graphique</span><span class="comp-name">NVIDIA RTX 5090 HP Omen</span></div>
         </div>
         <div class="component-card" id="card-ssd" data-hs="hs-ssd" data-path="path-ssd" onclick="selectComponent('ssd')">
-          <div class="thumb-box"><img src="https://laptopre.vn/storage/photos/1/linh-kien-pc/SSD/AORUS-NVMe-Gen-4-SSD-2TB-With-Heat-Sink/AORUS-NVMe-Gen4-SSD-2TB-With-Heat-Sink-GP-ASM2NE6200TTTD-moi.jpg" alt="SSD"></div>
+          <div class="thumb-box"><img src="https://ejayz-hub.github.io/mon-setup/S.PNG" alt="SSD"></div>
           <div class="info-box"><span class="comp-type">Stockage (2x SSD)</span><span class="comp-name">2x 2 To Gigabyte AORUS Gen4</span></div>
         </div>
         <div class="component-card" id="card-fans-bot" data-hs="hs-fans-bot" data-path="path-fans-bot" onclick="selectComponent('fans-bot')">
@@ -628,7 +495,7 @@ print("Contenu HTML modifié avec l'animation.")
           <div class="info-box"><span class="comp-type">Ventilateurs Bas (x3)</span><span class="comp-name">Corsair RS120 ARGB Reverse</span></div>
         </div>
         <div class="component-card" id="card-mobo" data-hs="hs-mobo" data-path="path-mobo" onclick="selectComponent('mobo')">
-          <div class="thumb-box"><img src="https://static.gigabyte.com/StaticFile/Image/Global/ed71caf62ebb565841883f77562c5273/ProductRemoveBg/45267/webp/2000" alt="Carte Mère"></div>
+          <div class="thumb-box"><img src="https://ejayz-hub.github.io/mon-setup/MA.png" alt="Carte Mère"></div>
           <div class="info-box"><span class="comp-type">Carte Mère</span><span class="comp-name">Gigabyte B850 AORUS Ice</span></div>
         </div>
       </div>
@@ -696,7 +563,7 @@ print("Contenu HTML modifié avec l'animation.")
     <div class="peripheral-grid">
       <div class="peripheral-card">
         <div class="media-preview mic">
-          <img src="https://m.media-amazon.com/images/I/61egnO8q6ZL._AC_SL1500_.jpg" alt="Microphone Yeti">
+          <img src="https://ejayz-hub.github.io/mon-setup/M.Png" alt="Microphone Yeti">
         </div>
         <div class="peripheral-info">
           <span class="peripheral-tag">Microphone USB</span>
@@ -707,7 +574,7 @@ print("Contenu HTML modifié avec l'animation.")
 
       <div class="peripheral-card">
         <div class="media-preview speakers">
-          <img src="https://image.son-video.com/images/article/kef/KEFLS50NRMWI2/ls50-wireless-2-noir-mat_5f68a31f62f98_1200.jpg?p=600" alt="KEF LS50 Wireless 2">
+          <img src="https://ejayz-hub.github.io/mon-setup/E.PNG" alt="KEF LS50 Wireless 2">
         </div>
         <div class="peripheral-info">
           <span class="peripheral-tag">Enceintes Actives Haute Fidélité</span>
@@ -718,7 +585,7 @@ print("Contenu HTML modifié avec l'animation.")
 
       <div class="peripheral-card">
         <div class="media-preview subwoofers">
-          <img src="https://www.easylounge.com/Content/photos/k/e/kefkc62nrm,138919-1200px.jpg" alt="KEF KC62">
+          <img src="https://ejayz-hub.github.io/mon-setup/c.PNG" alt="KEF KC62">
         </div>
         <div class="peripheral-info">
           <span class="peripheral-tag">Caissons de Basse (x2)</span>
@@ -729,7 +596,7 @@ print("Contenu HTML modifié avec l'animation.")
 
       <div class="peripheral-card">
         <div class="media-preview earphones">
-          <img src="https://muzikercdn.com/uploads/product_gallery/3180/318067/main_7e676749.jpg" alt="Fiio FH7">
+          <img src="https://ejayz-hub.github.io/mon-setup/Capture%20d%27%C3%A9cran%202026-08-16%20212939.png" alt="Fiio FH7">
         </div>
         <div class="peripheral-info">
           <span class="peripheral-tag">Écouteurs Intra-Auriculaires</span>
@@ -742,33 +609,32 @@ print("Contenu HTML modifié avec l'animation.")
 
   <script>
     const componentsData = {
-      'psu': { type: 'Alimentation', title: 'HyperX PS-4122-2 1200W', img: 'https://www.cybenetics.com/photos/models/common/2880_0.jpg', desc: 'Bloc d’alimentation modulaire haute puissance de 1200W platinium garantissant un apport électrique stable et sécurisé pour l’ensemble des composants lourds.' },
+      'psu': { type: 'Alimentation', title: 'HyperX PS-4122-2 1200W', img: 'https://ejayz-hub.github.io/mon-setup/A.png', desc: 'Bloc d’alimentation modulaire haute puissance de 1200W platinium garantissant un apport électrique stable et sécurisé pour l’ensemble des composants lourds.' },
       'case': {
         type: 'Boîtier',
         title: 'Corsair 5400 RS Blanc',
         images: [
           'https://assets.corsair.com/image/upload/c_pad,q_85,h_1100,w_1100,f_auto/products/air-5400/RS-R-WHITE/gallery/AIR_5400_RS-R_ARGB_White_Artboard01_AA.webp',
           'https://assets.corsair.com/image/upload/c_pad,q_85,h_1100,w_1100,f_auto/products/air-5400/RS-R-WHITE/gallery/AIR_5400_RS-R_ARGB_White_Artboard03_AA.webp',
-          'https://www.corsair.com/wp-content/uploads/2025/10/AIR_5400_PR_Image03.png',
-          'https://www.awd-it.co.uk/media/wysiwyg/AIR_5400_RS-R_ARGB_BLACK_14_AIRFLOW_GPU.png'
+          'https://www.corsair.com/wp-content/uploads/2025/10/AIR_5400_PR_Image03.png'
         ],
-        desc: 'Boîtier moyen-tour double chambre conçu pour un flux d’air optimal. Panneau panoramique en verre trempé offrant une vue dégagée sur l’ensemble des composants.' 
+        desc: 'Boîtier moyen-tour double chambre conçu pour un flux d’air optimal. Panneau panoramique en verre trempé offrant une vue dégagée sur l’ensemble des composants.'
       },
       'fans-top': { type: 'Ventilateurs Haut (x3)', title: 'Corsair RS120 ARGB Blanc', img: 'https://assets.corsair.com/image/upload/c_pad,q_85,h_1100,w_1100,f_auto/products/Fans/base-rs-argb-series-config/gallery/120/triple/white/RS120_ARGB_WHT_TRPL_01.webp', desc: 'Set de 3 ventilateurs PWM de 120 mm installés en extraction supérieure avec LED ARGB adressables.' },
       'aio': { type: 'Watercooling', title: 'Corsair 360 AIO Nautilus Blanc', img: 'https://assets.corsair.com/image/upload/c_pad,q_85,h_1100,w_1100,f_auto/products/Liquid-Cooling/nautilus/Gallery/CW-9060095-WW/CW-9060095-WW_01.webp', desc: 'Système AIO avec radiateur de 360 mm et pompe haute performance à faible bruit.' },
-      'ram': { type: 'Mémoire RAM', title: '32 Go DDR5 (Réf. HP60U40S8HA-16FRE)', img: 'https://media.rueducommerce.fr/r500/ld/products/00/05/95/90/LD0005959023_0005959075_0005959091.jpg', desc: 'Kit de mémoire RAM DDR5 haute fréquence pour un débit maximal et une parfaite stabilité.' },
+      'ram': { type: 'Mémoire RAM', title: '32 Go DDR5 (Réf. HP60U40S8HA-16FRE)', img: 'https://ejayz-hub.github.io/mon-setup/R.png', desc: 'Kit de mémoire RAM DDR5 haute fréquence pour un débit maximal et une parfaite stabilité.' },
       'cpu': { type: 'Processeur', title: 'AMD Ryzen 7 9800X3D', img: 'https://assets-prd.ignimgs.com/2024/11/05/9800x3d-3-1730839746205.jpg', desc: 'Processeur de jeu ultime doté de la technologie 3D V-Cache de 2ème génération.' },
       'gpu': { type: 'Carte Graphique', title: 'NVIDIA RTX 5090 HP Omen', img: 'https://blog.nbb.com/wp-content/uploads/2025/03/DSCF0586-Kopie.webp', desc: 'Carte graphique basée sur l’architecture Blackwell avec 32 Go de VRAM GDDR7.' },
-      'ssd': { type: 'Stockage (2x SSD)', title: '2x SSD 2 To Gigabyte AORUS NVMe Gen4', img: 'https://laptopre.vn/storage/photos/1/linh-kien-pc/SSD/AORUS-NVMe-Gen-4-SSD-2TB-With-Heat-Sink/AORUS-NVMe-Gen4-SSD-2TB-With-Heat-Sink-GP-ASM2NE6200TTTD-moi.jpg', desc: 'Configuration de 2x SSD 2 To M.2 NVMe PCIe 4.0 x4 (Réf. GP-ASM2NE6200TTTD). Équipés de dissipateurs thermiques intégrés en cuivre pour un refroidissement passif optimal et des débits très élevés.' },
+      'ssd': { type: 'Stockage (2x SSD)', title: '2x SSD 2 To Gigabyte AORUS NVMe Gen4', img: 'https://ejayz-hub.github.io/mon-setup/S.PNG', desc: 'Configuration de 2x SSD 2 To M.2 NVMe PCIe 4.0 x4 (Réf. GP-ASM2NE6200TTTD). Équipés de dissipateurs thermiques intégrés en cuivre pour un refroidissement passif optimal et des débits très élevés.' },
       'fans-bot': { type: 'Ventilateurs Bas (x3)', title: 'Corsair RS120 ARGB Reverse', img: 'https://assets.corsair.com/image/upload/c_pad,q_85,h_1100,w_1100,f_auto/products/Fans/base-rs-argb-config/Gallery/CO-9050197-WW/CO-9050197-WW_01.webp', desc: 'Trio de ventilateurs 120 mm à pales inversées en intake inférieur.' },
       'mobo': {
         type: 'Carte Mère',
         title: 'Gigabyte B850 AORUS Ice Stealth',
         images: [
-          'https://static.gigabyte.com/StaticFile/Image/Global/ed71caf62ebb565841883f77562c5273/ProductRemoveBg/45267/webp/2000',
+          'https://ejayz-hub.github.io/mon-setup/MA.png',
           'https://files.pccasegear.com/images/B850-A-STEALTH-ICE-add2.jpg'
-        ], 
-        desc: 'Carte mère AM5 blanche Stealth avec connecteurs arrière et support PCIe 5.0.' 
+        ],
+        desc: 'Carte mère AM5 blanche Stealth avec connecteurs arrière et support PCIe 5.0.'
       }
     };
 
@@ -882,5 +748,229 @@ print("Contenu HTML modifié avec l'animation.")
     });
     window.addEventListener('resize', drawElbowLines);
   </script>
+
+<script>
+(function() {
+    const canvas = document.createElement('canvas');
+    canvas.id = 'starfield';
+    canvas.style.cssText = 'position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1;';
+    document.body.prepend(canvas); // Add canvas as the first child of body
+
+    const ctx = canvas.getContext('2d');
+    let stars = [];
+    let shootingStars = [];
+    const numStars = 100; // Nombre de petites étoiles
+    const numShootingStars = 3; // Nombre d'étoiles filantes
+
+    function resizeCanvas() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+    }
+
+    class Star {
+        constructor() {
+            this.x = Math.random() * canvas.width;
+            this.y = Math.random() * canvas.height;
+            this.radius = Math.random() * 1.5; // Taille des étoiles
+            this.alpha = Math.random(); // Opacité initiale
+            this.velocity = Math.random() * 0.5 + 0.1; // Vitesse de déplacement vers le bas
+        }
+
+        draw() {
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2, false);
+            ctx.fillStyle = `rgba(255, 255, 255, ${this.alpha})`;
+            ctx.fill();
+        }
+
+        update() {
+            this.y += this.velocity; // Déplacement des étoiles vers le bas
+            if (this.y > canvas.height) {
+                this.y = 0; // Réinitialiser en haut de l'écran
+                this.x = Math.random() * canvas.width;
+            }
+            this.draw();
+        }
+    }
+
+    class ShootingStar {
+        constructor() {
+            this.reset();
+        }
+
+        reset() {
+            this.x = Math.random() * canvas.width; // Position de départ aléatoire en X
+            this.y = -Math.random() * canvas.height; // Démarrer au-dessus de l'écran
+            this.len = Math.random() * 200 + 50; // Longueur de la traînée
+            this.speed = Math.random() * 8 + 4; // Vitesse de l'étoile filante
+            this.alpha = 1; // Opacité initiale
+            this.angle = Math.PI / 4; // Angle de 45 degrés pour la chute
+        }
+
+        draw() {
+            ctx.save();
+            ctx.translate(this.x, this.y);
+            ctx.rotate(this.angle);
+            ctx.beginPath();
+            ctx.moveTo(0, 0);
+            ctx.lineTo(this.len, 0);
+            ctx.strokeStyle = `rgba(255, 255, 255, ${this.alpha})`;
+            ctx.lineWidth = 2;
+            ctx.stroke();
+            ctx.restore();
+        }
+
+        update() {
+            this.x += this.speed * Math.cos(this.angle);
+            this.y += this.speed * Math.sin(this.angle);
+            this.alpha -= 0.01; // Fade out
+
+            // Réinitialiser si l'étoile filante sort de l'écran ou a totalement disparu
+            if (this.y > canvas.height + this.len || this.x > canvas.width + this.len || this.alpha <= 0) {
+                this.reset();
+            }
+            this.draw();
+        }
+    }
+
+    function init() {
+        resizeCanvas();
+        for (let i = 0; i < numStars; i++) {
+            stars.push(new Star());
+        }
+        for (let i = 0; i < numShootingStars; i++) {
+            shootingStars.push(new ShootingStar());
+        }
+    }
+
+    function animate() {
+        requestAnimationFrame(animate);
+        ctx.clearRect(0, 0, canvas.width, canvas.height); // Effacer le canevas
+
+        // Dessiner le fond sombre pour le canevas
+        ctx.fillStyle = '#07090e'; // Correspond à la couleur --bg de votre CSS
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        stars.forEach(star => star.update());
+        shootingStars.forEach(sStar => sStar.update());
+    }
+
+    window.addEventListener('resize', resizeCanvas);
+    init();
+    animate();
+})();
+</script>
+
+<script>
+(function() {
+    const canvas = document.createElement('canvas');
+    canvas.id = 'starfield';
+    canvas.style.cssText = 'position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1;';
+    document.body.prepend(canvas); // Add canvas as the first child of body
+
+    const ctx = canvas.getContext('2d');
+    let stars = [];
+    let shootingStars = [];
+    const numStars = 100; // Nombre de petites étoiles
+    const numShootingStars = 3; // Nombre d'étoiles filantes
+
+    function resizeCanvas() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+    }
+
+    class Star {
+        constructor() {
+            this.x = Math.random() * canvas.width;
+            this.y = Math.random() * canvas.height;
+            this.radius = Math.random() * 1.5; // Taille des étoiles
+            this.alpha = Math.random(); // Opacité initiale
+            this.velocity = Math.random() * 0.5 + 0.1; // Vitesse de déplacement vers le bas
+        }
+
+        draw() {
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2, false);
+            ctx.fillStyle = `rgba(255, 255, 255, ${this.alpha})`;
+            ctx.fill();
+        }
+
+        update() {
+            this.y += this.velocity; // Déplacement des étoiles vers le bas
+            if (this.y > canvas.height) {
+                this.y = 0; // Réinitialiser en haut de l'écran
+                this.x = Math.random() * canvas.width;
+            }
+            this.draw();
+        }
+    }
+
+    class ShootingStar {
+        constructor() {
+            this.reset();
+        }
+
+        reset() {
+            this.x = Math.random() * canvas.width; // Position de départ aléatoire en X
+            this.y = -Math.random() * canvas.height; // Démarrer au-dessus de l'écran
+            this.len = Math.random() * 200 + 50; // Longueur de la traînée
+            this.speed = Math.random() * 8 + 4; // Vitesse de l'étoile filante
+            this.alpha = 1; // Opacité initiale
+            this.angle = Math.PI / 4; // Angle de 45 degrés pour la chute
+        }
+
+        draw() {
+            ctx.save();
+            ctx.translate(this.x, this.y);
+            ctx.rotate(this.angle);
+            ctx.beginPath();
+            ctx.moveTo(0, 0);
+            ctx.lineTo(this.len, 0);
+            ctx.strokeStyle = `rgba(255, 255, 255, ${this.alpha})`;
+            ctx.lineWidth = 2;
+            ctx.stroke();
+            ctx.restore();
+        }
+
+        update() {
+            this.x += this.speed * Math.cos(this.angle);
+            this.y += this.speed * Math.sin(this.angle);
+            this.alpha -= 0.01; // Fade out
+
+            // Réinitialiser si l'étoile filante sort de l'écran ou a totalement disparu
+            if (this.y > canvas.height + this.len || this.x > canvas.width + this.len || this.alpha <= 0) {
+                this.reset();
+            }
+            this.draw();
+        }
+    }
+
+    function init() {
+        resizeCanvas();
+        for (let i = 0; i < numStars; i++) {
+            stars.push(new Star());
+        }
+        for (let i = 0; i < numShootingStars; i++) {
+            shootingStars.push(new ShootingStar());
+        }
+    }
+
+    function animate() {
+        requestAnimationFrame(animate);
+        ctx.clearRect(0, 0, canvas.width, canvas.height); // Effacer le canevas
+
+        // Dessiner le fond sombre pour le canevas
+        ctx.fillStyle = '#07090e'; // Correspond à la couleur --bg de votre CSS
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        stars.forEach(star => star.update());
+        shootingStars.forEach(sStar => sStar.update());
+    }
+
+    window.addEventListener('resize', resizeCanvas);
+    init();
+    animate();
+})();
+</script>
 </body>
 </html>
