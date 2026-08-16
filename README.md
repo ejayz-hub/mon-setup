@@ -1,2 +1,760 @@
-# mon-setup
-pc EJayZ 2026
+[index.HTML](https://github.com/user-attachments/files/31121501/index.HTML)
+
+# Get the HTML content from the previous cell (assuming it was the markdown cell RMDHC7DuqmrR)
+html_content = """
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mon Setup</title>
+  <style>
+    :root {
+      --bg: #07090e;
+      --card-bg: #0f141d;
+      --card-border: rgba(255, 255, 255, 0.1);
+      --accent: #00f2fe;
+      --accent-glow: rgba(0, 242, 254, 0.3);
+      --text: #f8fafc;
+      --text-muted: #94a3b8;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; }
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 30px 15px;
+      gap: 30px;
+    }
+
+    .page-title {
+      font-size: 2.2rem;
+      font-weight: 900;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: #ffffff;
+      text-shadow: 0 0 20px rgba(0, 242, 254, 0.4);
+      border-bottom: 3px solid var(--accent);
+      padding-bottom: 8px;
+    }
+
+    .section-container {
+      width: 1280px;
+      max-width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .section-header {
+      font-size: 1.4rem;
+      font-weight: 800;
+      color: var(--accent);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .section-header::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--card-border);
+    }
+
+    /* SHOWCASE LA TOUR */
+    .showcase {
+      position: relative;
+      width: 1280px;
+      height: 640px;
+      background: #0b0f19;
+      border: 1px solid var(--card-border);
+      border-radius: 20px;
+      display: grid;
+      grid-template-columns: 500px 260px 1fr;
+      padding: 20px;
+      gap: 20px;
+      align-items: center;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.85);
+    }
+
+    .pc-case {
+      position: relative;
+      width: 500px;
+      height: 580px;
+      background: #11151e;
+      border: 2px solid rgba(255, 255, 255, 0.15);
+      border-radius: 16px;
+      box-shadow: 0 0 25px rgba(0, 0, 0, 0.5);
+      overflow: hidden;
+    }
+
+    .pc-case-img {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center bottom;
+      transform: scale(1.50) translateX(-30px);
+      transform-origin: center bottom;
+      z-index: 2;
+      pointer-events: none;
+    }
+
+    .hotspot {
+      position: absolute;
+      width: 14px;
+      height: 14px;
+      background: var(--accent);
+      border-radius: 50%;
+      box-shadow: 0 0 12px var(--accent);
+      z-index: 10;
+      cursor: pointer;
+      transform: translate(-50%, -50%);
+      transition: transform 0.25s ease, background-color 0.25s ease;
+    }
+
+    .hotspot:hover, .hotspot.active {
+      transform: translate(-50%, -50%) scale(1.5);
+      background: #ffffff;
+      box-shadow: 0 0 20px var(--accent);
+    }
+
+    .svg-layer {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 5;
+    }
+
+    .connecting-path {
+      stroke: var(--accent);
+      stroke-width: 2;
+      fill: none;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      filter: drop-shadow(0 0 5px var(--accent));
+      opacity: 0.35;
+      transition: opacity 0.3s ease, stroke-width 0.3s ease;
+    }
+
+    .connecting-path.active {
+      opacity: 1;
+      stroke-width: 3;
+      filter: drop-shadow(0 0 10px var(--accent));
+    }
+
+    .cards-container {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      height: 100%;
+      gap: 2px;
+      z-index: 10;
+    }
+
+    .component-card {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 8px;
+      padding: 2px 6px;
+      cursor: pointer;
+      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .component-card:hover, .component-card.active {
+      border-color: var(--accent);
+      transform: translateX(4px);
+      box-shadow: 0 6px 15px rgba(0, 0, 0, 0.5), 0 0 12px var(--accent-glow);
+      background: #161c28;
+    }
+
+    .thumb-box {
+      width: 30px;
+      height: 30px;
+      border-radius: 5px;
+      background: #1a202c;
+      flex-shrink: 0;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2px;
+      overflow: hidden;
+    }
+
+    .thumb-box img, .detail-image-box img {
+      width: 100%;
+      height: 100%;
+      transition: opacity 0.25s ease;
+    }
+
+    .detail-image-box img:not(.zoom-subwoofer) {
+      object-fit: contain;
+    }
+
+    .info-box { display: flex; flex-direction: column; gap: 0px; }
+    .comp-type { font-size: 0.52rem; font-weight: 800; text-transform: uppercase; color: var(--accent); letter-spacing: 0.6px; }
+    .comp-name { font-size: 0.68rem; font-weight: 700; color: var(--text); }
+
+    .detail-panel {
+      background: #0f141d;
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      padding: 20px;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      gap: 14px;
+      z-index: 10;
+    }
+
+    .detail-image-box {
+      position: relative;
+      width: 100%;
+      height: 280px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #141a26;
+      border-radius: 12px;
+      padding: 15px;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      overflow: hidden;
+    }
+
+    /* FLECHES DE NAVIGATION POUR IMAGES MULTIPLES */
+    .img-nav-btn {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      background: rgba(15, 20, 29, 0.85);
+      border: 1px solid var(--accent);
+      color: var(--accent);
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 1rem;
+      transition: all 0.25s ease;
+      z-index: 15;
+      opacity: 0;
+      pointer-events: none;
+      box-shadow: 0 0 10px rgba(0,0,0,0.5);
+    }
+
+    .img-nav-btn.visible {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .img-nav-btn:hover {
+      background: var(--accent);
+      color: #07090e;
+      box-shadow: 0 0 12px var(--accent-glow);
+      transform: translateY(-50%) scale(1.1);
+    }
+
+    .img-nav-btn.prev { left: 10px; }
+    .img-nav-btn.next { right: 10px; }
+
+    .detail-content {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .detail-badge {
+      align-self: flex-start;
+      font-size: 0.65rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      color: #07090e;
+      background: var(--accent);
+      padding: 3px 8px;
+      border-radius: 16px;
+      letter-spacing: 0.8px;
+    }
+
+    .detail-title {
+      font-size: 1.15rem;
+      font-weight: 800;
+      color: #ffffff;
+      line-height: 1.2;
+    }
+
+    .detail-description {
+      font-size: 0.82rem;
+      line-height: 1.5;
+      color: var(--text-muted);
+      border-top: 1px solid var(--card-border);
+      padding-top: 10px;
+    }
+
+    /* PÉRIPHÉRIQUES */
+    .peripheral-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
+      gap: 18px;
+    }
+
+    .peripheral-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      transition: border-color 0.3s ease, transform 0.3s ease;
+    }
+
+    .peripheral-card:hover {
+      border-color: var(--accent);
+      transform: translateY(-3px);
+    }
+
+    .media-preview {
+      width: 100%;
+      height: 200px;
+      background: #141a26;
+      border-radius: 10px;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .media-preview img, .media-preview video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .media-preview.speakers img,
+    .media-preview.mic img {
+      object-fit: contain;
+      padding: 10px;
+    }
+
+    /* 1. INDICATION POUR LE CAISSON DE BASSE */
+    .media-preview.subwoofers img,
+    .detail-image-box img.zoom-subwoofer {
+      object-fit: cover;
+      object-position: center;
+      transform: scale(1.0);
+      clip-path: inset(0px 18px 0px 18px);
+    }
+
+    /* 2. INDICATION POUR LES ÉCOUTEURS (FiiO FH7) */
+    .media-preview.earphones img {
+      object-fit: cover;
+      object-position: center 20%;
+      transform: scale(1.10);
+    }
+
+    /* 3. INDICATION POUR LA SOURIS */
+    .media-preview.mouse img {
+      object-fit: cover;
+      object-position: center;
+      transform: scale(1.0);
+    }
+
+    /* 4. INDICATION POUR LE CLAVIER */
+    .media-preview.keyboard img {
+      object-fit: cover;
+      object-position: center;
+      transform: scale(1.0);
+    }
+
+    /* 5. INDICATION POUR LE MICRO */
+    .media-preview.mic img {
+      object-fit: contain;
+      object-position: center;
+      transform: scale(1.0);
+      padding: 10px;
+    }
+
+    /* 6. INDICATION POUR LES ENCEINTES */
+    .media-preview.speakers img {
+      object-fit: contain;
+      object-position: center;
+      transform: scale(1.0);
+      padding: 10px;
+    }
+
+    .peripheral-tag {
+      font-size: 0.62rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      color: var(--accent);
+      letter-spacing: 0.8px;
+    }
+
+    .peripheral-info h3 {
+      font-size: 1.05rem;
+      color: #ffffff;
+      margin-top: 3px;
+    }
+
+    .peripheral-info p {
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      margin-top: 5px;
+    }
+  </style>
+</head>
+<body>
+
+  <h1 class="page-title">Mon Setup</h1>
+
+  <!-- SOUS-CATÉGORIE : LA TOUR -->
+  <div class="section-container">
+    <h2 class="section-header">La Tour</h2>
+
+    <div class="showcase" id="showcase">
+      <div class="pc-case">
+        <img class="pc-case-img" id="pc-case-img" src="https://assets.corsair.com/image/upload/c_pad,q_85,h_1100,w_1100,f_auto/products/air-5400/RS-R-WHITE/gallery/AIR_5400_RS-R_ARGB_White_Artboard07_AA.webp" alt="Boîtier PC Corsair 5400 RS ARGB Blanc">
+        <div class="hotspot" id="hs-psu" style="top: 30%; left: 25%;" data-card="card-psu"></div>
+        <div class="hotspot" id="hs-case" style="top: 9%; left: 74%;" data-card="card-case"></div>
+        <div class="hotspot" id="hs-fans-top" style="top: 15%; left: 60%;" data-card="card-fans-top"></div>
+        <div class="hotspot" id="hs-aio" style="top: 35%; left: 43%;" data-card="card-aio"></div>
+        <div class="hotspot" id="hs-ram" style="top: 38%; left: 51.5%;" data-card="card-ram"></div>
+        <div class="hotspot" id="hs-cpu" style="top: 40%; left: 40%;" data-card="card-cpu"></div>
+        <div class="hotspot" id="hs-gpu" style="top: 54%; left: 38%;" data-card="card-gpu"></div>
+        <div class="hotspot" id="hs-ssd" style="top: 59%; left: 48%;" data-card="card-ssd"></div>
+        <div class="hotspot" id="hs-mobo" style="top: 65%; left: 40%;" data-card="card-mobo"></div>
+        <div class="hotspot" id="hs-fans-bot" style="top: 77%; left: 66%;" data-card="card-fans-bot"></div>
+      </div>
+
+      <svg class="svg-layer" id="svg-layer">
+        <path id="path-psu" class="connecting-path" />
+        <path id="path-case" class="connecting-path" />
+        <path id="path-fans-top" class="connecting-path" />
+        <path id="path-aio" class="connecting-path" />
+        <path id="path-ram" class="connecting-path" />
+        <path id="path-cpu" class="connecting-path" />
+        <path id="path-gpu" class="connecting-path" />
+        <path id="path-ssd" class="connecting-path" />
+        <path id="path-fans-bot" class="connecting-path" />
+        <path id="path-mobo" class="connecting-path" />
+      </svg>
+
+      <div class="cards-container">
+        <div class="component-card" id="card-psu" data-hs="hs-psu" data-path="path-psu" onclick="selectComponent('psu')">
+          <div class="thumb-box"><img src="https://www.cybenetics.com/photos/models/common/2880_0.jpg" alt="Alimentation"></div>
+          <div class="info-box"><span class="comp-type">Alimentation</span><span class="comp-name">HyperX PS-4122-2 1200W</span></div>
+        </div>
+        <div class="component-card" id="card-case" data-hs="hs-case" data-path="path-case" onclick="selectComponent('case')">
+          <div class="thumb-box"><img src="https://assets.corsair.com/image/upload/c_pad,q_85,h_1100,w_1100,f_auto/products/air-5400/RS-R-WHITE/gallery/AIR_5400_RS-R_ARGB_White_Artboard01_AA.webp" alt="Boîtier"></div>
+          <div class="info-box"><span class="comp-type">Boîtier</span><span class="comp-name">Corsair 5400 RS Blanc</span></div>
+        </div>
+        <div class="component-card" id="card-fans-top" data-hs="hs-fans-top" data-path="path-fans-top" onclick="selectComponent('fans-top')">
+          <div class="thumb-box"><img src="https://assets.corsair.com/image/upload/c_pad,q_85,h_1100,w_1100,f_auto/products/Fans/base-rs-argb-series-config/gallery/120/triple/white/RS120_ARGB_WHT_TRPL_01.webp" alt="Ventilateurs"></div>
+          <div class="info-box"><span class="comp-type">Ventilateurs Haut (x3)</span><span class="comp-name">Corsair RS120 ARGB</span></div>
+        </div>
+        <div class="component-card" id="card-aio" data-hs="hs-aio" data-path="path-aio" onclick="selectComponent('aio')">
+          <div class="thumb-box"><img src="https://assets.corsair.com/image/upload/c_pad,q_85,h_1100,w_1100,f_auto/products/Liquid-Cooling/nautilus/Gallery/CW-9060095-WW/CW-9060095-WW_01.webp" alt="Watercooling"></div>
+          <div class="info-box"><span class="comp-type">Watercooling</span><span class="comp-name">Corsair 360 AIO Nautilus</span></div>
+        </div>
+        <div class="component-card" id="card-ram" data-hs="hs-ram" data-path="path-ram" onclick="selectComponent('ram')">
+          <div class="thumb-box"><img src="https://media.rueducommerce.fr/r500/ld/products/00/05/95/90/LD0005959023_0005959075_0005959091.jpg" alt="RAM"></div>
+          <div class="info-box"><span class="comp-type">Mémoire RAM</span><span class="comp-name">16x2 Go DDR5 HP60U40S8HA-16FRE</span></div>
+        </div>
+        <div class="component-card" id="card-cpu" data-hs="hs-cpu" data-path="path-cpu" onclick="selectComponent('cpu')">
+          <div class="thumb-box"><img src="https://assets-prd.ignimgs.com/2024/11/05/9800x3d-3-1730839746205.jpg" alt="Processeur"></div>
+          <div class="info-box"><span class="comp-type">Processeur</span><span class="comp-name">AMD Ryzen 7 9800X3D</span></div>
+        </div>
+        <div class="component-card" id="card-gpu" data-hs="hs-gpu" data-path="path-gpu" onclick="selectComponent('gpu')">
+          <div class="thumb-box"><img src="https://blog.nbb.com/wp-content/uploads/2025/03/DSCF0586-Kopie.webp" alt="GPU"></div>
+          <div class="info-box"><span class="comp-type">Carte Graphique</span><span class="comp-name">NVIDIA RTX 5090 HP Omen</span></div>
+        </div>
+        <div class="component-card" id="card-ssd" data-hs="hs-ssd" data-path="path-ssd" onclick="selectComponent('ssd')">
+          <div class="thumb-box"><img src="https://laptopre.vn/storage/photos/1/linh-kien-pc/SSD/AORUS-NVMe-Gen-4-SSD-2TB-With-Heat-Sink/AORUS-NVMe-Gen4-SSD-2TB-With-Heat-Sink-GP-ASM2NE6200TTTD-moi.jpg" alt="SSD"></div>
+          <div class="info-box"><span class="comp-type">Stockage (2x SSD)</span><span class="comp-name">2x 2 To Gigabyte AORUS Gen4</span></div>
+        </div>
+        <div class="component-card" id="card-fans-bot" data-hs="hs-fans-bot" data-path="path-fans-bot" onclick="selectComponent('fans-bot')">
+          <div class="thumb-box"><img src="https://assets.corsair.com/image/upload/c_pad,q_85,h_1100,w_1100,f_auto/products/Fans/base-rs-argb-config/Gallery/CO-9050197-WW/CO-9050197-WW_01.webp" alt="Ventilateurs Bas Reverse"></div>
+          <div class="info-box"><span class="comp-type">Ventilateurs Bas (x3)</span><span class="comp-name">Corsair RS120 ARGB Reverse</span></div>
+        </div>
+        <div class="component-card" id="card-mobo" data-hs="hs-mobo" data-path="path-mobo" onclick="selectComponent('mobo')">
+          <div class="thumb-box"><img src="https://static.gigabyte.com/StaticFile/Image/Global/ed71caf62ebb565841883f77562c5273/ProductRemoveBg/45267/webp/2000" alt="Carte Mère"></div>
+          <div class="info-box"><span class="comp-type">Carte Mère</span><span class="comp-name">Gigabyte B850 AORUS Ice</span></div>
+        </div>
+      </div>
+
+      <div class="detail-panel">
+        <div class="detail-image-box" id="detail-img-box">
+          <button class="img-nav-btn prev" id="img-prev-btn" onclick="cycleImage(-1)" title="Image précédente">&#10094;</button>
+          <img id="detail-img" src="" alt="Aperçu Grand Format">
+          <button class="img-nav-btn next" id="img-next-btn" onclick="cycleImage(1)" title="Image suivante">&#10095;</button>
+        </div>
+        <div class="detail-content">
+          <span class="detail-badge" id="detail-type">Composant</span>
+          <h2 class="detail-title" id="detail-title">Sélectionnez une pièce</h2>
+          <p class="detail-description" id="detail-desc">Cliquez sur un composant ou sur les points du boîtier pour afficher le visuel haute définition et les détails techniques.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SOUS-CATÉGORIE : SOURIS & CLAVIER -->
+  <div class="section-container">
+    <h2 class="section-header">Souris & Clavier</h2>
+    <div class="peripheral-grid">
+      <div class="peripheral-card">
+        <div class="media-preview mouse">
+          <video autoplay loop muted playsinline src="https://assets2.razerzone.com/images/pnx.assets/37d0556b001c3eeb6e07832a16665575/razer-pro-click-v2-vertical-6-button-video-v3-nocompress.mp4"></video>
+        </div>
+        <div class="peripheral-info">
+          <span class="peripheral-tag">Souris Ergonomique</span>
+          <h3>Razer Pro Click V2 Vertical</h3>
+          <p>Souris ergonomique verticale à 6 boutons conçue pour une posture naturelle du poignet et une précision bureautique/créative maximale.</p>
+        </div>
+      </div>
+
+      <div class="peripheral-card">
+        <div class="media-preview keyboard">
+          <video id="keyboard-video" autoplay muted playsinline src="https://dlcdnwebimgs.asus.com/files/media/A5D4599D-B512-4384-8A0B-AB3F6FBF5654/v1/video/touch-panel.mp4"></video>
+        </div>
+        <div class="peripheral-info">
+          <span class="peripheral-tag">Clavier Gamer</span>
+          <h3>ASUS ROG Low Profile Blanc</h3>
+          <p>Clavier mécanique compact au format Low Profile, finition blanche élégante pour s'accorder parfaitement avec la tour.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SOUS-CATÉGORIE : ÉCRAN -->
+  <div class="section-container">
+    <h2 class="section-header">Écran</h2>
+    <div class="peripheral-grid">
+      <div class="peripheral-card">
+        <div class="peripheral-info">
+          <span class="peripheral-tag">Écran OLED 77"</span>
+          <h3>LG OLED 77G26LA</h3>
+          <p>Écran géant OLED 77 pouces de série G2 avec résolution 4K, dalle ultra lumineuse et taux de rafraîchissement 120HZ pour une immersion visuelle absolue.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SOUS-CATÉGORIE : AUDIO / MICRO -->
+  <div class="section-container">
+    <h2 class="section-header">Audio / Micro</h2>
+    <div class="peripheral-grid">
+      <div class="peripheral-card">
+        <div class="media-preview mic">
+          <img src="https://m.media-amazon.com/images/I/61egnO8q6ZL._AC_SL1500_.jpg" alt="Microphone Yeti">
+        </div>
+        <div class="peripheral-info">
+          <span class="peripheral-tag">Microphone USB</span>
+          <h3>Blue Yeti</h3>
+          <p>Microphone USB multi-directivité légendaire, parfait pour le streaming, la communication vocale et la création de contenu.</p>
+        </div>
+      </div>
+
+      <div class="peripheral-card">
+        <div class="media-preview speakers">
+          <img src="https://image.son-video.com/images/article/kef/KEFLS50NRMWI2/ls50-wireless-2-noir-mat_5f68a31f62f98_1200.jpg?p=600" alt="KEF LS50 Wireless 2">
+        </div>
+        <div class="peripheral-info">
+          <span class="peripheral-tag">Enceintes Actives Haute Fidélité</span>
+          <h3>KEF LS50 Wireless 2</h3>
+          <p>Système stéréophonique haut de gamme sans fil avec haut-parleurs Uni-Q de 12ème génération pour un son audiophile exceptionnel.</p>
+        </div>
+      </div>
+
+      <div class="peripheral-card">
+        <div class="media-preview subwoofers">
+          <img src="https://www.easylounge.com/Content/photos/k/e/kefkc62nrm,138919-1200px.jpg" alt="KEF KC62">
+        </div>
+        <div class="peripheral-info">
+          <span class="peripheral-tag">Caissons de Basse (x2)</span>
+          <h3>KEF KC62</h3>
+          <p>Paires de caissons de graves ultra-compacts haute performance dotées de la technologie Uni-Core pour des basses profondes.</p>
+        </div>
+      </div>
+
+      <div class="peripheral-card">
+        <div class="media-preview earphones">
+          <img src="https://muzikercdn.com/uploads/product_gallery/3180/318067/main_7e676749.jpg" alt="Fiio FH7">
+        </div>
+        <div class="peripheral-info">
+          <span class="peripheral-tag">Écouteurs Intra-Auriculaires</span>
+          <h3>FiiO FH7</h3>
+          <p>Écouteurs hybrides haute résolution équipés d'un transducteur dynamique au béryllium et de 4 armatures équilibrées Knowles.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const componentsData = {
+      'psu': { type: 'Alimentation', title: 'HyperX PS-4122-2 1200W', img: 'https://www.cybenetics.com/photos/models/common/2880_0.jpg', desc: 'Bloc d’alimentation modulaire haute puissance de 1200W platinium garantissant un apport électrique stable et sécurisé pour l’ensemble des composants lourds.' },
+      'case': {
+        type: 'Boîtier',
+        title: 'Corsair 5400 RS Blanc',
+        images: [
+          'https://assets.corsair.com/image/upload/c_pad,q_85,h_1100,w_1100,f_auto/products/air-5400/RS-R-WHITE/gallery/AIR_5400_RS-R_ARGB_White_Artboard01_AA.webp',
+          'https://assets.corsair.com/image/upload/c_pad,q_85,h_1100,w_1100,f_auto/products/air-5400/RS-R-WHITE/gallery/AIR_5400_RS-R_ARGB_White_Artboard03_AA.webp',
+          'https://www.corsair.com/wp-content/uploads/2025/10/AIR_5400_PR_Image03.png'
+        ],
+        desc: 'Boîtier moyen-tour double chambre conçu pour un flux d’air optimal. Panneau panoramique en verre trempé offrant une vue dégagée sur l’ensemble des composants.'
+      },
+      'fans-top': { type: 'Ventilateurs Haut (x3)', title: 'Corsair RS120 ARGB Blanc', img: 'https://assets.corsair.com/image/upload/c_pad,q_85,h_1100,w_1100,f_auto/products/Fans/base-rs-argb-series-config/gallery/120/triple/white/RS120_ARGB_WHT_TRPL_01.webp', desc: 'Set de 3 ventilateurs PWM de 120 mm installés en extraction supérieure avec LED ARGB adressables.' },
+      'aio': { type: 'Watercooling', title: 'Corsair 360 AIO Nautilus Blanc', img: 'https://assets.corsair.com/image/upload/c_pad,q_85,h_1100,w_1100,f_auto/products/Liquid-Cooling/nautilus/Gallery/CW-9060095-WW/CW-9060095-WW_01.webp', desc: 'Système AIO avec radiateur de 360 mm et pompe haute performance à faible bruit.' },
+      'ram': { type: 'Mémoire RAM', title: '32 Go DDR5 (Réf. HP60U40S8HA-16FRE)', img: 'https://media.rueducommerce.fr/r500/ld/products/00/05/95/90/LD0005959023_0005959075_0005959091.jpg', desc: 'Kit de mémoire RAM DDR5 haute fréquence pour un débit maximal et une parfaite stabilité.' },
+      'cpu': { type: 'Processeur', title: 'AMD Ryzen 7 9800X3D', img: 'https://assets-prd.ignimgs.com/2024/11/05/9800x3d-3-1730839746205.jpg', desc: 'Processeur de jeu ultime doté de la technologie 3D V-Cache de 2ème génération.' },
+      'gpu': { type: 'Carte Graphique', title: 'NVIDIA RTX 5090 HP Omen', img: 'https://blog.nbb.com/wp-content/uploads/2025/03/DSCF0586-Kopie.webp', desc: 'Carte graphique basée sur l’architecture Blackwell avec 32 Go de VRAM GDDR7.' },
+      'ssd': { type: 'Stockage (2x SSD)', title: '2x SSD 2 To Gigabyte AORUS NVMe Gen4', img: 'https://laptopre.vn/storage/photos/1/linh-kien-pc/SSD/AORUS-NVMe-Gen-4-SSD-2TB-With-Heat-Sink/AORUS-NVMe-Gen4-SSD-2TB-With-Heat-Sink-GP-ASM2NE6200TTTD-moi.jpg', desc: 'Configuration de 2x SSD 2 To M.2 NVMe PCIe 4.0 x4 (Réf. GP-ASM2NE6200TTTD). Équipés de dissipateurs thermiques intégrés en cuivre pour un refroidissement passif optimal et des débits très élevés.' },
+      'fans-bot': { type: 'Ventilateurs Bas (x3)', title: 'Corsair RS120 ARGB Reverse', img: 'https://assets.corsair.com/image/upload/c_pad,q_85,h_1100,w_1100,f_auto/products/Fans/base-rs-argb-config/Gallery/CO-9050197-WW/CO-9050197-WW_01.webp', desc: 'Trio de ventilateurs 120 mm à pales inversées en intake inférieur.' },
+      'mobo': {
+        type: 'Carte Mère',
+        title: 'Gigabyte B850 AORUS Ice Stealth',
+        images: [
+          'https://static.gigabyte.com/StaticFile/Image/Global/ed71caf62ebb565841883f77562c5273/ProductRemoveBg/45267/webp/2000',
+          'https://files.pccasegear.com/images/B850-A-STEALTH-ICE-add2.jpg'
+        ],
+        desc: 'Carte mère AM5 blanche Stealth avec connecteurs arrière et support PCIe 5.0.'
+      }
+    };
+
+    const cards = document.querySelectorAll('.component-card');
+    const hotspots = document.querySelectorAll('.hotspot');
+    let currentCompImages = [];
+    let currentImgIndex = 0;
+
+    function drawElbowLines() {
+      const showcaseRect = document.getElementById('showcase').getBoundingClientRect();
+      cards.forEach(card => {
+        const hsEl = document.getElementById(card.dataset.hs);
+        const pathEl = document.getElementById(card.dataset.path);
+        if (hsEl && pathEl) {
+          const hsRect = hsEl.getBoundingClientRect();
+          const cardRect = card.getBoundingClientRect();
+          const startX = hsRect.left + hsRect.width / 2 - showcaseRect.left;
+          const startY = hsRect.top + hsRect.height / 2 - showcaseRect.top;
+          const endX = cardRect.left - showcaseRect.left;
+          const endY = cardRect.top + cardRect.height / 2 - showcaseRect.top;
+          const elbowX = startX + (endX - startX) * 0.45;
+          pathEl.setAttribute('d', `M ${startX} ${startY} L ${elbowX} ${endY} L ${endX} ${endY}`);
+        }
+      });
+    }
+
+    function selectComponent(key) {
+      const cardId = `card-${key}`;
+      const data = componentsData[key];
+      if (!data) return;
+
+      cards.forEach(c => c.classList.remove('active'));
+      hotspots.forEach(h => h.classList.remove('active'));
+      document.querySelectorAll('.connecting-path').forEach(p => p.classList.remove('active'));
+
+      const activeCard = document.getElementById(cardId);
+      if (activeCard) {
+        activeCard.classList.add('active');
+        const activeHs = document.getElementById(activeCard.dataset.hs);
+        const activePath = document.getElementById(activeCard.dataset.path);
+        if (activeHs) activeHs.classList.add('active');
+        if (activePath) activePath.classList.add('active');
+      }
+
+      currentCompImages = data.images || [data.img];
+      currentImgIndex = 0;
+
+      const prevBtn = document.getElementById('img-prev-btn');
+      const nextBtn = document.getElementById('img-next-btn');
+
+      if (currentCompImages.length > 1) {
+        prevBtn.classList.add('visible');
+        nextBtn.classList.add('visible');
+      } else {
+        prevBtn.classList.remove('visible');
+        nextBtn.classList.remove('visible');
+      }
+
+      const detailImg = document.getElementById('detail-img');
+      detailImg.style.opacity = '0';
+      detailImg.style.transform = 'scale(0.95)';
+
+      setTimeout(() => {
+        document.getElementById('detail-type').textContent = data.type;
+        document.getElementById('detail-title').textContent = data.title;
+        document.getElementById('detail-desc').textContent = data.desc;
+        detailImg.src = currentCompImages[currentImgIndex];
+        detailImg.classList.remove('zoom-subwoofer');
+        detailImg.style.opacity = '1';
+        detailImg.style.transform = 'scale(1)';
+      }, 150);
+    }
+
+    function cycleImage(direction) {
+      if (currentCompImages.length <= 1) return;
+      currentImgIndex = (currentImgIndex + direction + currentCompImages.length) % currentCompImages.length;
+      const detailImg = document.getElementById('detail-img');
+      detailImg.style.opacity = '0';
+      setTimeout(() => {
+        detailImg.src = currentCompImages[currentImgIndex];
+        detailImg.style.opacity = '1';
+      }, 150);
+    }
+
+    hotspots.forEach(hs => {
+      hs.addEventListener('click', () => {
+        const cardId = hs.dataset.card;
+        const key = cardId.replace('card-', '');
+        selectComponent(key);
+      });
+    });
+
+    const kbVideo = document.getElementById('keyboard-video');
+    const kbPlaylist = [
+      "https://dlcdnwebimgs.asus.com/files/media/A5D4599D-B512-4384-8A0B-AB3F6FBF5654/v1/video/touch-panel.mp4",
+      "https://dlcdnwebimgs.asus.com/files/media/A5D4599D-B512-4384-8A0B-AB3F6FBF5654/v1/video/compact-slim.mp4"
+    ];
+    let kbCurrentIdx = 0;
+
+    if (kbVideo) {
+      kbVideo.addEventListener('ended', () => {
+        kbCurrentIdx = (kbCurrentIdx + 1) % kbPlaylist.length;
+        kbVideo.src = kbPlaylist[kbCurrentIdx];
+        kbVideo.play();
+      });
+    }
+
+    window.addEventListener('load', () => {
+      drawElbowLines();
+      selectComponent('psu');
+    });
+    window.addEventListener('resize', drawElbowLines);
+  </script>
+</body>
+</html>
+"""
+
+with open('index.html', 'w') as f:
+    f.write(html_content)
+
+print("Fichier index.html créé.")
