@@ -328,6 +328,11 @@
       transform: translateY(-3px);
     }
 
+    .tv-card {
+      max-width: 1500px;
+      margin: 0 auto;
+    }
+
     .media-preview {
       width: 100%;
       height: 200px;
@@ -349,6 +354,18 @@
     .media-preview.speakers img,
     .media-preview.mic img {
       object-fit: contain;
+      padding: 10px;
+    }
+
+    /* AJUSTEMENTS TÉLÉVISEUR (+200% TAILLE IMAGE ET CADRE ADAPTÉ) */
+    .media-preview.tv {
+      height: 400px;
+    }
+
+    .media-preview.tv img {
+      object-fit: contain;
+      object-position: center;
+      transform: scale(1.20);
       padding: 10px;
     }
 
@@ -544,13 +561,14 @@
   <!-- SOUS-CATÉGORIE : ÉCRAN -->
   <div class="section-container">
     <h2 class="section-header">Écran</h2>
-    <div class="peripheral-grid">
-      <div class="peripheral-card">
-        <div class="peripheral-info">
-          <span class="peripheral-tag">Écran OLED 77"</span>
-          <h3>LG OLED 77G26LA</h3>
-          <p>Écran géant OLED 77 pouces de série G2 avec résolution 4K, dalle ultra lumineuse et taux de rafraîchissement 120HZ pour une immersion visuelle absolue.</p>
-        </div>
+    <div class="peripheral-card tv-card">
+      <div class="media-preview tv">
+        <img src="https://github.com/ejayz-hub/mon-setup/blob/main/T.PNG?raw=true" alt="LG OLED 77G26LA">
+      </div>
+      <div class="peripheral-info">
+        <span class="peripheral-tag">Écran OLED 77"</span>
+        <h3>LG OLED 77G26LA</h3>
+        <p>Écran géant OLED 77 pouces de série G2 avec résolution 4K, dalle ultra lumineuse et taux de rafraîchissement 120Hz pour une immersion visuelle absolue.</p>
       </div>
     </div>
   </div>
