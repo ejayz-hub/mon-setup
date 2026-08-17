@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -16,24 +17,326 @@
     }
 
     * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; }
+
     body {
       background-color: var(--bg);
       color: var(--text);
       min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ═══════════════════════════════════════
+       SPLASH SCREEN
+    ═══════════════════════════════════════ */
+    #splash {
+      position: fixed;
+      inset: 0;
+      background: #000;
+      z-index: 9999;
       display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      cursor: pointer;
+    }
+
+    #splash.fade-out {
+      animation: splashFade 0.7s ease forwards;
+    }
+
+    @keyframes splashFade {
+      to { opacity: 0; visibility: hidden; pointer-events: none; }
+    }
+
+    /* ── LOGO INTRO ── */
+    #logo-phase {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 10;
+    }
+
+    .intro-logo {
+      font-size: 5rem;
+      font-weight: 900;
+      color: #fff;
+      text-shadow: 0 0 30px var(--accent);
+      transform-origin: calc(38% + 0.25em) 68%;
+      animation: raceIn 0.8s cubic-bezier(0.1,0.9,0.2,1) forwards,
+                 zoomThrough 1.8s cubic-bezier(0.7,0,1,0.5) 1.5s forwards;
+    }
+
+    @keyframes raceIn {
+      0%   { transform: translateX(120vw) skewX(-35deg) scaleX(1.8); letter-spacing:40px; opacity:0; }
+      70%  { transform: translateX(-5vw) skewX(15deg) scaleX(0.8); letter-spacing:-10px; opacity:1; }
+      85%  { transform: translateX(2vw) skewX(-5deg) scaleX(1.05); letter-spacing:2px; }
+      100% { transform: translateX(0) skewX(0deg) scaleX(1); letter-spacing:0; }
+    }
+
+    @keyframes zoomThrough {
+      0%  { transform: scale(1); opacity:1; }
+      70% { opacity:1; }
+      100%{ transform: scale(400); opacity:0; }
+    }
+
+    /* ── LIGHTNING PHASE ── */
+    #lightning-phase {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      pointer-events: none;
+      z-index: 5;
+    }
+
+    #lightning-phase.show { opacity: 1; pointer-events: auto; }
+
+    #flash {
+      position: absolute;
+      inset: 0;
+      background: #fff;
+      opacity: 0;
+      pointer-events: none;
+    }
+    #flash.strike {
+      animation: flashAnim 0.18s ease-out forwards;
+    }
+    @keyframes flashAnim {
+      0%  { opacity: 0.9; }
+      100%{ opacity: 0; }
+    }
+
+    #bolt-svg {
+      position: absolute;
+      left: 50%;
+      top: 0;
+      transform: translateX(-50%) scaleY(-1);
+      transform-origin: center center;
+      width: 160px;
+      height: 100vh;
+      opacity: 0;
+      pointer-events: none;
+      z-index: 6;
+      filter: drop-shadow(0 0 12px #fff) drop-shadow(0 0 30px #00f2fe) drop-shadow(0 0 60px #00f2fe);
+    }
+
+    #bolt-svg.appear {
+      animation: boltAppear 0.15s ease-out 0.05s forwards;
+    }
+
+    @keyframes boltAppear {
+      0%   { opacity: 0; }
+      30%  { opacity: 1; }
+      100% { opacity: 1; }
+    }
+
+    #bolt-glow {
+      position: absolute;
+      left: 50%;
+      top: 0;
+      transform: translateX(-50%);
+      width: 300px;
+      height: 100%;
+      background: radial-gradient(ellipse 60% 100% at 50% 50%, rgba(0,242,254,0.12) 0%, transparent 70%);
+      opacity: 0;
+      pointer-events: none;
+    }
+    #bolt-glow.glow { opacity: 1; transition: opacity 0.3s; }
+
+    /* ── LEFT GAMES PANEL ── */
+    #games-panel {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 45%;
+      height: 100%;
+      z-index: 7;
+      pointer-events: none;
+    }
+
+    .game-logo {
+      position: absolute;
+      left: 4%;
+      width: 180px;
+      opacity: 0;
+      margin-left: -60px;
+      transition: opacity 0.6s ease, margin-left 0.6s ease;
+      pointer-events: none;
+      z-index: 20;
+      display: block;
+      text-decoration: none;
+    }
+
+    .game-logo.visible {
+      opacity: 1;
+      margin-left: 0;
+      pointer-events: auto;
+    }
+
+    /* Le logo survolé passe en priorité absolue au-dessus des autres logos */
+    .game-logo:hover {
+      z-index: 100;
+    }
+
+    /* Filtrage global pour éliminer le fond blanc sur tous les logos */
+    .game-logo img.logo-img {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      object-fit: contain;
+      display: block;
+      filter: url(#remove-white) drop-shadow(0 0 10px rgba(0,242,254,0.3));
+      transition: filter 0.3s ease, transform 0.3s ease;
+    }
+
+    /* Inversion du logo Valorant noir pour le rendre blanc et lumineux sur fond sombre */
+    #gl-val img.logo-img {
+      filter: url(#remove-white) invert(1) drop-shadow(0 0 10px rgba(0,242,254,0.3));
+    }
+
+    .game-logo:hover img.logo-img {
+      filter: url(#remove-white) drop-shadow(0 0 22px rgba(0,242,254,0.9)) brightness(1.2);
+      transform: scale(1.06);
+    }
+
+    #gl-val:hover img.logo-img {
+      filter: url(#remove-white) invert(1) drop-shadow(0 0 22px rgba(0,242,254,0.9)) brightness(1.2);
+      transform: scale(1.06);
+    }
+
+    /* Containers personnages - placé au-dessus du logo (z-index: 50) */
+    .chars-wrap {
+      position: fixed;
+      left: 0;
+      top: 0;
+      width: 45vw;
+      height: 100vh;
+      pointer-events: none;
+      overflow: hidden;
+      z-index: 50;
+    }
+
+    .char {
+      position: absolute;
+      left: 0;
+      width: 85%;
+      height: 38vh;
+      opacity: 0;
+      transform: translateX(-120%);
+      transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.4s ease;
+      pointer-events: none;
+    }
+
+    .char img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      object-position: left top;
+      filter: drop-shadow(6px 6px 18px rgba(0,0,0,0.85));
+    }
+
+    .char:nth-child(1) { top: 2vh;   z-index: 1; }
+    .char:nth-child(2) { top: 22vh;  z-index: 2; }
+    .char:nth-child(3) { top: 42vh;  z-index: 3; }
+    .char:nth-child(4) { top: 62vh;  z-index: 4; }
+
+    /* Effet miroir et suppression de fond spécifique pour le 4ème perso LoL */
+    #gl-lol .char:nth-child(4) img {
+      transform: scaleX(-1);
+      filter: url(#remove-white) drop-shadow(6px 6px 18px rgba(0,0,0,0.85));
+    }
+
+    .game-logo:hover .chars-wrap .char:nth-child(1) { opacity: 1; transform: translateX(0%);   transition-delay: 0s;    }
+    .game-logo:hover .chars-wrap .char:nth-child(2) { opacity: 1; transform: translateX(6%);   transition-delay: 0.12s; }
+    .game-logo:hover .chars-wrap .char:nth-child(3) { opacity: 1; transform: translateX(12%);  transition-delay: 0.24s; }
+    .game-logo:hover .chars-wrap .char:nth-child(4) { opacity: 1; transform: translateX(18%);  transition-delay: 0.36s; }
+
+    /* ── RIGHT-SIDE IMAGES ── */
+    #gallery {
+      position: absolute;
+      right: 0;
+      top: 0;
+      width: 50%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 7;
+    }
+
+    .gal-img {
+      position: absolute;
+      overflow: hidden;
+      opacity: 0;
+      transform: translateX(80px) scale(0.95);
+      transition: none;
+      cursor: pointer;
+      pointer-events: none;
+    }
+
+    .gal-img.visible {
+      opacity: 1;
+      transform: translateX(0) scale(1);
+      pointer-events: auto;
+      transition: opacity 0.7s ease, transform 0.7s ease;
+    }
+
+    .gal-img:hover {
+      transform: scale(1.03) translateY(-4px) !important;
+      z-index: 20 !important;
+    }
+
+    .gal-img img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      display: block;
+    }
+
+    #click-hint {
+      position: absolute;
+      bottom: 48px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 13px;
+      letter-spacing: 0.22em;
+      color: rgba(0,242,254,0.5);
+      text-transform: uppercase;
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      pointer-events: none;
+      opacity: 0;
+      animation: hintPulse 2s ease-in-out infinite;
+      z-index: 15;
+      white-space: nowrap;
+    }
+    @keyframes hintPulse {
+      0%,100% { opacity: 0.35; }
+      50%      { opacity: 0.8; }
+    }
+
+    /* ═══════════════════════════════════════
+       MAIN SETUP PAGE
+    ═══════════════════════════════════════ */
+    #setup-page {
+      display: none;
       flex-direction: column;
       align-items: center;
       padding: 30px 15px;
       gap: 30px;
+      min-height: 100vh;
     }
+
+    #setup-page.active { display: flex; }
 
     .page-title {
       font-size: 2.2rem;
       font-weight: 900;
       letter-spacing: 2px;
       text-transform: uppercase;
-      color: #ffffff;
-      text-shadow: 0 0 20px rgba(0, 242, 254, 0.4);
+      color: #fff;
+      text-shadow: 0 0 20px rgba(0,242,254,0.4);
       border-bottom: 3px solid var(--accent);
       padding-bottom: 8px;
     }
@@ -64,7 +367,6 @@
       background: var(--card-border);
     }
 
-    /* SHOWCASE LA TOUR */
     .showcase {
       position: relative;
       width: 1280px;
@@ -77,7 +379,7 @@
       padding: 20px;
       gap: 20px;
       align-items: center;
-      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.85);
+      box-shadow: 0 20px 40px rgba(0,0,0,0.85);
     }
 
     .pc-case {
@@ -85,9 +387,9 @@
       width: 500px;
       height: 580px;
       background: #11151e;
-      border: 2px solid rgba(255, 255, 255, 0.15);
+      border: 2px solid rgba(255,255,255,0.15);
       border-radius: 16px;
-      box-shadow: 0 0 25px rgba(0, 0, 0, 0.5);
+      box-shadow: 0 0 25px rgba(0,0,0,0.5);
       overflow: hidden;
     }
 
@@ -106,773 +408,620 @@
 
     .hotspot {
       position: absolute;
-      width: 14px;
-      height: 14px;
+      width: 14px; height: 14px;
       background: var(--accent);
       border-radius: 50%;
       box-shadow: 0 0 12px var(--accent);
       z-index: 10;
       cursor: pointer;
-      transform: translate(-50%, -50%);
-      transition: transform 0.25s ease, background-color 0.25s ease;
+      transform: translate(-50%,-50%);
+      transition: transform .25s, background-color .25s;
     }
 
     .hotspot:hover, .hotspot.active {
-      transform: translate(-50%, -50%) scale(1.5);
-      background: #ffffff;
+      transform: translate(-50%,-50%) scale(1.5);
+      background: #fff;
       box-shadow: 0 0 20px var(--accent);
     }
 
     .svg-layer {
-      position: absolute;
-      inset: 0;
-      width: 100%;
-      height: 100%;
-      pointer-events: none;
-      z-index: 5;
+      position: absolute; inset: 0;
+      width: 100%; height: 100%;
+      pointer-events: none; z-index: 5;
     }
 
     .connecting-path {
-      stroke: var(--accent);
-      stroke-width: 2;
-      fill: none;
-      stroke-linecap: round;
-      stroke-linejoin: round;
+      stroke: var(--accent); stroke-width: 2; fill: none;
+      stroke-linecap: round; stroke-linejoin: round;
       filter: drop-shadow(0 0 5px var(--accent));
-      opacity: 0.35;
-      transition: opacity 0.3s ease, stroke-width 0.3s ease;
+      opacity: .35;
+      transition: opacity .3s, stroke-width .3s;
     }
-
-    .connecting-path.active {
-      opacity: 1;
-      stroke-width: 3;
-      filter: drop-shadow(0 0 10px var(--accent));
-    }
+    .connecting-path.active { opacity:1; stroke-width:3; filter: drop-shadow(0 0 10px var(--accent)); }
 
     .cards-container {
-      display: flex;
-      flex-direction: column;
+      display: flex; flex-direction: column;
       justify-content: space-between;
-      height: 100%;
-      gap: 2px;
-      z-index: 10;
+      height: 100%; gap: 2px; z-index: 10;
     }
 
     .component-card {
-      display: flex;
-      align-items: center;
-      gap: 8px;
+      display: flex; align-items: center; gap: 8px;
       background: var(--card-bg);
       border: 1px solid var(--card-border);
       border-radius: 8px;
       padding: 2px 6px;
       cursor: pointer;
-      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+      transition: all .25s cubic-bezier(.4,0,.2,1);
     }
-
     .component-card:hover, .component-card.active {
       border-color: var(--accent);
       transform: translateX(4px);
-      box-shadow: 0 6px 15px rgba(0, 0, 0, 0.5), 0 0 12px var(--accent-glow);
+      box-shadow: 0 6px 15px rgba(0,0,0,0.5), 0 0 12px var(--accent-glow);
       background: #161c28;
     }
 
     .thumb-box {
-      width: 30px;
-      height: 30px;
-      border-radius: 5px;
-      background: #1a202c;
-      flex-shrink: 0;
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 2px;
-      overflow: hidden;
+      width: 30px; height: 30px;
+      border-radius: 5px; background: #1a202c;
+      flex-shrink: 0; border: 1px solid rgba(255,255,255,0.1);
+      display: flex; align-items: center; justify-content: center;
+      padding: 2px; overflow: hidden;
     }
+    .thumb-box img, .detail-image-box img { width:100%; height:100%; transition: opacity .25s; }
+    .detail-image-box img:not(.zoom-subwoofer) { object-fit: contain; }
 
-    .thumb-box img, .detail-image-box img {
-      width: 100%;
-      height: 100%;
-      transition: opacity 0.25s ease;
-    }
-
-    .detail-image-box img:not(.zoom-subwoofer) {
-      object-fit: contain;
-    }
-
-    .info-box { display: flex; flex-direction: column; gap: 0px; }
-    .comp-type { font-size: 0.52rem; font-weight: 800; text-transform: uppercase; color: var(--accent); letter-spacing: 0.6px; }
-    .comp-name { font-size: 0.68rem; font-weight: 700; color: var(--text); }
+    .info-box { display:flex; flex-direction:column; gap:0; }
+    .comp-type { font-size:.52rem; font-weight:800; text-transform:uppercase; color:var(--accent); letter-spacing:.6px; }
+    .comp-name { font-size:.68rem; font-weight:700; color:var(--text); }
 
     .detail-panel {
       background: #0f141d;
       border: 1px solid var(--card-border);
       border-radius: 16px;
-      padding: 20px;
-      height: 100%;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: flex-start;
-      gap: 14px;
-      z-index: 10;
+      padding: 20px; height: 100%;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: flex-start;
+      gap: 14px; z-index: 10;
     }
 
     .detail-image-box {
-      position: relative;
-      width: 100%;
-      height: 280px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: #141a26;
-      border-radius: 12px;
-      padding: 15px;
-      border: 1px solid rgba(255, 255, 255, 0.05);
-      overflow: hidden;
+      position: relative; width: 100%; height: 280px;
+      display: flex; align-items: center; justify-content: center;
+      background: #141a26; border-radius: 12px; padding: 15px;
+      border: 1px solid rgba(255,255,255,0.05); overflow: hidden;
     }
 
-    /* FLECHES DE NAVIGATION POUR IMAGES MULTIPLES */
     .img-nav-btn {
-      position: absolute;
-      top: 50%;
-      transform: translateY(-50%);
-      background: rgba(15, 20, 29, 0.85);
-      border: 1px solid var(--accent);
-      color: var(--accent);
-      width: 34px;
-      height: 34px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      font-size: 1rem;
-      transition: all 0.25s ease;
-      z-index: 15;
-      opacity: 0;
-      pointer-events: none;
+      position: absolute; top: 50%; transform: translateY(-50%);
+      background: rgba(15,20,29,0.85);
+      border: 1px solid var(--accent); color: var(--accent);
+      width: 34px; height: 34px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; font-size: 1rem;
+      transition: all .25s; z-index: 15;
+      opacity: 0; pointer-events: none;
       box-shadow: 0 0 10px rgba(0,0,0,0.5);
     }
+    .img-nav-btn.visible { opacity:1; pointer-events:auto; }
+    .img-nav-btn:hover { background:var(--accent); color:#07090e; box-shadow:0 0 12px var(--accent-glow); transform:translateY(-50%) scale(1.1); }
+    .img-nav-btn.prev { left:10px; }
+    .img-nav-btn.next { right:10px; }
 
-    .img-nav-btn.visible {
-      opacity: 1;
-      pointer-events: auto;
-    }
+    .detail-content { width:100%; display:flex; flex-direction:column; gap:8px; }
+    .detail-badge { align-self:flex-start; font-size:.65rem; font-weight:800; text-transform:uppercase; color:#07090e; background:var(--accent); padding:3px 8px; border-radius:16px; letter-spacing:.8px; }
+    .detail-title { font-size:1.15rem; font-weight:800; color:#fff; line-height:1.2; }
+    .detail-description { font-size:.82rem; line-height:1.5; color:var(--text-muted); border-top:1px solid var(--card-border); padding-top:10px; }
 
-    .img-nav-btn:hover {
-      background: var(--accent);
-      color: #07090e;
-      box-shadow: 0 0 12px var(--accent-glow);
-      transform: translateY(-50%) scale(1.1);
-    }
-
-    .img-nav-btn.prev { left: 10px; }
-    .img-nav-btn.next { right: 10px; }
-
-    .detail-content {
-      width: 100%;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-
-    .detail-badge {
-      align-self: flex-start;
-      font-size: 0.65rem;
-      font-weight: 800;
-      text-transform: uppercase;
-      color: #07090e;
-      background: var(--accent);
-      padding: 3px 8px;
-      border-radius: 16px;
-      letter-spacing: 0.8px;
-    }
-
-    .detail-title {
-      font-size: 1.15rem;
-      font-weight: 800;
-      color: #ffffff;
-      line-height: 1.2;
-    }
-
-    .detail-description {
-      font-size: 0.82rem;
-      line-height: 1.5;
-      color: var(--text-muted);
-      border-top: 1px solid var(--card-border);
-      padding-top: 10px;
-    }
-
-    /* PÉRIPHÉRIQUES */
-    .peripheral-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
-      gap: 18px;
-    }
+    .peripheral-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(290px,1fr)); gap:18px; }
 
     .peripheral-card {
-      background: var(--card-bg);
-      border: 1px solid var(--card-border);
-      border-radius: 16px;
-      padding: 16px;
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-      transition: border-color 0.3s ease, transform 0.3s ease;
+      background:var(--card-bg); border:1px solid var(--card-border);
+      border-radius:16px; padding:16px;
+      display:flex; flex-direction:column; gap:12px;
+      transition: border-color .3s, transform .3s;
     }
-
-    .peripheral-card:hover {
-      border-color: var(--accent);
-      transform: translateY(-3px);
-    }
-
-    .tv-card {
-      max-width: 1500px;
-      margin: 0 auto;
-    }
+    .peripheral-card:hover { border-color:var(--accent); transform:translateY(-3px); }
+    .tv-card { max-width:1500px; margin:0 auto; }
 
     .media-preview {
-      width: 100%;
-      height: 200px;
-      background: #141a26;
-      border-radius: 10px;
-      overflow: hidden;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      border: 1px solid rgba(255, 255, 255, 0.05);
+      width:100%; height:200px; background:#141a26;
+      border-radius:10px; overflow:hidden;
+      display:flex; align-items:center; justify-content:center;
+      border:1px solid rgba(255,255,255,0.05);
     }
-
-    .media-preview img, .media-preview video {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
-
-    .media-preview.speakers img,
-    .media-preview.mic img {
-      object-fit: contain;
-      padding: 10px;
-    }
-
-    /* AJUSTEMENTS TÉLÉVISEUR (+200% TAILLE IMAGE ET CADRE ADAPTÉ) */
-    .media-preview.tv {
-      height: 400px;
-    }
-
-    .media-preview.tv img {
-      object-fit: contain;
-      object-position: center;
-      transform: scale(1.20);
-      padding: 10px;
-    }
-
-    /* INDICATION POUR LE CAISSON DE BASSE */
-    .media-preview.subwoofers img,
-    .detail-image-box img.zoom-subwoofer {
-      object-fit: cover;
-      object-position: center;
-      transform: scale(1.0);
-      clip-path: inset(0px 18px 0px 18px);
-    }
-
-    /* INDICATION POUR LES ÉCOUTEURS (FiiO FH7) */
-    .media-preview.earphones img {
-      object-fit: cover;
-      object-position: center 20%;
-      transform: scale(1.10);
-    }
-
-    /* INDICATION POUR LA SOURIS */
-    .media-preview.mouse img {
-      object-fit: cover;
-      object-position: center;
-      transform: scale(1.0);
-    }
-
-    /* INDICATION POUR LE CLAVIER */
-    .media-preview.keyboard img {
-      object-fit: cover;
-      object-position: center;
-      transform: scale(1.0);
-    }
-
-    /* INDICATION POUR LE MICRO */
-    .media-preview.mic img {
-      object-fit: contain;
-      object-position: center;
-      transform: scale(1.0);
-      padding: 10px;
-    }
-
-    /* INDICATION POUR LES ENCEINTES */
-    .media-preview.speakers img {
-      object-fit: contain;
-      object-position: center;
-      transform: scale(1.0);
-      padding: 10px;
-    }
-
-    .peripheral-tag {
-      font-size: 0.62rem;
-      font-weight: 800;
-      text-transform: uppercase;
-      color: var(--accent);
-      letter-spacing: 0.8px;
-    }
-
-    .peripheral-info h3 {
-      font-size: 1.05rem;
-      color: #ffffff;
-      margin-top: 3px;
-    }
-
-    .peripheral-info p {
-      font-size: 0.82rem;
-      color: var(--text-muted);
-      margin-top: 5px;
-    }
+    .media-preview img, .media-preview video { width:100%; height:100%; object-fit:cover; }
+    .media-preview.tv { height:400px; }
+    .media-preview.tv img { object-fit:contain; transform:scale(1.20); padding:10px; }
+    .media-preview.subwoofers img { object-fit:cover; clip-path:inset(0px 18px 0px 18px); }
+    .media-preview.earphones img { object-fit:cover; object-position:center 20%; transform:scale(1.10); }
+    .media-preview.mic img, .media-preview.speakers img { object-fit:contain; padding:10px; }
   </style>
 </head>
 <body>
 
-  <h1 class="page-title">Mon Setup</h1>
+  <!-- Filtre SVG pour éliminer le fond blanc -->
+  <svg style="position: absolute; width: 0; height: 0; overflow: hidden;" aria-hidden="true">
+    <filter id="remove-white" color-interpolation-filters="sRGB">
+      <feColorMatrix type="matrix" values="
+        1 0 0 0 0
+        0 1 0 0 0
+        0 0 1 0 0
+        -1 -1 -1 3 0" />
+    </filter>
+  </svg>
 
-  <!-- SOUS-CATÉGORIE : LA TOUR -->
-  <div class="section-container">
-    <h2 class="section-header">La Tour</h2>
+  <!-- ═══════════════════════════════════════
+       SPLASH SCREEN
+  ═══════════════════════════════════════ -->
+  <div id="splash">
 
-    <div class="showcase" id="showcase">
-      <div class="pc-case">
-        <img class="pc-case-img" id="pc-case-img" src="https://assets.corsair.com/image/upload/c_pad,q_85,h_1100,w_1100,f_auto/products/air-5400/RS-R-WHITE/gallery/AIR_5400_RS-R_ARGB_White_Artboard07_AA.webp" alt="Boîtier PC Corsair 5400 RS ARGB Blanc">
-        <div class="hotspot" id="hs-psu" style="top: 30%; left: 25%;" data-card="card-psu"></div>
-        <div class="hotspot" id="hs-case" style="top: 9%; left: 74%;" data-card="card-case"></div>
-        <div class="hotspot" id="hs-fans-top" style="top: 15%; left: 60%;" data-card="card-fans-top"></div>
-        <div class="hotspot" id="hs-aio" style="top: 35%; left: 43%;" data-card="card-aio"></div>
-        <div class="hotspot" id="hs-ram" style="top: 38%; left: 51.5%;" data-card="card-ram"></div>
-        <div class="hotspot" id="hs-cpu" style="top: 40%; left: 40%;" data-card="card-cpu"></div>
-        <div class="hotspot" id="hs-gpu" style="top: 54%; left: 38%;" data-card="card-gpu"></div>
-        <div class="hotspot" id="hs-ssd" style="top: 59%; left: 48%;" data-card="card-ssd"></div>
-        <div class="hotspot" id="hs-mobo" style="top: 65%; left: 40%;" data-card="card-mobo"></div>
-        <div class="hotspot" id="hs-fans-bot" style="top: 77%; left: 66%;" data-card="card-fans-bot"></div>
-      </div>
+    <!-- PHASE 1: Logo animation -->
+    <div id="logo-phase">
+      <div class="intro-logo">EJayZ</div>
+    </div>
 
-      <svg class="svg-layer" id="svg-layer">
-        <path id="path-psu" class="connecting-path" />
-        <path id="path-case" class="connecting-path" />
-        <path id="path-fans-top" class="connecting-path" />
-        <path id="path-aio" class="connecting-path" />
-        <path id="path-ram" class="connecting-path" />
-        <path id="path-cpu" class="connecting-path" />
-        <path id="path-gpu" class="connecting-path" />
-        <path id="path-ssd" class="connecting-path" />
-        <path id="path-fans-bot" class="connecting-path" />
-        <path id="path-mobo" class="connecting-path" />
+    <!-- PHASE 2: Lightning + gallery -->
+    <div id="lightning-phase">
+      <div id="flash"></div>
+      <div id="bolt-glow"></div>
+
+      <svg id="bolt-svg" viewBox="0 0 160 900" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="boltGrad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%"   stop-color="#ffffff" stop-opacity="1"/>
+            <stop offset="30%"  stop-color="#00f2fe" stop-opacity="1"/>
+            <stop offset="70%"  stop-color="#ffffff" stop-opacity="0.9"/>
+            <stop offset="100%" stop-color="#00f2fe" stop-opacity="0.6"/>
+          </linearGradient>
+          <linearGradient id="boltCore" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%"  stop-color="#ffffff" stop-opacity="0.9"/>
+            <stop offset="50%" stop-color="#ffffff" stop-opacity="0.7"/>
+            <stop offset="100%"stop-color="#00f2fe" stop-opacity="0.5"/>
+          </linearGradient>
+        </defs>
+        <polyline points="80,0 52,180 72,180 38,380 68,380 22,580 60,580 20,720 56,720 18,900 88,900 118,720 84,720 128,580 90,580 134,380 104,380 128,180 110,180 80,0" fill="url(#boltGrad)" opacity="0.25"/>
+        <polyline points="80,0 58,170 74,170 44,360 66,360 28,555 62,555 26,700 58,700 24,900 92,900 116,700 84,700 126,555 88,555 128,360 106,360 126,170 108,170 80,0" fill="url(#boltGrad)" opacity="0.7"/>
+        <polyline points="80,0 64,165 76,165 50,350 68,350 36,540 64,540 32,690 60,690 30,900 90,900 112,690 82,690 118,540 90,540 122,350 104,350 122,165 106,165 80,0" fill="url(#boltCore)" opacity="0.9"/>
       </svg>
 
-      <div class="cards-container">
-        <div class="component-card" id="card-psu" data-hs="hs-psu" data-path="path-psu" onclick="selectComponent('psu')">
-          <div class="thumb-box"><img src="https://ejayz-hub.github.io/mon-setup/A.png" alt="Alimentation"></div>
-          <div class="info-box"><span class="comp-type">Alimentation</span><span class="comp-name">HyperX PS-4122-2 1200W</span></div>
+      <!-- LEFT: GAME LOGOS + CHARACTERS -->
+      <div id="games-panel">
+
+        <!-- League of Legends -->
+        <a href="https://www.leagueoflegends.com/" target="_blank" rel="noopener noreferrer" class="game-logo" id="gl-lol" style="top:5%;" onclick="event.stopPropagation();">
+          <img class="logo-img" src="https://logos-world.net/wp-content/uploads/2023/02/LoL-Symbol.png" alt="League of Legends"/>
+          <div class="chars-wrap">
+            <div class="char"><img src="https://static.wikia.nocookie.net/leagueoflegends/images/a/a6/Akali_Render.png/revision/latest" alt="Akali"/></div>
+            <div class="char"><img src="https://static.wikia.nocookie.net/leagueoflegends/images/8/88/Jinx_Render.png/revision/latest" alt="Jinx"/></div>
+            <div class="char"><img src="https://github.com/ejayz-hub/mon-setup/blob/main/poppy.png?raw=true" alt="Yasuo"/></div>
+            <div class="char"><img src="https://i.pinimg.com/originals/b3/46/ca/b346cabc59b0b84b1d7f797f7111183e.png" alt="LoL Character 4"/></div>
+          </div>
+        </a>
+
+        <!-- Valorant -->
+        <a href="https://playvalorant.com/" target="_blank" rel="noopener noreferrer" class="game-logo" id="gl-val" style="top:28%;" onclick="event.stopPropagation();">
+          <img class="logo-img" src="https://toppng.com/uploads/preview/valorant-logo-black-11608280059ccj8cbjenx.png" alt="Valorant"/>
+          <div class="chars-wrap">
+            <div class="char"><img src="https://static.wikia.nocookie.net/valorant/images/3/35/Jett_artwork.png/revision/latest" alt="Jett"/></div>
+            <div class="char"><img src="https://static.wikia.nocookie.net/valorant/images/1/14/Phoenix_artwork.png/revision/latest" alt="Phoenix"/></div>
+            <div class="char"><img src="https://static.wikia.nocookie.net/valorant/images/b/b0/Reyna_artwork.png/revision/latest" alt="Reyna"/></div>
+            <div class="char"><img src="https://static.wikia.nocookie.net/valorant/images/1/1e/Sage_artwork.png/revision/latest" alt="Sage"/></div>
+          </div>
+        </a>
+
+        <!-- StarCraft -->
+        <a href="https://starcraft2.blizzard.com/fr-fr/" target="_blank" rel="noopener noreferrer" class="game-logo" id="gl-sc" style="top:50%;" onclick="event.stopPropagation();">
+          <img class="logo-img" src="https://cdn2.steamgriddb.com/file/sgdb-cdn/logo_thumb/4ccea3161064506dda8e0c9fd416d1ae.png" alt="StarCraft II"/>
+          <div class="chars-wrap">
+            <div class="char"><img src="https://static.wikia.nocookie.net/starcraft/images/d/d3/JimRaynor_SC2_Art1.png/revision/latest" alt="Terran"/></div>
+            <div class="char"><img src="https://static.wikia.nocookie.net/starcraft/images/e/e1/Kerrigan_SC2_Rend1.png/revision/latest" alt="Zerg"/></div>
+            <div class="char"><img src="https://static.wikia.nocookie.net/starcraft/images/4/41/Artanis_SC2-LotV_Rend1.png/revision/latest" alt="Protoss"/></div>
+            <div class="char"><img src="https://static.wikia.nocookie.net/starcraft/images/b/b6/NovaTerra_SC2-NCO_Rend1.png/revision/latest" alt="Nova"/></div>
+          </div>
+        </a>
+
+        <!-- Minecraft -->
+        <a href="https://www.minecraft.net/" target="_blank" rel="noopener noreferrer" class="game-logo" id="gl-mc" style="top:74%;" onclick="event.stopPropagation();">
+          <img class="logo-img" src="https://clipartcraft.com/images/minecraft-logo-png-2.png" alt="Minecraft"/>
+          <div class="chars-wrap">
+            <div class="char"><img src="https://static.wikia.nocookie.net/minecraft_gamepedia/images/d/d4/Steve_JE4.png/revision/latest" alt="Steve"/></div>
+            <div class="char"><img src="https://static.wikia.nocookie.net/minecraft_gamepedia/images/a/a9/Alex_JE3.png/revision/latest" alt="Alex"/></div>
+            <div class="char"><img src="https://static.wikia.nocookie.net/minecraft_gamepedia/images/b/b9/Creeper_JE2_BE1.png/revision/latest" alt="Creeper"/></div>
+            <div class="char"><img src="https://static.wikia.nocookie.net/minecraft_gamepedia/images/d/d5/Enderman_JE2_BE2.png/revision/latest" alt="Enderman"/></div>
+          </div>
+        </a>
+
+      </div>
+
+      <!-- Gallery images -->
+      <div id="gallery">
+        <div class="gal-img" id="gi0" style="top:0%;right:1%;width:68%;height:31%;">
+          <img src="https://github.com/ejayz-hub/mon-setup/blob/main/ordi1.png?raw=true" alt="Ordi 1" loading="lazy"/>
         </div>
-        <div class="component-card" id="card-case" data-hs="hs-case" data-path="path-case" onclick="selectComponent('case')">
-          <div class="thumb-box"><img src="https://assets.corsair.com/image/upload/c_pad,q_85,h_1100,w_1100,f_auto/products/air-5400/RS-R-WHITE/gallery/AIR_5400_RS-R_ARGB_White_Artboard01_AA.webp" alt="Boîtier"></div>
-          <div class="info-box"><span class="comp-type">Boîtier</span><span class="comp-name">Corsair 5400 RS Blanc</span></div>
+        <div class="gal-img" id="gi1" style="top:20%;right:10%;width:62%;height:31%;">
+          <img src="https://github.com/ejayz-hub/mon-setup/blob/main/ecran1.png?raw=true" alt="Ecran 1" loading="lazy"/>
         </div>
-        <div class="component-card" id="card-fans-top" data-hs="hs-fans-top" data-path="path-fans-top" onclick="selectComponent('fans-top')">
-          <div class="thumb-box"><img src="https://assets.corsair.com/image/upload/c_pad,q_85,h_1100,w_1100,f_auto/products/Fans/base-rs-argb-series-config/gallery/120/triple/white/RS120_ARGB_WHT_TRPL_01.webp" alt="Ventilateurs"></div>
-          <div class="info-box"><span class="comp-type">Ventilateurs Haut (x3)</span><span class="comp-name">Corsair RS120 ARGB</span></div>
+        <div class="gal-img" id="gi2" style="top:40%;right:0%;width:68%;height:31%;">
+          <img src="https://github.com/ejayz-hub/mon-setup/blob/main/ordi2.png?raw=true" alt="Ordi 2" loading="lazy"/>
         </div>
-        <div class="component-card" id="card-aio" data-hs="hs-aio" data-path="path-aio" onclick="selectComponent('aio')">
-          <div class="thumb-box"><img src="https://assets.corsair.com/image/upload/c_pad,q_85,h_1100,w_1100,f_auto/products/Liquid-Cooling/nautilus/Gallery/CW-9060095-WW/CW-9060095-WW_01.webp" alt="Watercooling"></div>
-          <div class="info-box"><span class="comp-type">Watercooling</span><span class="comp-name">Corsair 360 AIO Nautilus</span></div>
+        <div class="gal-img" id="gi3" style="top:60%;right:10%;width:62%;height:31%;">
+          <img src="https://github.com/ejayz-hub/mon-setup/blob/main/ecran2.png?raw=true" alt="Ecran 2" loading="lazy"/>
         </div>
-        <div class="component-card" id="card-ram" data-hs="hs-ram" data-path="path-ram" onclick="selectComponent('ram')">
-          <div class="thumb-box"><img src="https://ejayz-hub.github.io/mon-setup/R.png" alt="RAM"></div>
-          <div class="info-box"><span class="comp-type">Mémoire RAM</span><span class="comp-name">32 Go DDR5 (2x16 Go)</span></div>
-        </div>
-        <div class="component-card" id="card-cpu" data-hs="hs-cpu" data-path="path-cpu" onclick="selectComponent('cpu')">
-          <div class="thumb-box"><img src="https://assets-prd.ignimgs.com/2024/11/05/9800x3d-3-1730839746205.jpg" alt="Processeur"></div>
-          <div class="info-box"><span class="comp-type">Processeur</span><span class="comp-name">AMD Ryzen 7 9800X3D</span></div>
-        </div>
-        <div class="component-card" id="card-gpu" data-hs="hs-gpu" data-path="path-gpu" onclick="selectComponent('gpu')">
-          <div class="thumb-box"><img src="https://blog.nbb.com/wp-content/uploads/2025/03/DSCF0586-Kopie.webp" alt="GPU"></div>
-          <div class="info-box"><span class="comp-type">Carte Graphique</span><span class="comp-name">NVIDIA RTX 5090 HP Omen</span></div>
-        </div>
-        <div class="component-card" id="card-ssd" data-hs="hs-ssd" data-path="path-ssd" onclick="selectComponent('ssd')">
-          <div class="thumb-box"><img src="https://ejayz-hub.github.io/mon-setup/S.PNG" alt="SSD"></div>
-          <div class="info-box"><span class="comp-type">Stockage (2x SSD)</span><span class="comp-name">2x 2 To Gigabyte AORUS Gen4</span></div>
-        </div>
-        <div class="component-card" id="card-fans-bot" data-hs="hs-fans-bot" data-path="path-fans-bot" onclick="selectComponent('fans-bot')">
-          <div class="thumb-box"><img src="https://assets.corsair.com/image/upload/c_pad,q_85,h_1100,w_1100,f_auto/products/Fans/base-rs-argb-config/Gallery/CO-9050197-WW/CO-9050197-WW_01.webp" alt="Ventilateurs Bas Reverse"></div>
-          <div class="info-box"><span class="comp-type">Ventilateurs Bas (x3)</span><span class="comp-name">Corsair RS120 ARGB Reverse</span></div>
-        </div>
-        <div class="component-card" id="card-mobo" data-hs="hs-mobo" data-path="path-mobo" onclick="selectComponent('mobo')">
-          <div class="thumb-box"><img src="https://ejayz-hub.github.io/mon-setup/MA.png" alt="Carte Mère"></div>
-          <div class="info-box"><span class="comp-type">Carte Mère</span><span class="comp-name">Gigabyte B850 AORUS Ice</span></div>
+        <div class="gal-img" id="gi4" style="top:74%;right:0%;width:68%;height:31%;">
+          <img src="https://github.com/ejayz-hub/mon-setup/blob/main/ordi3.png?raw=true" alt="Ordi 3" loading="lazy"/>
         </div>
       </div>
 
-      <div class="detail-panel">
-        <div class="detail-image-box" id="detail-img-box">
-          <button class="img-nav-btn prev" id="img-prev-btn" onclick="cycleImage(-1)" title="Image précédente">&#10094;</button>
-          <img id="detail-img" src="" alt="Aperçu Grand Format">
-          <button class="img-nav-btn next" id="img-next-btn" onclick="cycleImage(1)" title="Image suivante">&#10095;</button>
-        </div>
-        <div class="detail-content">
-          <span class="detail-badge" id="detail-type">Composant</span>
-          <h2 class="detail-title" id="detail-title">Sélectionnez une pièce</h2>
-          <p class="detail-description" id="detail-desc">Cliquez sur un composant ou sur les points du boîtier pour afficher le visuel haute définition et les détails techniques.</p>
-        </div>
-      </div>
+      <div id="click-hint">Cliquez pour découvrir le setup</div>
+
     </div>
   </div>
 
-  <!-- SOUS-CATÉGORIE : SOURIS & CLAVIER -->
-  <div class="section-container">
-    <h2 class="section-header">Souris & Clavier</h2>
-    <div class="peripheral-grid">
-      <div class="peripheral-card">
-        <div class="media-preview mouse">
-          <video autoplay loop muted playsinline src="https://assets2.razerzone.com/images/pnx.assets/37d0556b001c3eeb6e07832a16665575/razer-pro-click-v2-vertical-6-button-video-v3-nocompress.mp4"></video>
-        </div>
-        <div class="peripheral-info">
-          <span class="peripheral-tag">Souris Ergonomique</span>
-          <h3>Razer Pro Click V2 Vertical</h3>
-          <p>Souris ergonomique verticale à 6 boutons conçue pour une posture naturelle du poignet et une précision bureautique/créative maximale.</p>
-        </div>
-      </div>
 
-      <div class="peripheral-card">
-        <div class="media-preview keyboard">
-          <video id="keyboard-video" autoplay muted playsinline src="https://dlcdnwebimgs.asus.com/files/media/A5D4599D-B512-4384-8A0B-AB3F6FBF5654/v1/video/touch-panel.mp4"></video>
+  <!-- ═══════════════════════════════════════
+       MAIN SETUP PAGE
+  ═══════════════════════════════════════ -->
+  <div id="setup-page">
+
+    <h1 class="page-title">Mon Setup</h1>
+
+    <!-- LA TOUR -->
+    <div class="section-container">
+      <h2 class="section-header">La Tour</h2>
+      <div class="showcase" id="showcase">
+        <div class="pc-case">
+          <img class="pc-case-img" id="pc-case-img"
+            src="https://assets.corsair.com/image/upload/c_pad,q_85,h_1100,w_1100,f_auto/products/air-5400/RS-R-WHITE/gallery/AIR_5400_RS-R_ARGB_White_Artboard07_AA.webp"
+            alt="Corsair 5400 RS ARGB Blanc">
+          <div class="hotspot" id="hs-psu"      style="top:30%;left:25%;" data-card="card-psu"></div>
+          <div class="hotspot" id="hs-case"     style="top:9%;left:74%;"  data-card="card-case"></div>
+          <div class="hotspot" id="hs-fans-top" style="top:15%;left:60%;" data-card="card-fans-top"></div>
+          <div class="hotspot" id="hs-aio"      style="top:35%;left:43%;" data-card="card-aio"></div>
+          <div class="hotspot" id="hs-ram"      style="top:38%;left:51.5%;" data-card="card-ram"></div>
+          <div class="hotspot" id="hs-cpu"      style="top:40%;left:40%;" data-card="card-cpu"></div>
+          <div class="hotspot" id="hs-gpu"      style="top:54%;left:38%;" data-card="card-gpu"></div>
+          <div class="hotspot" id="hs-ssd"      style="top:59%;left:48%;" data-card="card-ssd"></div>
+          <div class="hotspot" id="hs-mobo"     style="top:65%;left:40%;" data-card="card-mobo"></div>
+          <div class="hotspot" id="hs-fans-bot" style="top:77%;left:66%;" data-card="card-fans-bot"></div>
         </div>
-        <div class="peripheral-info">
-          <span class="peripheral-tag">Clavier Gamer</span>
-          <h3>ASUS ROG Low Profile Blanc</h3>
-          <p>Clavier mécanique compact au format Low Profile, finition blanche élégante pour s'accorder parfaitement avec la tour.</p>
+
+        <svg class="svg-layer" id="svg-layer">
+          <path id="path-psu"      class="connecting-path"/>
+          <path id="path-case"     class="connecting-path"/>
+          <path id="path-fans-top" class="connecting-path"/>
+          <path id="path-aio"      class="connecting-path"/>
+          <path id="path-ram"      class="connecting-path"/>
+          <path id="path-cpu"      class="connecting-path"/>
+          <path id="path-gpu"      class="connecting-path"/>
+          <path id="path-ssd"      class="connecting-path"/>
+          <path id="path-fans-bot" class="connecting-path"/>
+          <path id="path-mobo"     class="connecting-path"/>
+        </svg>
+
+        <div class="cards-container">
+          <div class="component-card" id="card-psu"      data-hs="hs-psu"      data-path="path-psu"      onclick="selectComponent('psu')">
+            <div class="thumb-box"><img src="https://ejayz-hub.github.io/mon-setup/A.png" alt="Alimentation"></div>
+            <div class="info-box"><span class="comp-type">Alimentation</span><span class="comp-name">HyperX PS-4122-2 1200W</span></div>
+          </div>
+          <div class="component-card" id="card-case"     data-hs="hs-case"     data-path="path-case"     onclick="selectComponent('case')">
+            <div class="thumb-box"><img src="https://assets.corsair.com/image/upload/c_pad,q_85,h_1100,w_1100,f_auto/products/air-5400/RS-R-WHITE/gallery/AIR_5400_RS-R_ARGB_White_Artboard01_AA.webp" alt="Boîtier"></div>
+            <div class="info-box"><span class="comp-type">Boîtier</span><span class="comp-name">Corsair 5400 RS Blanc</span></div>
+          </div>
+          <div class="component-card" id="card-fans-top" data-hs="hs-fans-top" data-path="path-fans-top" onclick="selectComponent('fans-top')">
+            <div class="thumb-box"><img src="https://assets.corsair.com/image/upload/c_pad,q_85,h_1100,w_1100,f_auto/products/Fans/base-rs-argb-series-config/gallery/120/triple/white/RS120_ARGB_WHT_TRPL_01.webp" alt="Ventilateurs"></div>
+            <div class="info-box"><span class="comp-type">Ventilateurs Haut (x3)</span><span class="comp-name">Corsair RS120 ARGB</span></div>
+          </div>
+          <div class="component-card" id="card-aio"      data-hs="hs-aio"      data-path="path-aio"      onclick="selectComponent('aio')">
+            <div class="thumb-box"><img src="https://assets.corsair.com/image/upload/c_pad,q_85,h_1100,w_1100,f_auto/products/Liquid-Cooling/nautilus/Gallery/CW-9060095-WW/CW-9060095-WW_01.webp" alt="Watercooling"></div>
+            <div class="info-box"><span class="comp-type">Watercooling</span><span class="comp-name">Corsair 360 AIO Nautilus</span></div>
+          </div>
+          <div class="component-card" id="card-ram"      data-hs="hs-ram"      data-path="path-ram"      onclick="selectComponent('ram')">
+            <div class="thumb-box"><img src="https://ejayz-hub.github.io/mon-setup/R.png" alt="RAM"></div>
+            <div class="info-box"><span class="comp-type">Mémoire RAM</span><span class="comp-name">32 Go DDR5 (2x16 Go)</span></div>
+          </div>
+          <div class="component-card" id="card-cpu"      data-hs="hs-cpu"      data-path="path-cpu"      onclick="selectComponent('cpu')">
+            <div class="thumb-box"><img src="https://assets-prd.ignimgs.com/2024/11/05/9800x3d-3-1730839746205.jpg" alt="Processeur"></div>
+            <div class="info-box"><span class="comp-type">Processeur</span><span class="comp-name">AMD Ryzen 7 9800X3D</span></div>
+          </div>
+          <div class="component-card" id="card-gpu"      data-hs="hs-gpu"      data-path="path-gpu"      onclick="selectComponent('gpu')">
+            <div class="thumb-box"><img src="https://blog.nbb.com/wp-content/uploads/2025/03/DSCF0586-Kopie.webp" alt="GPU"></div>
+            <div class="info-box"><span class="comp-type">Carte Graphique</span><span class="comp-name">NVIDIA RTX 5090 HP Omen</span></div>
+          </div>
+          <div class="component-card" id="card-ssd"      data-hs="hs-ssd"      data-path="path-ssd"      onclick="selectComponent('ssd')">
+            <div class="thumb-box"><img src="https://ejayz-hub.github.io/mon-setup/S.PNG" alt="SSD"></div>
+            <div class="info-box"><span class="comp-type">Stockage (2x SSD)</span><span class="comp-name">2x 2 To Gigabyte AORUS Gen4</span></div>
+          </div>
+          <div class="component-card" id="card-fans-bot" data-hs="hs-fans-bot" data-path="path-fans-bot" onclick="selectComponent('fans-bot')">
+            <div class="thumb-box"><img src="https://assets.corsair.com/image/upload/c_pad,q_85,h_1100,w_1100,f_auto/products/Fans/base-rs-argb-config/Gallery/CO-9050197-WW/CO-9050197-WW_01.webp" alt="Ventilateurs Bas"></div>
+            <div class="info-box"><span class="comp-type">Ventilateurs Bas (x3)</span><span class="comp-name">Corsair RS120 ARGB Reverse</span></div>
+          </div>
+          <div class="component-card" id="card-mobo"     data-hs="hs-mobo"     data-path="path-mobo"     onclick="selectComponent('mobo')">
+            <div class="thumb-box"><img src="https://ejayz-hub.github.io/mon-setup/MA.png" alt="Carte Mère"></div>
+            <div class="info-box"><span class="comp-type">Carte Mère</span><span class="comp-name">Gigabyte B850 AORUS Ice</span></div>
+          </div>
+        </div>
+
+        <div class="detail-panel">
+          <div class="detail-image-box" id="detail-img-box">
+            <button class="img-nav-btn prev" id="img-prev-btn" onclick="cycleImage(-1)">&#10094;</button>
+            <img id="detail-img" src="" alt="Aperçu">
+            <button class="img-nav-btn next" id="img-next-btn" onclick="cycleImage(1)">&#10095;</button>
+          </div>
+          <div class="detail-content">
+            <span class="detail-badge" id="detail-type">Composant</span>
+            <h2 class="detail-title" id="detail-title">Sélectionnez une pièce</h2>
+            <p class="detail-description" id="detail-desc">Cliquez sur un composant ou un point du boîtier pour afficher le visuel HD et les détails techniques.</p>
+          </div>
         </div>
       </div>
     </div>
-  </div>
 
-  <!-- SOUS-CATÉGORIE : ÉCRAN -->
-  <div class="section-container">
-    <h2 class="section-header">Écran</h2>
-    <div class="peripheral-card tv-card">
-      <div class="media-preview tv">
-        <img src="https://github.com/ejayz-hub/mon-setup/blob/main/T.PNG?raw=true" alt="LG OLED 77G26LA">
-      </div>
-      <div class="peripheral-info">
-        <span class="peripheral-tag">Écran OLED 77"</span>
-        <h3>LG OLED 77G26LA</h3>
-        <p>Écran géant OLED 77 pouces de série G2 avec résolution 4K, dalle ultra lumineuse et taux de rafraîchissement 120Hz pour une immersion visuelle absolue.</p>
-      </div>
-    </div>
-  </div>
-
-  <!-- SOUS-CATÉGORIE : AUDIO / MICRO -->
-  <div class="section-container">
-    <h2 class="section-header">Audio / Micro</h2>
-    <div class="peripheral-grid">
-      <div class="peripheral-card">
-        <div class="media-preview mic">
-          <img src="https://github.com/ejayz-hub/mon-setup/blob/main/M.png?raw=true" alt="Microphone Yeti">
+    <!-- SOURIS & CLAVIER -->
+    <div class="section-container">
+      <h2 class="section-header">Souris & Clavier</h2>
+      <div class="peripheral-grid">
+        <div class="peripheral-card">
+          <div class="media-preview mouse">
+            <video autoplay loop muted playsinline src="https://assets2.razerzone.com/images/pnx.assets/37d0556b001c3eeb6e07832a16665575/razer-pro-click-v2-vertical-6-button-video-v3-nocompress.mp4"></video>
+          </div>
+          <div class="peripheral-info">
+            <span class="peripheral-tag">Souris Ergonomique</span>
+            <h3>Razer Pro Click V2 Vertical</h3>
+            <p>Souris ergonomique verticale à 6 boutons conçue pour une posture naturelle du poignet et une précision bureautique/créative maximale.</p>
+          </div>
         </div>
-        <div class="peripheral-info">
-          <span class="peripheral-tag">Microphone USB</span>
-          <h3>Blue Yeti</h3>
-          <p>Microphone USB multi-directivité légendaire, parfait pour le streaming, la communication vocale et la création de contenu.</p>
-        </div>
-      </div>
-
-      <div class="peripheral-card">
-        <div class="media-preview speakers">
-          <img src="https://ejayz-hub.github.io/mon-setup/E.PNG" alt="KEF LS50 Wireless 2">
-        </div>
-        <div class="peripheral-info">
-          <span class="peripheral-tag">Enceintes Actives Haute Fidélité</span>
-          <h3>KEF LS50 Wireless 2</h3>
-          <p>Système stéréophonique haut de gamme sans fil avec haut-parleurs Uni-Q de 12ème génération pour un son audiophile exceptionnel.</p>
-        </div>
-      </div>
-
-      <div class="peripheral-card">
-        <div class="media-preview subwoofers">
-          <img src="https://github.com/ejayz-hub/mon-setup/blob/main/c.png?raw=true" alt="KEF KC62">
-        </div>
-        <div class="peripheral-info">
-          <span class="peripheral-tag">Caissons de Basse (x2)</span>
-          <h3>KEF KC62</h3>
-          <p>Paires de caissons de graves ultra-compacts haute performance dotées de la technologie Uni-Core pour des basses profondes.</p>
-        </div>
-      </div>
-
-      <div class="peripheral-card">
-        <div class="media-preview earphones">
-          <img src="https://github.com/ejayz-hub/mon-setup/blob/main/EC.png?raw=true" alt="Fiio FH7">
-        </div>
-        <div class="peripheral-info">
-          <span class="peripheral-tag">Écouteurs Intra-Auriculaires</span>
-          <h3>FiiO FH7</h3>
-          <p>Écouteurs hybrides haute résolution équipés d'un transducteur dynamique au béryllium et de 4 armatures équilibrées Knowles.</p>
+        <div class="peripheral-card">
+          <div class="media-preview keyboard">
+            <video id="keyboard-video" autoplay muted playsinline src="https://dlcdnwebimgs.asus.com/files/media/A5D4599D-B512-4384-8A0B-AB3F6FBF5654/v1/video/touch-panel.mp4"></video>
+          </div>
+          <div class="peripheral-info">
+            <span class="peripheral-tag">Clavier Gamer</span>
+            <h3>ASUS ROG Low Profile Blanc</h3>
+            <p>Clavier mécanique compact au format Low Profile, finition blanche élégante pour s'accorder parfaitement avec la tour.</p>
+          </div>
         </div>
       </div>
     </div>
+
+    <!-- ÉCRAN -->
+    <div class="section-container">
+      <h2 class="section-header">Écran</h2>
+      <div class="peripheral-card tv-card">
+        <div class="media-preview tv">
+          <img src="https://github.com/ejayz-hub/mon-setup/blob/main/T.PNG?raw=true" alt="LG OLED 77G26LA">
+        </div>
+        <div class="peripheral-info">
+          <span class="peripheral-tag">Écran OLED 77"</span>
+          <h3>LG OLED 77G26LA</h3>
+          <p>Écran géant OLED 77 pouces de série G2 avec résolution 4K, dalle ultra lumineuse et taux de rafraîchissement 120Hz.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- AUDIO / MICRO -->
+    <div class="section-container">
+      <h2 class="section-header">Audio / Micro</h2>
+      <div class="peripheral-grid">
+        <div class="peripheral-card">
+          <div class="media-preview mic">
+            <img src="https://github.com/ejayz-hub/mon-setup/blob/main/M.png?raw=true" alt="Blue Yeti">
+          </div>
+          <div class="peripheral-info">
+            <span class="peripheral-tag">Microphone USB</span>
+            <h3>Blue Yeti</h3>
+            <p>Microphone USB multi-directivité légendaire, parfait pour le streaming et la création de contenu.</p>
+          </div>
+        </div>
+        <div class="peripheral-card">
+          <div class="media-preview speakers">
+            <img src="https://ejayz-hub.github.io/mon-setup/E.PNG" alt="KEF LS50 Wireless 2">
+          </div>
+          <div class="peripheral-info">
+            <span class="peripheral-tag">Enceintes Actives Haute Fidélité</span>
+            <h3>KEF LS50 Wireless 2</h3>
+            <p>Système stéréophonique haut de gamme sans fil avec haut-parleurs Uni-Q de 12ème génération.</p>
+          </div>
+        </div>
+        <div class="peripheral-card">
+          <div class="media-preview subwoofers">
+            <img src="https://github.com/ejayz-hub/mon-setup/blob/main/c.png?raw=true" alt="KEF KC62">
+          </div>
+          <div class="peripheral-info">
+            <span class="peripheral-tag">Caissons de Basse (x2)</span>
+            <h3>KEF KC62</h3>
+            <p>Paires de caissons de graves ultra-compacts haute performance dotées de la technologie Uni-Core.</p>
+          </div>
+        </div>
+        <div class="peripheral-card">
+          <div class="media-preview earphones">
+            <img src="https://github.com/ejayz-hub/mon-setup/blob/main/EC.png?raw=true" alt="FiiO FH7">
+          </div>
+          <div class="peripheral-info">
+            <span class="peripheral-tag">Écouteurs Intra-Auriculaires</span>
+            <h3>FiiO FH7</h3>
+            <p>Écouteurs hybrides haute résolution équipés d'un transducteur dynamique au béryllium et de 4 armatures Knowles.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
   </div>
+
+  <canvas id="starfield" style="position:fixed;top:0;left:0;width:100%;height:100%;z-index:-1;pointer-events:none;"></canvas>
 
   <script>
-    const componentsData = {
-      'psu': { type: 'Alimentation', title: 'HyperX PS-4122-2 1200W', img: 'https://ejayz-hub.github.io/mon-setup/A.png', desc: 'Bloc d’alimentation modulaire haute puissance de 1200W platinium garantissant un apport électrique stable et sécurisé pour l’ensemble des composants lourds.' },
-      'case': {
-        type: 'Boîtier',
-        title: 'Corsair 5400 RS Blanc',
-        images: [
-          'https://assets.corsair.com/image/upload/c_pad,q_85,h_1100,w_1100,f_auto/products/air-5400/RS-R-WHITE/gallery/AIR_5400_RS-R_ARGB_White_Artboard01_AA.webp',
-          'https://assets.corsair.com/image/upload/c_pad,q_85,h_1100,w_1100,f_auto/products/air-5400/RS-R-WHITE/gallery/AIR_5400_RS-R_ARGB_White_Artboard03_AA.webp',
-          'https://www.corsair.com/wp-content/uploads/2025/10/AIR_5400_PR_Image03.png'
-        ],
-        desc: 'Boîtier moyen-tour double chambre conçu pour un flux d’air optimal. Panneau panoramique en verre trempé offrant une vue dégagée sur l’ensemble des composants.'
-      },
-      'fans-top': { type: 'Ventilateurs Haut (x3)', title: 'Corsair RS120 ARGB Blanc', img: 'https://assets.corsair.com/image/upload/c_pad,q_85,h_1100,w_1100,f_auto/products/Fans/base-rs-argb-series-config/gallery/120/triple/white/RS120_ARGB_WHT_TRPL_01.webp', desc: 'Set de 3 ventilateurs PWM de 120 mm installés en extraction supérieure avec LED ARGB adressables.' },
-      'aio': { type: 'Watercooling', title: 'Corsair 360 AIO Nautilus Blanc', img: 'https://assets.corsair.com/image/upload/c_pad,q_85,h_1100,w_1100,f_auto/products/Liquid-Cooling/nautilus/Gallery/CW-9060095-WW/CW-9060095-WW_01.webp', desc: 'Système AIO avec radiateur de 360 mm et pompe haute performance à faible bruit.' },
-      'ram': { type: 'Mémoire RAM', title: '32 Go DDR5 (2x16 Go HP60U40S8HA-16FRE)', img: 'https://ejayz-hub.github.io/mon-setup/R.png', desc: 'Kit de mémoire RAM DDR5 haute fréquence pour un débit maximal et une parfaite stabilité.' },
-      'cpu': { type: 'Processeur', title: 'AMD Ryzen 7 9800X3D', img: 'https://assets-prd.ignimgs.com/2024/11/05/9800x3d-3-1730839746205.jpg', desc: 'Processeur de jeu ultime doté de la technologie 3D V-Cache de 2ème génération.' },
-      'gpu': { type: 'Carte Graphique', title: 'NVIDIA RTX 5090 HP Omen', img: 'https://blog.nbb.com/wp-content/uploads/2025/03/DSCF0586-Kopie.webp', desc: 'Carte graphique basée sur l’architecture Blackwell avec 32 Go de VRAM GDDR7.' },
-      'ssd': { type: 'Stockage (2x SSD)', title: '2x SSD 2 To Gigabyte AORUS NVMe Gen4', img: 'https://ejayz-hub.github.io/mon-setup/S.PNG', desc: 'Configuration de 2x SSD 2 To M.2 NVMe PCIe 4.0 x4 (Réf. GP-ASM2NE6200TTTD). Équipés de dissipateurs thermiques intégrés en cuivre pour un refroidissement passif optimal et des débits très élevés.' },
-      'fans-bot': { type: 'Ventilateurs Bas (x3)', title: 'Corsair RS120 ARGB Reverse', img: 'https://assets.corsair.com/image/upload/c_pad,q_85,h_1100,w_1100,f_auto/products/Fans/base-rs-argb-config/Gallery/CO-9050197-WW/CO-9050197-WW_01.webp', desc: 'Trio de ventilateurs 120 mm à pales inversées en intake inférieur.' },
-      'mobo': {
-        type: 'Carte Mère',
-        title: 'Gigabyte B850 AORUS Ice Stealth',
-        images: [
-          'https://static.gigabyte.com/StaticFile/Image/Global/ed71caf62ebb565841883f77562c5273/ProductRemoveBg/45267/webp/2000',
-          'https://ejayz-hub.github.io/mon-setup/MA.png',
-        ],
-        desc: 'Carte mère AM5 blanche Stealth avec connecteurs arrière et support PCIe 5.0.'
-      }
-    };
-
-    const cards = document.querySelectorAll('.component-card');
-    const hotspots = document.querySelectorAll('.hotspot');
-    let currentCompImages = [];
-    let currentImgIndex = 0;
-
-    function drawElbowLines() {
-      const showcaseRect = document.getElementById('showcase').getBoundingClientRect();
-      cards.forEach(card => {
-        const hsEl = document.getElementById(card.dataset.hs);
-        const pathEl = document.getElementById(card.dataset.path);
-        if (hsEl && pathEl) {
-          const hsRect = hsEl.getBoundingClientRect();
-          const cardRect = card.getBoundingClientRect();
-          const startX = hsRect.left + hsRect.width / 2 - showcaseRect.left;
-          const startY = hsRect.top + hsRect.height / 2 - showcaseRect.top;
-          const endX = cardRect.left - showcaseRect.left;
-          const endY = cardRect.top + cardRect.height / 2 - showcaseRect.top;
-          const elbowX = startX + (endX - startX) * 0.45;
-          pathEl.setAttribute('d', `M ${startX} ${startY} L ${elbowX} ${endY} L ${endX} ${endY}`);
-        }
-      });
+  /* ─── STARFIELD ─── */
+  (function(){
+    const cv = document.getElementById('starfield');
+    const cx = cv.getContext('2d');
+    let stars=[], shoots=[];
+    function resize(){ cv.width=innerWidth; cv.height=innerHeight; }
+    resize(); window.addEventListener('resize',resize);
+    class Star{
+      constructor(){ this.x=Math.random()*cv.width; this.y=Math.random()*cv.height; this.r=Math.random()*1.5; this.a=Math.random(); this.v=Math.random()*.5+.1; }
+      draw(){ cx.beginPath(); cx.arc(this.x,this.y,this.r,0,Math.PI*2); cx.fillStyle=`rgba(255,255,255,${this.a})`; cx.fill(); }
+      update(){ this.y+=this.v; if(this.y>cv.height){this.y=0;this.x=Math.random()*cv.width;} this.draw(); }
     }
+    class Shoot{
+      constructor(){ this.reset(); }
+      reset(){ this.x=Math.random()*cv.width; this.y=-Math.random()*cv.height; this.len=Math.random()*200+50; this.spd=Math.random()*8+4; this.a=1; this.ang=Math.PI/4; }
+      draw(){ cx.save(); cx.translate(this.x,this.y); cx.rotate(this.ang); cx.beginPath(); cx.moveTo(0,0); cx.lineTo(this.len,0); cx.strokeStyle=`rgba(255,255,255,${this.a})`; cx.lineWidth=2; cx.stroke(); cx.restore(); }
+      update(){ this.x+=this.spd*Math.cos(this.ang); this.y+=this.spd*Math.sin(this.ang); this.a-=.01; if(this.y>cv.height+this.len||this.x>cv.width+this.len||this.a<=0)this.reset(); this.draw(); }
+    }
+    for(let i=0;i<100;i++) stars.push(new Star());
+    for(let i=0;i<3;i++) shoots.push(new Shoot());
+    function anim(){ requestAnimationFrame(anim); cx.fillStyle='#07090e'; cx.fillRect(0,0,cv.width,cv.height); stars.forEach(s=>s.update()); shoots.forEach(s=>s.update()); }
+    anim();
+  })();
 
-    function selectComponent(key) {
-      const cardId = `card-${key}`;
-      const data = componentsData[key];
-      if (!data) return;
+  /* ─── SPLASH SEQUENCE ─── */
+  const splash         = document.getElementById('splash');
+  const logoPhase      = document.getElementById('logo-phase');
+  const lightningPhase = document.getElementById('lightning-phase');
+  const flash          = document.getElementById('flash');
+  const boltSvg        = document.getElementById('bolt-svg');
+  const boltGlow       = document.getElementById('bolt-glow');
+  const clickHint      = document.getElementById('click-hint');
+  const setupPage      = document.getElementById('setup-page');
+  const galImgs        = document.querySelectorAll('.gal-img');
 
-      cards.forEach(c => c.classList.remove('active'));
-      hotspots.forEach(h => h.classList.remove('active'));
-      document.querySelectorAll('.connecting-path').forEach(p => p.classList.remove('active'));
+  let splashReady = false;
 
-      const activeCard = document.getElementById(cardId);
-      if (activeCard) {
-        activeCard.classList.add('active');
-        const activeHs = document.getElementById(activeCard.dataset.hs);
-        const activePath = document.getElementById(activeCard.dataset.path);
-        if (activeHs) activeHs.classList.add('active');
-        if (activePath) activePath.classList.add('active');
-      }
+  setTimeout(() => {
+    logoPhase.style.display = 'none';
+    lightningPhase.classList.add('show');
 
-      currentCompImages = data.images || [data.img];
-      currentImgIndex = 0;
+    setTimeout(() => {
+      flash.classList.add('strike');
+      boltSvg.classList.add('appear');
+      setTimeout(() => { boltGlow.classList.add('glow'); }, 120);
 
-      const prevBtn = document.getElementById('img-prev-btn');
-      const nextBtn = document.getElementById('img-next-btn');
+      const delays = [350, 580, 820, 1060, 1300];
+      galImgs.forEach((img, i) => {
+        setTimeout(() => { img.classList.add('visible'); }, delays[i]);
+      });
 
-      if (currentCompImages.length > 1) {
-        prevBtn.classList.add('visible');
-        nextBtn.classList.add('visible');
-      } else {
-        prevBtn.classList.remove('visible');
-        nextBtn.classList.remove('visible');
-      }
-
-      const detailImg = document.getElementById('detail-img');
-      detailImg.style.opacity = '0';
-      detailImg.style.transform = 'scale(0.95)';
+      const gameLogos = document.querySelectorAll('.game-logo');
+      const logoDelays = [450, 680, 920, 1160];
+      gameLogos.forEach((logo, i) => {
+        setTimeout(() => { logo.classList.add('visible'); }, logoDelays[i]);
+      });
 
       setTimeout(() => {
-        document.getElementById('detail-type').textContent = data.type;
-        document.getElementById('detail-title').textContent = data.title;
-        document.getElementById('detail-desc').textContent = data.desc;
-        detailImg.src = currentCompImages[currentImgIndex];
-        detailImg.classList.remove('zoom-subwoofer');
-        detailImg.style.opacity = '1';
-        detailImg.style.transform = 'scale(1)';
-      }, 150);
-    }
+        clickHint.style.opacity = '1';
+        splashReady = true;
+      }, 1700);
 
-    function cycleImage(direction) {
-      if (currentCompImages.length <= 1) return;
-      currentImgIndex = (currentImgIndex + direction + currentCompImages.length) % currentCompImages.length;
-      const detailImg = document.getElementById('detail-img');
-      detailImg.style.opacity = '0';
-      setTimeout(() => {
-        detailImg.src = currentCompImages[currentImgIndex];
-        detailImg.style.opacity = '1';
-      }, 150);
-    }
+    }, 80);
 
-    hotspots.forEach(hs => {
-      hs.addEventListener('click', () => {
-        const cardId = hs.dataset.card;
-        const key = cardId.replace('card-', '');
-        selectComponent(key);
-      });
+  }, 3350);
+
+  splash.addEventListener('click', () => {
+    if (!splashReady) return;
+    enterSetup();
+  });
+
+  galImgs.forEach(img => {
+    img.addEventListener('click', (e) => {
+      if (!splashReady) return;
+      e.stopPropagation();
+      enterSetup();
     });
+  });
 
-    const kbVideo = document.getElementById('keyboard-video');
-    const kbPlaylist = [
-      "https://dlcdnwebimgs.asus.com/files/media/A5D4599D-B512-4384-8A0B-AB3F6FBF5654/v1/video/touch-panel.mp4",
-      "https://dlcdnwebimgs.asus.com/files/media/A5D4599D-B512-4384-8A0B-AB3F6FBF5654/v1/video/compact-slim.mp4"
-    ];
-    let kbCurrentIdx = 0;
-
-    if (kbVideo) {
-      kbVideo.addEventListener('ended', () => {
-        kbCurrentIdx = (kbCurrentIdx + 1) % kbPlaylist.length;
-        kbVideo.src = kbPlaylist[kbCurrentIdx];
-        kbVideo.play();
-      });
-    }
-
-    window.addEventListener('load', () => {
+  function enterSetup() {
+    splash.classList.add('fade-out');
+    setTimeout(() => {
+      splash.style.display = 'none';
+      setupPage.classList.add('active');
+      window.scrollTo(0,0);
       drawElbowLines();
       selectComponent('psu');
+    }, 700);
+  }
+
+  /* ─── SETUP PAGE LOGIC ─── */
+  const componentsData = {
+    'psu':      { type:'Alimentation',        title:'HyperX PS-4122-2 1200W',                 img:'https://ejayz-hub.github.io/mon-setup/A.png', desc:'Bloc d\'alimentation modulaire 1200W platinium pour un apport électrique stable.' },
+    'case':     { type:'Boîtier',             title:'Corsair AIR 5400 RS Blanc',               images:['https://assets.corsair.com/image/upload/c_pad,q_85,h_1100,w_1100,f_auto/products/air-5400/RS-R-WHITE/gallery/AIR_5400_RS-R_ARGB_White_Artboard01_AA.webp','https://assets.corsair.com/image/upload/c_pad,q_85,h_1100,w_1100,f_auto/products/air-5400/RS-R-WHITE/gallery/AIR_5400_RS-R_ARGB_White_Artboard03_AA.webp'], desc:'Boîtier moyen-tour triple chambre avec panneau panoramique en verre trempé.' },
+    'fans-top': { type:'Ventilateurs Haut (x3)', title:'Corsair RS120 ARGB Blanc',             img:'https://assets.corsair.com/image/upload/c_pad,q_85,h_1100,w_1100,f_auto/products/Fans/base-rs-argb-series-config/gallery/120/triple/white/RS120_ARGB_WHT_TRPL_01.webp', desc:'3× ventilateurs 120mm PWM ARGB en extraction supérieure.' },
+    'aio':      { type:'Watercooling',        title:'Corsair 360 AIO Nautilus Blanc',          img:'https://assets.corsair.com/image/upload/c_pad,q_85,h_1100,w_1100,f_auto/products/Liquid-Cooling/nautilus/Gallery/CW-9060095-WW/CW-9060095-WW_01.webp', desc:'Système AIO radiateur 360mm haute performance silencieux.' },
+    'ram':      { type:'Mémoire RAM',         title:'32 Go DDR5 (2x16 Go HP60U40S8HA-16FRE)',  img:'https://ejayz-hub.github.io/mon-setup/R.png', desc:'Kit DDR5 haute fréquence pour débit maximal et stabilité.' },
+    'cpu':      { type:'Processeur',          title:'AMD Ryzen 7 9800X3D',                     img:'https://assets-prd.ignimgs.com/2024/11/05/9800x3d-3-1730839746205.jpg', desc:'Processeur gaming ultime avec 3D V-Cache 2ème génération.' },
+    'gpu':      { type:'Carte Graphique',     title:'NVIDIA RTX 5090 HP Omen',                 img:'https://blog.nbb.com/wp-content/uploads/2025/03/DSCF0586-Kopie.webp', desc:'Architecture Blackwell, 32 Go VRAM GDDR7, performance absolue.' },
+    'ssd':      { type:'Stockage (2x SSD)',   title:'2x SSD 2 To Gigabyte AORUS NVMe Gen4',    img:'https://ejayz-hub.github.io/mon-setup/S.PNG', desc:'2× 2 To M.2 NVMe PCIe 4.0 x4 avec dissipateurs thermiques cuivre.' },
+    'fans-bot': { type:'Ventilateurs Bas (x3)', title:'Corsair RS120 ARGB Reverse',            img:'https://assets.corsair.com/image/upload/c_pad,q_85,h_1100,w_1100,f_auto/products/Fans/base-rs-argb-config/Gallery/CO-9050197-WW/CO-9050197-WW_01.webp', desc:'3× ventilateurs 120mm pales inversées en intake inférieur.' },
+    'mobo':     { type:'Carte Mère',          title:'Gigabyte B850 AORUS Stealth Ice',          images:['https://static.gigabyte.com/StaticFile/Image/Global/ed71caf62ebb565841883f77562c5273/ProductRemoveBg/45267/webp/2000','https://ejayz-hub.github.io/mon-setup/MA.png'], desc:'AM5 blanche Stealth, PCIe 5.0, Wi-Fi 7, connecteurs arrière.' },
+  };
+
+  const cards     = document.querySelectorAll('.component-card');
+  const hotspots  = document.querySelectorAll('.hotspot');
+  let currentCompImages=[], currentImgIndex=0;
+
+  function drawElbowLines(){
+    const sr = document.getElementById('showcase').getBoundingClientRect();
+    cards.forEach(card=>{
+      const hs=document.getElementById(card.dataset.hs);
+      const pt=document.getElementById(card.dataset.path);
+      if(!hs||!pt) return;
+      const hr=hs.getBoundingClientRect(), cr=card.getBoundingClientRect();
+      const sx=hr.left+hr.width/2-sr.left, sy=hr.top+hr.height/2-sr.top;
+      const ex=cr.left-sr.left,            ey=cr.top+cr.height/2-sr.top;
+      const mx=sx+(ex-sx)*.45;
+      pt.setAttribute('d',`M ${sx} ${sy} L ${mx} ${ey} L ${ex} ${ey}`);
     });
-    window.addEventListener('resize', drawElbowLines);
+  }
+
+  function selectComponent(key){
+    const data=componentsData[key]; if(!data) return;
+    const cardId=`card-${key}`;
+    cards.forEach(c=>c.classList.remove('active'));
+    hotspots.forEach(h=>h.classList.remove('active'));
+    document.querySelectorAll('.connecting-path').forEach(p=>p.classList.remove('active'));
+    const ac=document.getElementById(cardId);
+    if(ac){
+      ac.classList.add('active');
+      const ah=document.getElementById(ac.dataset.hs);
+      const ap=document.getElementById(ac.dataset.path);
+      if(ah) ah.classList.add('active');
+      if(ap) ap.classList.add('active');
+    }
+    currentCompImages=data.images||[data.img];
+    currentImgIndex=0;
+    const pb=document.getElementById('img-prev-btn'), nb=document.getElementById('img-next-btn');
+    if(currentCompImages.length>1){ pb.classList.add('visible'); nb.classList.add('visible'); }
+    else{ pb.classList.remove('visible'); nb.classList.remove('visible'); }
+    const di=document.getElementById('detail-img');
+    di.style.opacity='0'; di.style.transform='scale(.95)';
+    setTimeout(()=>{
+      document.getElementById('detail-type').textContent=data.type;
+      document.getElementById('detail-title').textContent=data.title;
+      document.getElementById('detail-desc').textContent=data.desc;
+      di.src=currentCompImages[0]; di.classList.remove('zoom-subwoofer');
+      di.style.opacity='1'; di.style.transform='scale(1)';
+    },150);
+  }
+
+  function cycleImage(dir){
+    if(currentCompImages.length<=1) return;
+    currentImgIndex=(currentImgIndex+dir+currentCompImages.length)%currentCompImages.length;
+    const di=document.getElementById('detail-img');
+    di.style.opacity='0';
+    setTimeout(()=>{ di.src=currentCompImages[currentImgIndex]; di.style.opacity='1'; },150);
+  }
+
+  hotspots.forEach(hs=>{
+    hs.addEventListener('click',()=>{ selectComponent(hs.dataset.card.replace('card-','')); });
+  });
+
+  const kbv=document.getElementById('keyboard-video');
+  const kbList=["https://dlcdnwebimgs.asus.com/files/media/A5D4599D-B512-4384-8A0B-AB3F6FBF5654/v1/video/touch-panel.mp4","https://dlcdnwebimgs.asus.com/files/media/A5D4599D-B512-4384-8A0B-AB3F6FBF5654/v1/video/compact-slim.mp4"];
+  let kbIdx=0;
+  if(kbv) kbv.addEventListener('ended',()=>{ kbIdx=(kbIdx+1)%kbList.length; kbv.src=kbList[kbIdx]; kbv.play(); });
+
+  window.addEventListener('resize', drawElbowLines);
   </script>
 
-  <script>
-  (function() {
-      const canvas = document.createElement('canvas');
-      canvas.id = 'starfield';
-      canvas.style.cssText = 'position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1;';
-      document.body.prepend(canvas);
-
-      const ctx = canvas.getContext('2d');
-      let stars = [];
-      let shootingStars = [];
-      const numStars = 100;
-      const numShootingStars = 3;
-
-      function resizeCanvas() {
-          canvas.width = window.innerWidth;
-          canvas.height = window.innerHeight;
-      }
-
-      class Star {
-          constructor() {
-              this.x = Math.random() * canvas.width;
-              this.y = Math.random() * canvas.height;
-              this.radius = Math.random() * 1.5;
-              this.alpha = Math.random();
-              this.velocity = Math.random() * 0.5 + 0.1;
-          }
-
-          draw() {
-              ctx.beginPath();
-              ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2, false);
-              ctx.fillStyle = `rgba(255, 255, 255, ${this.alpha})`;
-              ctx.fill();
-          }
-
-          update() {
-              this.y += this.velocity;
-              if (this.y > canvas.height) {
-                  this.y = 0;
-                  this.x = Math.random() * canvas.width;
-              }
-              this.draw();
-          }
-      }
-
-      class ShootingStar {
-          constructor() {
-              this.reset();
-          }
-
-          reset() {
-              this.x = Math.random() * canvas.width;
-              this.y = -Math.random() * canvas.height;
-              this.len = Math.random() * 200 + 50;
-              this.speed = Math.random() * 8 + 4;
-              this.alpha = 1;
-              this.angle = Math.PI / 4;
-          }
-
-          draw() {
-              ctx.save();
-              ctx.translate(this.x, this.y);
-              ctx.rotate(this.angle);
-              ctx.beginPath();
-              ctx.moveTo(0, 0);
-              ctx.lineTo(this.len, 0);
-              ctx.strokeStyle = `rgba(255, 255, 255, ${this.alpha})`;
-              ctx.lineWidth = 2;
-              ctx.stroke();
-              ctx.restore();
-          }
-
-          update() {
-              this.x += this.speed * Math.cos(this.angle);
-              this.y += this.speed * Math.sin(this.angle);
-              this.alpha -= 0.01;
-
-              if (this.y > canvas.height + this.len || this.x > canvas.width + this.len || this.alpha <= 0) {
-                  this.reset();
-              }
-              this.draw();
-          }
-      }
-
-      function init() {
-          resizeCanvas();
-          for (let i = 0; i < numStars; i++) {
-              stars.push(new Star());
-          }
-          for (let i = 0; i < numShootingStars; i++) {
-              shootingStars.push(new ShootingStar());
-          }
-      }
-
-      function animate() {
-          requestAnimationFrame(animate);
-          ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-          ctx.fillStyle = '#07090e';
-          ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-          stars.forEach(star => star.update());
-          shootingStars.forEach(sStar => sStar.update());
-      }
-
-      window.addEventListener('resize', resizeCanvas);
-      init();
-      animate();
-  })();
-  </script>
 </body>
 </html>
