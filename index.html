@@ -1,5 +1,3 @@
-
-
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -354,7 +352,7 @@
       padding: 10px;
     }
 
-    /* 1. INDICATION POUR LE CAISSON DE BASSE */
+    /* INDICATION POUR LE CAISSON DE BASSE */
     .media-preview.subwoofers img,
     .detail-image-box img.zoom-subwoofer {
       object-fit: cover;
@@ -363,28 +361,28 @@
       clip-path: inset(0px 18px 0px 18px);
     }
 
-    /* 2. INDICATION POUR LES ÉCOUTEURS (FiiO FH7) */
+    /* INDICATION POUR LES ÉCOUTEURS (FiiO FH7) */
     .media-preview.earphones img {
       object-fit: cover;
       object-position: center 20%;
       transform: scale(1.10);
     }
 
-    /* 3. INDICATION POUR LA SOURIS */
+    /* INDICATION POUR LA SOURIS */
     .media-preview.mouse img {
       object-fit: cover;
       object-position: center;
       transform: scale(1.0);
     }
 
-    /* 4. INDICATION POUR LE CLAVIER */
+    /* INDICATION POUR LE CLAVIER */
     .media-preview.keyboard img {
       object-fit: cover;
       object-position: center;
       transform: scale(1.0);
     }
 
-    /* 5. INDICATION POUR LE MICRO */
+    /* INDICATION POUR LE MICRO */
     .media-preview.mic img {
       object-fit: contain;
       object-position: center;
@@ -392,7 +390,7 @@
       padding: 10px;
     }
 
-    /* 6. INDICATION POUR LES ENCEINTES */
+    /* INDICATION POUR LES ENCEINTES */
     .media-preview.speakers img {
       object-fit: contain;
       object-position: center;
@@ -476,7 +474,7 @@
         </div>
         <div class="component-card" id="card-ram" data-hs="hs-ram" data-path="path-ram" onclick="selectComponent('ram')">
           <div class="thumb-box"><img src="https://ejayz-hub.github.io/mon-setup/R.png" alt="RAM"></div>
-          <div class="info-box"><span class="comp-type">Mémoire RAM</span><span class="comp-name">16x2 Go DDR5 HP60U40S8HA-16FRE</span></div>
+          <div class="info-box"><span class="comp-type">Mémoire RAM</span><span class="comp-name">32 Go DDR5 (2x16 Go)</span></div>
         </div>
         <div class="component-card" id="card-cpu" data-hs="hs-cpu" data-path="path-cpu" onclick="selectComponent('cpu')">
           <div class="thumb-box"><img src="https://assets-prd.ignimgs.com/2024/11/05/9800x3d-3-1730839746205.jpg" alt="Processeur"></div>
@@ -622,7 +620,7 @@
       },
       'fans-top': { type: 'Ventilateurs Haut (x3)', title: 'Corsair RS120 ARGB Blanc', img: 'https://assets.corsair.com/image/upload/c_pad,q_85,h_1100,w_1100,f_auto/products/Fans/base-rs-argb-series-config/gallery/120/triple/white/RS120_ARGB_WHT_TRPL_01.webp', desc: 'Set de 3 ventilateurs PWM de 120 mm installés en extraction supérieure avec LED ARGB adressables.' },
       'aio': { type: 'Watercooling', title: 'Corsair 360 AIO Nautilus Blanc', img: 'https://assets.corsair.com/image/upload/c_pad,q_85,h_1100,w_1100,f_auto/products/Liquid-Cooling/nautilus/Gallery/CW-9060095-WW/CW-9060095-WW_01.webp', desc: 'Système AIO avec radiateur de 360 mm et pompe haute performance à faible bruit.' },
-      'ram': { type: 'Mémoire RAM', title: '32 Go DDR5 (Réf. HP60U40S8HA-16FRE)', img: 'https://ejayz-hub.github.io/mon-setup/R.png', desc: 'Kit de mémoire RAM DDR5 haute fréquence pour un débit maximal et une parfaite stabilité.' },
+      'ram': { type: 'Mémoire RAM', title: '32 Go DDR5 (2x16 Go HP60U40S8HA-16FRE)', img: 'https://ejayz-hub.github.io/mon-setup/R.png', desc: 'Kit de mémoire RAM DDR5 haute fréquence pour un débit maximal et une parfaite stabilité.' },
       'cpu': { type: 'Processeur', title: 'AMD Ryzen 7 9800X3D', img: 'https://assets-prd.ignimgs.com/2024/11/05/9800x3d-3-1730839746205.jpg', desc: 'Processeur de jeu ultime doté de la technologie 3D V-Cache de 2ème génération.' },
       'gpu': { type: 'Carte Graphique', title: 'NVIDIA RTX 5090 HP Omen', img: 'https://blog.nbb.com/wp-content/uploads/2025/03/DSCF0586-Kopie.webp', desc: 'Carte graphique basée sur l’architecture Blackwell avec 32 Go de VRAM GDDR7.' },
       'ssd': { type: 'Stockage (2x SSD)', title: '2x SSD 2 To Gigabyte AORUS NVMe Gen4', img: 'https://ejayz-hub.github.io/mon-setup/S.PNG', desc: 'Configuration de 2x SSD 2 To M.2 NVMe PCIe 4.0 x4 (Réf. GP-ASM2NE6200TTTD). Équipés de dissipateurs thermiques intégrés en cuivre pour un refroidissement passif optimal et des débits très élevés.' },
@@ -749,228 +747,114 @@
     window.addEventListener('resize', drawElbowLines);
   </script>
 
-<script>
-(function() {
-    const canvas = document.createElement('canvas');
-    canvas.id = 'starfield';
-    canvas.style.cssText = 'position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1;';
-    document.body.prepend(canvas); // Add canvas as the first child of body
+  <script>
+  (function() {
+      const canvas = document.createElement('canvas');
+      canvas.id = 'starfield';
+      canvas.style.cssText = 'position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1;';
+      document.body.prepend(canvas);
 
-    const ctx = canvas.getContext('2d');
-    let stars = [];
-    let shootingStars = [];
-    const numStars = 100; // Nombre de petites étoiles
-    const numShootingStars = 3; // Nombre d'étoiles filantes
+      const ctx = canvas.getContext('2d');
+      let stars = [];
+      let shootingStars = [];
+      const numStars = 100;
+      const numShootingStars = 3;
 
-    function resizeCanvas() {
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
-    }
+      function resizeCanvas() {
+          canvas.width = window.innerWidth;
+          canvas.height = window.innerHeight;
+      }
 
-    class Star {
-        constructor() {
-            this.x = Math.random() * canvas.width;
-            this.y = Math.random() * canvas.height;
-            this.radius = Math.random() * 1.5; // Taille des étoiles
-            this.alpha = Math.random(); // Opacité initiale
-            this.velocity = Math.random() * 0.5 + 0.1; // Vitesse de déplacement vers le bas
-        }
+      class Star {
+          constructor() {
+              this.x = Math.random() * canvas.width;
+              this.y = Math.random() * canvas.height;
+              this.radius = Math.random() * 1.5;
+              this.alpha = Math.random();
+              this.velocity = Math.random() * 0.5 + 0.1;
+          }
 
-        draw() {
-            ctx.beginPath();
-            ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2, false);
-            ctx.fillStyle = `rgba(255, 255, 255, ${this.alpha})`;
-            ctx.fill();
-        }
+          draw() {
+              ctx.beginPath();
+              ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2, false);
+              ctx.fillStyle = `rgba(255, 255, 255, ${this.alpha})`;
+              ctx.fill();
+          }
 
-        update() {
-            this.y += this.velocity; // Déplacement des étoiles vers le bas
-            if (this.y > canvas.height) {
-                this.y = 0; // Réinitialiser en haut de l'écran
-                this.x = Math.random() * canvas.width;
-            }
-            this.draw();
-        }
-    }
+          update() {
+              this.y += this.velocity;
+              if (this.y > canvas.height) {
+                  this.y = 0;
+                  this.x = Math.random() * canvas.width;
+              }
+              this.draw();
+          }
+      }
 
-    class ShootingStar {
-        constructor() {
-            this.reset();
-        }
+      class ShootingStar {
+          constructor() {
+              this.reset();
+          }
 
-        reset() {
-            this.x = Math.random() * canvas.width; // Position de départ aléatoire en X
-            this.y = -Math.random() * canvas.height; // Démarrer au-dessus de l'écran
-            this.len = Math.random() * 200 + 50; // Longueur de la traînée
-            this.speed = Math.random() * 8 + 4; // Vitesse de l'étoile filante
-            this.alpha = 1; // Opacité initiale
-            this.angle = Math.PI / 4; // Angle de 45 degrés pour la chute
-        }
+          reset() {
+              this.x = Math.random() * canvas.width;
+              this.y = -Math.random() * canvas.height;
+              this.len = Math.random() * 200 + 50;
+              this.speed = Math.random() * 8 + 4;
+              this.alpha = 1;
+              this.angle = Math.PI / 4;
+          }
 
-        draw() {
-            ctx.save();
-            ctx.translate(this.x, this.y);
-            ctx.rotate(this.angle);
-            ctx.beginPath();
-            ctx.moveTo(0, 0);
-            ctx.lineTo(this.len, 0);
-            ctx.strokeStyle = `rgba(255, 255, 255, ${this.alpha})`;
-            ctx.lineWidth = 2;
-            ctx.stroke();
-            ctx.restore();
-        }
+          draw() {
+              ctx.save();
+              ctx.translate(this.x, this.y);
+              ctx.rotate(this.angle);
+              ctx.beginPath();
+              ctx.moveTo(0, 0);
+              ctx.lineTo(this.len, 0);
+              ctx.strokeStyle = `rgba(255, 255, 255, ${this.alpha})`;
+              ctx.lineWidth = 2;
+              ctx.stroke();
+              ctx.restore();
+          }
 
-        update() {
-            this.x += this.speed * Math.cos(this.angle);
-            this.y += this.speed * Math.sin(this.angle);
-            this.alpha -= 0.01; // Fade out
+          update() {
+              this.x += this.speed * Math.cos(this.angle);
+              this.y += this.speed * Math.sin(this.angle);
+              this.alpha -= 0.01;
 
-            // Réinitialiser si l'étoile filante sort de l'écran ou a totalement disparu
-            if (this.y > canvas.height + this.len || this.x > canvas.width + this.len || this.alpha <= 0) {
-                this.reset();
-            }
-            this.draw();
-        }
-    }
+              if (this.y > canvas.height + this.len || this.x > canvas.width + this.len || this.alpha <= 0) {
+                  this.reset();
+              }
+              this.draw();
+          }
+      }
 
-    function init() {
-        resizeCanvas();
-        for (let i = 0; i < numStars; i++) {
-            stars.push(new Star());
-        }
-        for (let i = 0; i < numShootingStars; i++) {
-            shootingStars.push(new ShootingStar());
-        }
-    }
+      function init() {
+          resizeCanvas();
+          for (let i = 0; i < numStars; i++) {
+              stars.push(new Star());
+          }
+          for (let i = 0; i < numShootingStars; i++) {
+              shootingStars.push(new ShootingStar());
+          }
+      }
 
-    function animate() {
-        requestAnimationFrame(animate);
-        ctx.clearRect(0, 0, canvas.width, canvas.height); // Effacer le canevas
+      function animate() {
+          requestAnimationFrame(animate);
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-        // Dessiner le fond sombre pour le canevas
-        ctx.fillStyle = '#07090e'; // Correspond à la couleur --bg de votre CSS
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
+          ctx.fillStyle = '#07090e';
+          ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-        stars.forEach(star => star.update());
-        shootingStars.forEach(sStar => sStar.update());
-    }
+          stars.forEach(star => star.update());
+          shootingStars.forEach(sStar => sStar.update());
+      }
 
-    window.addEventListener('resize', resizeCanvas);
-    init();
-    animate();
-})();
-</script>
-
-<script>
-(function() {
-    const canvas = document.createElement('canvas');
-    canvas.id = 'starfield';
-    canvas.style.cssText = 'position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1;';
-    document.body.prepend(canvas); // Add canvas as the first child of body
-
-    const ctx = canvas.getContext('2d');
-    let stars = [];
-    let shootingStars = [];
-    const numStars = 100; // Nombre de petites étoiles
-    const numShootingStars = 3; // Nombre d'étoiles filantes
-
-    function resizeCanvas() {
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
-    }
-
-    class Star {
-        constructor() {
-            this.x = Math.random() * canvas.width;
-            this.y = Math.random() * canvas.height;
-            this.radius = Math.random() * 1.5; // Taille des étoiles
-            this.alpha = Math.random(); // Opacité initiale
-            this.velocity = Math.random() * 0.5 + 0.1; // Vitesse de déplacement vers le bas
-        }
-
-        draw() {
-            ctx.beginPath();
-            ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2, false);
-            ctx.fillStyle = `rgba(255, 255, 255, ${this.alpha})`;
-            ctx.fill();
-        }
-
-        update() {
-            this.y += this.velocity; // Déplacement des étoiles vers le bas
-            if (this.y > canvas.height) {
-                this.y = 0; // Réinitialiser en haut de l'écran
-                this.x = Math.random() * canvas.width;
-            }
-            this.draw();
-        }
-    }
-
-    class ShootingStar {
-        constructor() {
-            this.reset();
-        }
-
-        reset() {
-            this.x = Math.random() * canvas.width; // Position de départ aléatoire en X
-            this.y = -Math.random() * canvas.height; // Démarrer au-dessus de l'écran
-            this.len = Math.random() * 200 + 50; // Longueur de la traînée
-            this.speed = Math.random() * 8 + 4; // Vitesse de l'étoile filante
-            this.alpha = 1; // Opacité initiale
-            this.angle = Math.PI / 4; // Angle de 45 degrés pour la chute
-        }
-
-        draw() {
-            ctx.save();
-            ctx.translate(this.x, this.y);
-            ctx.rotate(this.angle);
-            ctx.beginPath();
-            ctx.moveTo(0, 0);
-            ctx.lineTo(this.len, 0);
-            ctx.strokeStyle = `rgba(255, 255, 255, ${this.alpha})`;
-            ctx.lineWidth = 2;
-            ctx.stroke();
-            ctx.restore();
-        }
-
-        update() {
-            this.x += this.speed * Math.cos(this.angle);
-            this.y += this.speed * Math.sin(this.angle);
-            this.alpha -= 0.01; // Fade out
-
-            // Réinitialiser si l'étoile filante sort de l'écran ou a totalement disparu
-            if (this.y > canvas.height + this.len || this.x > canvas.width + this.len || this.alpha <= 0) {
-                this.reset();
-            }
-            this.draw();
-        }
-    }
-
-    function init() {
-        resizeCanvas();
-        for (let i = 0; i < numStars; i++) {
-            stars.push(new Star());
-        }
-        for (let i = 0; i < numShootingStars; i++) {
-            shootingStars.push(new ShootingStar());
-        }
-    }
-
-    function animate() {
-        requestAnimationFrame(animate);
-        ctx.clearRect(0, 0, canvas.width, canvas.height); // Effacer le canevas
-
-        // Dessiner le fond sombre pour le canevas
-        ctx.fillStyle = '#07090e'; // Correspond à la couleur --bg de votre CSS
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-        stars.forEach(star => star.update());
-        shootingStars.forEach(sStar => sStar.update());
-    }
-
-    window.addEventListener('resize', resizeCanvas);
-    init();
-    animate();
-})();
-</script>
+      window.addEventListener('resize', resizeCanvas);
+      init();
+      animate();
+  })();
+  </script>
 </body>
 </html>
