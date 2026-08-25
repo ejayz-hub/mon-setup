@@ -1,4 +1,5 @@
 
+
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -537,8 +538,672 @@
     .media-preview.earphones img { object-fit:cover; object-position:center 20%; transform:scale(1.10); }
     .media-preview.mic img, .media-preview.speakers img { object-fit:contain; padding:10px; }
   </style>
+<style>
+/* ═══════════════════════════════════════
+   LOL MID ORACLE PAGE — styles isolés
+═══════════════════════════════════════ */
+#lol-page {
+  position: fixed;
+  inset: 0;
+  z-index: 99000;
+  display: none;
+  overflow-y: auto;
+  overflow-x: hidden;
+  overscroll-behavior: contain;
+  min-height: 100dvh;
+  height: 100dvh;
+  background: #050A12;
+  animation: lolPageIn .45s cubic-bezier(0.22,1,0.36,1) forwards;
+}
+#lol-page.visible { display: block; }
+
+/* Centrage forcé du contenu dans lol-page */
+#lol-page .wrap {
+  max-width: 1020px !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+  padding: 0 32px 220px !important;
+}
+#lol-page header {
+  text-align: center;
+}
+#lol-page .champions-grid {
+  margin-left: auto !important;
+  margin-right: auto !important;
+}
+#lol-page .mode-tabs,
+#lol-page .pool-filter-bar,
+#lol-page .champion-prompt {
+  max-width: 960px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* Back button */
+#lol-back-btn {
+  position: fixed;
+  top: 20px;
+  left: 24px;
+  z-index: 99100;
+  background: rgba(10, 16, 30, 0.85);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(200,155,60,.45);
+  color: #C89B3C;
+  font-family: 'Cinzel', serif;
+  font-size: .74rem;
+  font-weight: 700;
+  letter-spacing: .12em;
+  padding: 10px 20px 10px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  display: none;
+  align-items: center;
+  gap: 10px;
+  transition: all .22s;
+  text-transform: uppercase;
+  box-shadow: 0 4px 18px rgba(0,0,0,.5);
+}
+#lol-back-btn:hover {
+  background: rgba(200,155,60,.18);
+  color: #E8B84B;
+  border-color: #C89B3C;
+  box-shadow: 0 0 18px rgba(200,155,60,.25);
+}
+#lol-back-btn.visible { display: flex; }
+
+@keyframes lolPageIn {
+  from { opacity:0; transform: translateY(30px); }
+  to   { opacity:1; transform: translateY(0); }
+}
+
+/* ── Isolate gemini styles under #lol-page ── */
+#lol-page 
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg:        #050A12;
+    --bg2:       #090F1A;
+    --bg3:       #0D1525;
+    --panel:     #111C2E;
+    --border:    #1A2D47;
+    --gold:      #C89B3C;
+    --gold-dim:  #8A6A24;
+    --gold-glow: #E8B84B;
+    --blue:      #0BC4E3;
+    --blue-dim:  #0778A0;
+    --red:       #C84B31;
+    --red-dim:   #7A2A18;
+    --green:     #36B37E;
+    --green-dim: #1D6647;
+    --text:      #C8AA78;
+    --text-dim:  #6B7FA0;
+    --text-light:#E8D9B8;
+    --white:     #F0EAD6;
+  }
+
+  html, body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ── BACKGROUND ── */
+  body::before {
+    content: '';
+    position: fixed; inset: 0; z-index: 0;
+    background:
+      radial-gradient(ellipse 80% 60% at 50% -10%, rgba(200,155,60,0.07) 0%, transparent 60%),
+      radial-gradient(ellipse 50% 40% at 100% 100%, rgba(11,196,227,0.04) 0%, transparent 50%),
+      repeating-linear-gradient(0deg, transparent, transparent 59px, rgba(26,45,71,0.3) 60px),
+      repeating-linear-gradient(90deg, transparent, transparent 59px, rgba(26,45,71,0.3) 60px);
+    pointer-events: none;
+  }
+
+  /* ── LAYOUT ── */
+  .wrap { position: relative; z-index: 1; max-width: 900px; margin: 0 auto; padding: 0 36px 80px; }
+
+  /* ── HEADER ── */
+  header {
+    text-align: center;
+    padding: 80px 0 56px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 52px;
+  }
+  .logo-rune {
+    display: inline-block;
+    width: 60px; height: 60px;
+    margin-bottom: 20px;
+  }
+  .logo-rune svg { width: 100%; height: 100%; }
+  #lol-page h1 {
+    font-family: 'Cinzel', serif;
+    font-size: clamp(1.8rem, 4vw, 2.8rem);
+    font-weight: 900;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: var(--gold-glow);
+    text-shadow: 0 0 40px rgba(200,155,60,.4);
+    line-height: 1.15;
+  }
+  .subtitle {
+    margin-top: 14px;
+    font-size: .88rem;
+    color: var(--text-dim);
+    letter-spacing: .1em;
+    text-transform: uppercase;
+  }
+
+  /* ── MODE TABS ── */
+  .mode-tabs {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    background: transparent;
+    border: none;
+    padding: 0;
+    margin: 0 auto 42px;
+    max-width: 960px;
+  }
+
+  .tab-btn {
+    min-height: 96px;
+    width: 100%;
+    background: linear-gradient(145deg, rgba(13,21,37,.96), rgba(9,15,26,.96));
+    border: 2px solid var(--border);
+    color: var(--text-dim);
+    font-family: 'Cinzel', serif;
+    font-size: clamp(.9rem, 1.35vw, 1.25rem);
+    font-weight: 700;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    padding: 20px 22px;
+    border-radius: 16px;
+    cursor: pointer;
+    transition: all .22s ease;
+    box-shadow: inset 0 0 24px rgba(0,0,0,.2), 0 8px 24px rgba(0,0,0,.18);
+  }
+
+  .tab-btn:first-child {
+    border-color: rgba(55,130,210,.65);
+  }
+
+  .tab-btn:last-child {
+    border-color: rgba(200,155,60,.65);
+  }
+  .tab-btn:hover {
+    color: var(--text-light);
+    transform: translateY(-2px);
+  }
+
+  .tab-btn.active {
+    background: linear-gradient(135deg, rgba(200,155,60,.18), rgba(200,155,60,.07));
+    color: var(--gold-glow);
+    border-color: var(--gold);
+    box-shadow: 0 0 24px rgba(200,155,60,.13), inset 0 0 28px rgba(200,155,60,.04);
+    text-shadow: 0 0 12px rgba(200,155,60,.4);
+  }
+
+  .tab-btn:first-child.active {
+    background: linear-gradient(135deg, rgba(25,75,135,.32), rgba(10,25,48,.96));
+    border-color: #3479c8;
+    color: #b9d6ff;
+    box-shadow: 0 0 24px rgba(52,121,200,.16), inset 0 0 28px rgba(52,121,200,.06);
+  }
+
+  .tab-btn:last-child.active {
+    background: linear-gradient(135deg, rgba(200,155,60,.19), rgba(35,29,18,.96));
+    border-color: var(--gold);
+    color: var(--gold-glow);
+  }
+
+  /* ── POOL FILTER BAR ── */
+  .pool-filter-bar {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    margin-bottom: 40px;
+    flex-wrap: wrap;
+  }
+  .filter-chip {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    color: var(--text-dim);
+    font-size: .9rem;
+    font-family: 'Cinzel', serif;
+    letter-spacing: .05em;
+    padding: 10px 20px;
+    border-radius: 24px;
+    cursor: pointer;
+    transition: all .2s;
+  }
+  .filter-chip:hover { color: var(--gold); border-color: var(--gold-dim); }
+  .filter-chip.active {
+    background: rgba(200,155,60,.15);
+    color: var(--gold-glow);
+    border-color: var(--gold);
+    box-shadow: 0 0 10px rgba(200,155,60,.2);
+  }
+
+  /* ── CHAMPION PROMPT ── */
+  .champion-prompt {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 22px;
+    margin: 0 auto 30px;
+    padding: 0 20px;
+    color: var(--gold);
+    font-family: 'Cinzel', serif;
+    font-size: clamp(1rem, 1.8vw, 1.45rem);
+    font-weight: 700;
+    letter-spacing: .13em;
+    text-transform: uppercase;
+    text-align: center;
+  }
+
+  .champion-prompt::before,
+  .champion-prompt::after {
+    content: '';
+    height: 1px;
+    flex: 1;
+    max-width: 310px;
+    background: linear-gradient(90deg, transparent, var(--gold-dim));
+  }
+
+  .champion-prompt::after {
+    background: linear-gradient(90deg, var(--gold-dim), transparent);
+  }
+
+  /* ── GRID ── */
+  .champions-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 14px;
+    justify-content: center;
+    max-width: 960px;
+    margin: 0 auto 90px;
+    padding: 0 10px 10px;
+  }
+  .champ-pill {
+    background: linear-gradient(145deg, rgba(17,28,46,.98), rgba(8,16,29,.98));
+    border: 2px solid rgba(200,155,60,.42);
+    border-radius: 14px;
+    padding: 12px 16px;
+    cursor: pointer;
+    transition: all .18s;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: .9rem;
+    color: var(--text);
+    user-select: none;
+    position: relative;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+  .champ-pill:hover {
+    border-color: var(--gold-dim);
+    color: var(--gold-glow);
+    background: rgba(200,155,60,.08);
+  }
+  .champ-pill.selected {
+    background: linear-gradient(135deg, rgba(200,155,60,.22), rgba(200,155,60,.1));
+    border-color: var(--gold);
+    color: var(--gold-glow);
+    box-shadow: 0 0 16px rgba(200,155,60,.2);
+  }
+  .champ-pill.is-pool {
+    border-color: rgba(200,155,60,.4);
+  }
+  .champ-pill .role-badge {
+    font-size: .66rem;
+    color: var(--text-dim);
+    background: var(--bg3);
+    padding: 2px 6px;
+    border-radius: 3px;
+    margin-left: 2px;
+    flex-shrink: 0;
+  }
+  .champ-img-wrap {
+    width: 46px; height: 46px;
+    border-radius: 50%;
+    overflow: hidden;
+    flex-shrink: 0;
+    border: 1px solid var(--gold-dim);
+    background: var(--bg3);
+    display: flex; align-items: center; justify-content: center;
+  }
+  .champ-img-wrap img {
+    width: 100%; height: 100%; object-fit: cover;
+  }
+
+  /* ── RESULT PANEL ── */
+  #result-panel {
+    display: none;
+    animation: fadeSlide .35s ease;
+    min-width: 0;
+    width: 100%;
+  }
+  #result-panel.visible { display: block; }
+  /* Zone de respiration en bas : la page ne se termine plus brutalement. */
+  #lol-page .wrap::after {
+    content: '';
+    display: block;
+    height: 140px;
+  }
+  @keyframes fadeSlide {
+    from { opacity: 0; transform: translateY(14px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .result-header {
+    display: flex;
+    align-items: center;
+    gap: 28px;
+    margin-bottom: 36px;
+    padding-bottom: 28px;
+    border-bottom: 1px solid var(--border);
+  }
+  .result-champ-icon {
+    width: 88px; height: 88px;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 2px solid var(--gold);
+    box-shadow: 0 0 28px rgba(200,155,60,.35), inset 0 0 20px rgba(0,0,0,.4);
+    flex-shrink: 0;
+    position: relative;
+    background: var(--panel);
+  }
+  .result-champ-icon img { width: 100%; height: 100%; object-fit: cover; }
+  .result-info h2 {
+    font-family: 'Cinzel', serif;
+    font-size: 1.8rem; font-weight: 900;
+    letter-spacing: .1em;
+    color: var(--white);
+    text-transform: uppercase;
+  }
+  .result-meta {
+    margin-top: 10px;
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  .meta-badge {
+    font-size: .78rem;
+    padding: 4px 12px;
+    border-radius: 50px;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    color: var(--text-dim);
+  }
+  .meta-badge.wr { color: var(--green); border-color: var(--green-dim); background: rgba(54,179,126,.08); }
+  .meta-badge.tier-A { color: #A78BFA; border-color: #4C3588; background: rgba(167,139,250,.08); }
+  .meta-badge.tier-B { color: #60A5FA; border-color: #1D4FAA; background: rgba(96,165,250,.08); }
+  .meta-badge.tier-C { color: var(--text-dim); border-color: var(--border); }
+  .meta-badge.tier-S { color: var(--gold-glow); border-color: var(--gold-dim); background: rgba(200,155,60,.08); }
+
+  /* ── BUILD CONTAINER ── */
+  .build-section {
+    max-width: 960px;
+    margin-left: auto;
+    margin-right: auto;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 24px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+  }
+  .build-grid {
+    max-width: 960px;
+    margin-left: auto;
+    margin-right: auto;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 20px;
+  }
+  .build-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .build-group.full-width {
+    grid-column: 1 / -1;
+  }
+  .build-title {
+    font-family: 'Cinzel', serif;
+    font-size: .76rem;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: var(--gold-glow);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .item-list {
+    max-width: 900px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: center;
+  }
+  .item-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 8px 10px;
+    min-width: 80px;
+    transition: all .2s ease;
+    cursor: pointer;
+    position: relative;
+  }
+  .item-card:hover {
+    border-color: var(--gold);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 14px rgba(200,155,60,0.25);
+  }
+  .item-img {
+    width: 44px;
+    height: 44px;
+    border-radius: 6px;
+    border: 1px solid rgba(200,155,60,0.3);
+    object-fit: cover;
+    background: var(--bg);
+  }
+  .item-name {
+    font-size: .68rem;
+    color: var(--text-light);
+    text-align: center;
+    max-width: 85px;
+    line-height: 1.15;
+  }
+  .item-gold {
+    font-size: .62rem;
+    color: var(--gold-glow);
+    font-weight: 600;
+  }
+  .item-arrow {
+    color: var(--gold-dim);
+    font-size: 1.2rem;
+    font-weight: bold;
+    user-select: none;
+  }
+
+  /* ── HOVER TOOLTIP ── */
+  .item-tooltip {
+    position: fixed;
+    z-index: 2147483647;
+    display: none;
+    pointer-events: none;
+    background: #091428;
+    border: 1px solid var(--gold);
+    border-radius: 6px;
+    padding: 12px 14px;
+    width: 280px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.85), 0 0 12px rgba(200,155,60,0.25);
+    font-family: 'Inter', sans-serif;
+  }
+  .item-tooltip .tt-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 6px;
+    border-bottom: 1px solid rgba(200,155,60,0.25);
+    padding-bottom: 6px;
+  }
+  .item-tooltip .tt-title {
+    font-family: 'Cinzel', serif;
+    font-size: 0.88rem;
+    font-weight: 700;
+    color: var(--gold-glow);
+  }
+  .item-tooltip .tt-cost {
+    font-size: 0.75rem;
+    color: var(--gold);
+    font-weight: 600;
+  }
+  .item-tooltip .tt-stats {
+    font-size: 0.75rem;
+    color: var(--blue);
+    font-weight: 600;
+    margin-bottom: 8px;
+    line-height: 1.35;
+  }
+  .item-tooltip .tt-desc {
+    font-size: 0.72rem;
+    color: var(--text-light);
+    line-height: 1.45;
+  }
+
+  /* ── MATCHUP COLUMNS ── */
+  .matchup-cols {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 20px;
+    margin-bottom: 28px;
+    width: 100%;
+  }
+  @media(max-width: 640px) { .matchup-cols { grid-template-columns: 1fr; } }
+
+  .matchup-col {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+  }
+  .col-header {
+    padding: 14px 20px;
+    font-family: 'Cinzel', serif;
+    font-size: .76rem;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .col-header.strong { background: rgba(54,179,126,.12); color: var(--green); border-bottom: 1px solid var(--green-dim); }
+  .col-header.weak   { background: rgba(200,75,49,.12);  color: var(--red);   border-bottom: 1px solid var(--red-dim); }
+  .col-header.countered-by { background: rgba(11,196,227,.08); color: var(--blue); border-bottom: 1px solid var(--blue-dim); }
+  .col-header.synergy { background: rgba(200,155,60,.1); color: var(--gold); border-bottom: 1px solid var(--gold-dim); }
+
+  .matchup-list { list-style: none; padding: 6px 0; }
+  .matchup-list li {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 10px 20px;
+    font-size: .88rem;
+    color: var(--text);
+    transition: background .15s;
+    cursor: pointer;
+    border-bottom: 1px solid rgba(26,45,71,.5);
+    min-width: 0;
+    overflow: hidden;
+  }
+  .matchup-list li:last-child { border-bottom: none; }
+  .matchup-list li:hover { background: rgba(255,255,255,.04); }
+  .matchup-list li .mi-name {
+    font-weight: 600;
+    flex: 0 1 34%;
+    min-width: 70px;
+    overflow-wrap: anywhere;
+  }
+  .matchup-list li .mi-reason {
+    flex: 1 1 66%;
+    min-width: 0;
+    font-size: .73rem;
+    color: var(--text-dim);
+    line-height: 1.35;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+  }
+
+  .tip-box {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--gold-dim);
+    border-radius: 0 10px 10px 0;
+    padding: 18px 22px;
+    font-size: .86rem;
+    color: var(--text);
+    line-height: 1.7;
+    margin-bottom: 24px;
+  }
+  .tip-box strong { color: var(--gold); }
+
+  /* ── EMPTY STATE ── */
+  .empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--text-dim);
+  }
+  .empty-state .rune { font-size: 3rem; margin-bottom: 16px; opacity: .3; }
+  .empty-state p { font-size: .9rem; line-height: 1.7; }
+
+  /* ── DIVIDER ── */
+  .sect-title {
+    font-family: 'Cinzel', serif;
+    font-size: .75rem;
+    letter-spacing: .18em;
+    text-transform: uppercase;
+    color: var(--gold-dim);
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .sect-title::before, .sect-title::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  /* ── SCROLLBAR ── */
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--gold-dim); }
+
+</style>
 </head>
 <body>
+
+<nav id="global-site-nav" aria-label="Navigation principale">
+  <div class="global-nav-inner">
+    <div class="global-nav-brand">MID LANE</div>
+    <button type="button" id="nav-setup" onclick="goToSetupMenu()">🖥 <span>MON SETUP</span></button>
+    <button type="button" id="nav-matchup" onclick="goToMatchupMenu()">⚔ <span>MATCHUP &amp; BUILD</span></button>
+  </div>
+</nav>
+
 
   <!-- Filtre SVG pour éliminer le fond blanc -->
   <svg style="position: absolute; width: 0; height: 0; overflow: hidden;" aria-hidden="true">
@@ -589,7 +1254,7 @@
       <div id="games-panel">
 
         <!-- League of Legends -->
-        <a href="https://www.leagueoflegends.com/" target="_blank" rel="noopener noreferrer" class="game-logo" id="gl-lol" style="top:5%;" onclick="event.stopPropagation();">
+        <a href="#" class="game-logo" id="gl-lol" style="top:5%;" onclick="event.stopPropagation(); openLolPage(); return false;">
           <img class="logo-img" src="https://logos-world.net/wp-content/uploads/2023/02/LoL-Symbol.png" alt="League of Legends"/>
           <div class="chars-wrap">
             <div class="char"><img src="https://static.wikia.nocookie.net/leagueoflegends/images/a/a6/Akali_Render.png/revision/latest" alt="Akali"/></div>
@@ -665,8 +1330,7 @@
   <div id="setup-page">
 
     <h1 class="page-title">Mon Setup</h1>
-
-    <!-- LA TOUR -->
+<!-- LA TOUR -->
     <div class="section-container">
       <h2 class="section-header">La Tour</h2>
       <div class="showcase" id="showcase">
@@ -1021,7 +1685,1056 @@
   if(kbv) kbv.addEventListener('ended',()=>{ kbIdx=(kbIdx+1)%kbList.length; kbv.src=kbList[kbIdx]; kbv.play(); });
 
   window.addEventListener('resize', drawElbowLines);
-  </script>
+  
+
+/* ─── LOL MID ORACLE JS ─── */
+function openLolPage() {
+  document.getElementById('lol-page').classList.add('visible');
+  document.getElementById('lol-back-btn').classList.add('visible');
+  document.body.style.overflow = 'hidden'; // lol-page handles its own scroll
+  // Init oracle if not done yet
+  if (!window.__lolInitDone) {
+    window.__lolInitDone = true;
+    init();
+  }
+}
+
+function closeLolPage() {
+  document.getElementById('lol-page').classList.remove('visible');
+  document.getElementById('lol-back-btn').classList.remove('visible');
+  document.body.style.overflow = '';
+}
+
+
+const MY_CHAMPS = ["Kennen", "Diana", "Malzahar", "Brand", "Orianna", "Ziggs"];
+
+// MAPPING DATADRAGON CHAMPIONS
+const DD_NAME_MAP = {
+  "Twisted Fate": "TwistedFate",
+  "Aurelion Sol": "AurelionSol",
+  "LeBlanc": "Leblanc",
+  "Zoé": "Zoe",
+  "Vel'Koz": "Velkoz"
+};
+
+const ITEMS = {
+  1056: { n: "Anneau de Doran", g: 400, stats: "+18 AP · +90 PV · +0.7 Mana/s", desc: "Restaure 4.5 mana chaque seconde. Si votre mana est plein, restaure des PV à la place." },
+  1054: { n: "Bouclier de Doran", g: 450, stats: "+110 PV · +3.0 Regen PV", desc: "Réduit les dégâts des attaques de 5. Régénère jusqu'à 45 PV en 8s après avoir subi des dégâts." },
+  1055: { n: "Lame de Doran", g: 450, stats: "+10 AD · +80 PV · +3.5% Vol de vie", desc: "Objet de départ offensif équilibré pour les champions AD." },
+  1036: { n: "Épée longue", g: 350, stats: "+10 AD", desc: "Composant de base pour augmenter les dégâts d'attaque physiques." },
+  2003: { n: "Potion de soin", g: 50, stats: "Consommable", desc: "Restaure 120 PV sur une durée de 15 secondes." },
+  3070: { n: "Larme de la déesse", g: 400, stats: "+240 Mana", desc: "Chaque compétence touchant une cible octroie +3 Mana bonus (jusqu'à +360 Mana)." },
+  3020: { n: "Chaussures du sorcier", g: 1100, stats: "+18 Pénétration magique · +45 Vitesse", desc: "Augmente la vitesse de déplacement et permet d'ignorer une partie de la résistance magique." },
+  3158: { n: "Bottes de lucidité", g: 900, stats: "+15 Hâte de sort · +45 Vitesse · +12 Hâte d'invocateur", desc: "Réduit les délais de récupération de vos sorts et de vos sorts d'invocateur." },
+  3111: { n: "Sandales de Mercure", g: 1100, stats: "+25 Résistance magique · +45 Vitesse · +30% Ténacité", desc: "Réduit la durée des étourdissements, ralentissements et pannes de contrôle subis." },
+  3047: { n: "Coques en acier", g: 1000, stats: "+20 Armure · +45 Vitesse", desc: "Réduit de 12% les dégâts subis provenant des attaques de base." },
+  3006: { n: "Jambières du berzerker", g: 1100, stats: "+35% Vitesse d'attaque · +45 Vitesse", desc: "Augmente significativement la fréquence des attaques automatiques." },
+  3009: { n: "Bottes de rapidité", g: 1000, stats: "+60 Vitesse de déplacement", desc: "Réduit l'efficacité des ralentissements subis de 25%." },
+  6653: { n: "Compagnon de Luden", g: 2900, stats: "+90 AP · +600 Mana · +20 Hâte", desc: "Gagne des charges au fil du temps. Lancer un sort libère des tirs énergétiques sur la cible et 6 cibles proches." },
+  3118: { n: "Malignité", g: 2700, stats: "+80 AP · +600 Mana · +20 Hâte · +20 Hâte d'Ulti", desc: "Votre compétence ultime brûle le sol sous la cible, réduisant sa résistance magique et infligeant des dégâts." },
+  3152: { n: "Ceinture-roquette Hextech", g: 2600, stats: "+70 AP · +400 PV · +15 Hâte", desc: "Actif : Dash vers l'avant en envoyant une volée de roquettes magiques ralentissantes." },
+  3151: { n: "Tourment de Liandry", g: 3000, stats: "+90 AP · +300 PV", desc: "Les sorts infligent des brûlures équivalentes à 2% des PV max par seconde pendant 3 secondes." },
+  3116: { n: "Sceptre de Rylai", g: 2600, stats: "+75 AP · +400 PV", desc: "Les sorts offensifs ralentissent les ennemis de 30% pendant 1 seconde." },
+  3089: { n: "Coiffe de Rabadon", g: 3600, stats: "+140 Puissance (AP)", desc: "Passif : Augmente votre puissance totale de 35%." },
+  3157: { n: "Sablier de Zhonya", g: 3250, stats: "+120 AP · +50 Armure", desc: "Actif : Rend invulnérable et inciblable pendant 2,5 secondes, mais incapable d'agir." },
+  3137: { n: "Fleur cryptique", g: 2850, stats: "+70 AP · +15 Hâte · +30% Pénétration magique", desc: "Tuer ou assister sur un champion envoie une onde de soin soignant tous les alliés proches." },
+  3135: { n: "Bâton du vide", g: 3000, stats: "+80 AP · +40% Pénétration magique", desc: "Ignore 40% de la résistance magique totale de la cible." },
+  4645: { n: "Flamme d'ombre", g: 3200, stats: "+120 AP · +12 Pénétration magique", desc: "Les dégâts magiques et bruts infligent des coups critiques aux cibles sous 35% de leurs PV max." },
+  6655: { n: "Onde d'orage", g: 2900, stats: "+90 AP · +10 Pénétration magique · +5% Vitesse", desc: "Infliger 35% des PV d'un champion en 2.5s déclenche un éclair foudroyant après un court délai." },
+  3100: { n: "Fléau de liche", g: 3100, stats: "+100 AP · +15 Hâte · +8% Vitesse", desc: "Après avoir lancé un sort, votre prochaine attaque inflige des dégâts magiques colossaux." },
+  3003: { n: "Étreinte de Séraphin", g: 2900, stats: "+80 AP · +1000 Mana · +25 Hâte", desc: "Donne de l'AP basé sur le Mana max. Déclenche un bouclier massif lorsque vous subissez des dégâts mortels." },
+  3027: { n: "Bâton des âges", g: 2600, stats: "+50 AP · +400 PV · +400 Mana", desc: "Gagne 20 PV, 20 Mana et 4 AP chaque minute (max 10 fois). Offre +1 niveau au maximum de charges." },
+  4637: { n: "Volonté cosmique", g: 3000, stats: "+80 AP · +250 PV · +25 Hâte · +5% Vitesse", desc: "Blesser un champion avec un sort octroie un bonus important de vitesse de déplacement." },
+  3115: { n: "Dent de Nashor", g: 3000, stats: "+90 AP · +50% Vitesse d'attaque · +15 Hâte", desc: "Les attaques de base infligent des dégâts magiques supplémentaires à l'impact basés sur l'AP." },
+  4633: { n: "Créateur de failles", g: 3000, stats: "+80 AP · +350 PV · +15 Hâte", desc: "Augmente les dégâts infligés au combat jusqu'à 10%. Offre de l'omnivampirisme à pleine puissance." },
+  3165: { n: "Morellonomicon", g: 2200, stats: "+90 AP · +15 Pénétration magique", desc: "Les dégâts magiques appliquent Hémorragie (réduit les soins de 40%) pendant 3 secondes." },
+  4628: { n: "Focalisateur d'horizon", g: 2700, stats: "+90 AP · +20 Hâte", desc: "Blesser un champion à plus de 600 de portée le révèle et augmente les dégâts subis de 10%." },
+  3041: { n: "Voleur d'âmes de Mejai", g: 1500, stats: "+35 AP · +100 PV", desc: "Gagne de la puissance et de la vitesse de déplacement par élimination. Perd 10 charges en cas de mort." },
+  3102: { n: "Voile de la banshee", g: 3100, stats: "+120 AP · +50 Résistance magique", desc: "Octroie un bouclier anti-sorts qui bloque la prochaine compétence ennemie reçue." },
+  6692: { n: "Éclipse", g: 2800, stats: "+70 AD · +15 Hâte", desc: "Toucher un champion avec 2 sorts ou attaques en 1.5s donne un bouclier et des dégâts en % PV max." },
+  6696: { n: "Hydre profane", g: 3300, stats: "+60 AD · +18 Létalité · +20 Hâte", desc: "Actif : Tranche les ennemis autour de vous, infligeant des dégâts accrus aux cibles sous 50% PV." },
+  3142: { n: "Lame de Youmuu", g: 2700, stats: "+60 AD · +18 Létalité", desc: "Actif : Accorde un burst massif de vitesse de déplacement et la capacité de traverser les unités." },
+  3035: { n: "Rancune de Serylda", g: 3200, stats: "+45 AD · +15 Létalité · +15 Hâte", desc: "Vos compétences offensives ralentissent les cibles sous 50% PV et pénètrent l'armure." },
+  6694: { n: "Arc axiomatique", g: 3000, stats: "+55 AD · +18 Létalité · +25 Hâte", desc: "Les éliminations de champions réduisent le délai de récupération restant de votre ultime de 10%+." },
+  3814: { n: "Manteau de la nuit", g: 3000, stats: "+55 AD · +15 Létalité · +250 PV", desc: "Octroie un bouclier anti-sorts passif hors combat qui bloque la prochaine compétence ennemie." },
+  3156: { n: "Gueule de Malmortius", g: 3100, stats: "+70 AD · +50 Résistance magique · +15 Hâte", desc: "Subir des dégâts magiques qui vous feraient tomber sous 30% PV octroie un bouclier magique géant." },
+  6697: { n: "Opportunité", g: 2700, stats: "+55 AD · +18 Létalité · +5% Vitesse", desc: "Gagne de la Létalité bonus en début de combat, puis de la vitesse de déplacement lors des kills." },
+  6695: { n: "Crocs de serpent", g: 2500, stats: "+55 AD · +15 Létalité", desc: "Blesser un champion réduit l'efficacité de tous les boucliers qu'il reçoit de 50% pendant 3s." },
+  6676: { n: "Le Percepteur", g: 3000, stats: "+60 AD · +12 Létalité · +25% Crit", desc: "Exécute les champions ennemis subissant des dégâts qui tombent sous 5% de leurs PV max." },
+  6672: { n: "Tueur de krakens", g: 3100, stats: "+50 AD · +40% Vitesse d'attaque · +7% Vitesse", desc: "Chaque troisième attaque de base inflige des dégâts physiques bonus (augmente à chaque déclenchement)." },
+  3153: { n: "Lame du roi déchu", g: 3200, stats: "+50 AD · +25% Vitesse d'attaque · +10% Vol de vie", desc: "Les attaques infligent des dégâts supplémentaires selon les PV actuels de la cible et volent sa vitesse." },
+  3031: { n: "Lame d'infini", g: 3400, stats: "+80 AD · +25% Crit · +40% Dégâts Crit", desc: "Augmente les dégâts de vos coups critiques de 40%." },
+  6673: { n: "Arc-bouclier immortel", g: 3000, stats: "+55 AD · +25% Crit", desc: "Subir des dégâts critiques mortels déclenche un bouclier physique massif pendant 3 secondes." },
+  6333: { n: "Danse de la mort", g: 3200, stats: "+60 AD · +45 Armure · +15 Hâte", desc: "Diffère 30% des dégâts subis sous forme de saignement sur 3s, effacé instantanément lors d'un kill." },
+  3026: { n: "Ange gardien", g: 3200, stats: "+55 AD · +45 Armure", desc: "Lors de dégâts mortels, vous ramène à la vie avec 50% de vos PV de base et 30% de Mana après 4s." },
+  3094: { n: "Canon rapide", g: 3000, stats: "+35 AD · +30% Vitesse d'attaque · +25% Crit · +5% Vitesse", desc: "Se déplacer génère de l'Énergie. À 100 charges, votre prochaine attaque a sa portée augmentée de 35%." }
+};
+
+const DATA = {
+
+  "Nasus": {
+    wr: 53.18, tier: "A", rank: "#2/56", pick: "2.41%", ban: "—",
+    build: { starter: [1054, 2003], boots: [3158, 3009], core: [3078, 3047, 3053, 3742, 3065], situational: [3111, 4401, 3110, 6333] }, strong: [], weak: [],
+    tip: "Champion de scaling et de pression de lane à gérer selon la distance et les fenêtres de farm.",
+    playstyle: "Il cherche à sécuriser son farm et à devenir très difficile à arrêter en milieu et fin de partie."
+  },
+  "Katarina": {
+    wr: 50.68, tier: "A", rank: "#7/56", pick: "7.26%", ban: "—",
+    build: { starter: [1082, 2003], boots: [3020, 3111], core: [3100, 4645, 3157, 3089, 3135], situational: [3041, 3152, 3137] }, strong: [], weak: [],
+    tip: "Surveille ses dagues et ses resets : éviter de lui offrir des éliminations faciles est prioritaire.",
+    playstyle: "Très mobile, elle cherche les resets et les escarmouches autour des dagues."
+  },
+  "Lissandra": {
+    wr: 51.18, tier: "A", rank: "#10/56", pick: "5.36%", ban: "—",
+    build: { starter: [1056, 2003], boots: [3020, 3158], core: [6653, 3116, 3157, 3089, 3135], situational: [4645, 3102, 3137] }, strong: [], weak: [],
+    tip: "Respecte son contrôle de zone et son potentiel d'engage avant de prendre un trade prolongé.",
+    playstyle: "Elle privilégie le contrôle, le setup et les engagements fiables."
+  },
+  "Vex": {
+    wr: 52.15, tier: "A", rank: "#11/56", pick: "2.69%", ban: "—",
+    build: { starter: [1056, 2003], boots: [3020], core: [6655, 4645, 3089, 3157, 3135], situational: [3102, 3137, 3116] }, strong: [], weak: [],
+    tip: "Évite de lui donner gratuitement plusieurs déclenchements de son passif et respecte son burst.",
+    playstyle: "Elle punit les champions qui dashent et cherche à convertir ses contrôles en burst."
+  },
+  "Hwei": {
+    wr: 51.07, tier: "A", rank: "#12/56", pick: "4.35%", ban: "—",
+    build: { starter: [1056, 2003], boots: [3020, 3158], core: [3118, 6653, 4645, 3089, 3157], situational: [3135, 3137, 3102] }, strong: [], weak: [],
+    tip: "Joue autour de ses temps de récupération et de la portée de ses sorts.",
+    playstyle: "Mage à longue portée qui veut contrôler la zone et les vagues."
+  },
+  "Locke": {
+    wr: 49.54, tier: "A", rank: "#13/56", pick: "6.34%", ban: "—",
+    build: { starter: [1056, 2003], boots: [3020], core: [3100, 4645, 3089, 3157, 3135], situational: [6655, 3118, 3102] }, strong: [], weak: [],
+    tip: "Évite de lui offrir des trades gratuits et exploite ses fenêtres de récupération.",
+    playstyle: "Assassin/mage de lane qui cherche à prendre l'avantage rapidement puis à snowball."
+  },
+  "Sylas": {
+    wr: 49.30, tier: "A", rank: "#16/56", pick: "7.17%", ban: "—",
+    build: { starter: [1056, 2003], boots: [3020, 3158], core: [3152, 4633, 3157, 4645, 3089], situational: [3100, 3135, 3118] }, strong: [], weak: [],
+    tip: "Pense à la valeur de son soin et de son ultime volé avant de forcer un combat.",
+    playstyle: "Combattant AP mobile qui veut prolonger les échanges et exploiter les ultimes adverses."
+  },
+  "Vladimir": {
+    wr: 50.18, tier: "A", rank: "#21/56", pick: "3.91%", ban: "—",
+    build: { starter: [1056, 2003], boots: [3020], core: [4633, 4628, 3089, 3157, 3135], situational: [3100, 3116, 4645] }, strong: [], weak: [],
+    tip: "Profite de son début de partie plus vulnérable avant qu'il ne devienne très difficile à tuer.",
+    playstyle: "Il cherche à survivre, scaler et devenir extrêmement fort dans les combats prolongés."
+  },
+  "Gwen": {
+    wr: 52.43, tier: "A", rank: "#22/56", pick: "1.25%", ban: "—",
+    build: { starter: [1056, 2003], boots: [3020, 3047], core: [4633, 3115, 4645, 3089, 3157], situational: [4628, 3135, 3116] }, strong: [], weak: [],
+    tip: "Respecte son potentiel de duel et sa zone de brume pendant les échanges.",
+    playstyle: "Combattante qui devient dangereuse dans les échanges prolongés et les combats rapprochés."
+  },
+  "Zoé": {
+    wr: 50.47, tier: "A", rank: "#24/56", pick: "2.70%", ban: "—",
+    build: { starter: [1056, 2003], boots: [3020], core: [6655, 4645, 3089, 3157, 3135], situational: [3100, 3118, 3137] }, strong: [], weak: [],
+    tip: "Joue autour de sa portée et surtout de son E : une erreur de positionnement peut coûter très cher.",
+    playstyle: "Mage poke qui cherche à créer des picks à longue distance."
+  },
+  "Annie": {
+    wr: 50.98, tier: "A", rank: "#27/56", pick: "1.83%", ban: "—",
+    build: { starter: [1056, 2003], boots: [3158, 3020], core: [6655, 4645, 3089, 3157, 3135], situational: [3100, 3118, 3137] }, strong: [], weak: [],
+    tip: "Compte son passif avant de t'engager : son stun peut transformer instantanément un trade.",
+    playstyle: "Mage burst simple et fiable qui cherche une ouverture pour son combo."
+  },
+  "Anivia": {
+    wr: 50.17, tier: "A", rank: "#28/56", pick: "2.39%", ban: "—",
+    build: { starter: [1056, 2003], boots: [3020, 3009], core: [3070, 3110, 3040, 3157, 6653], situational: [3089, 3135, 3118] }, strong: [], weak: [],
+    tip: "Punissez ses longs cooldowns et évitez de vous battre dans une zone qu'elle contrôle.",
+    playstyle: "Mage de contrôle qui excelle dans le waveclear et la défense de zone."
+  },
+  "Yone": {
+    wr: 48.00, tier: "B", rank: "#30/56", pick: "6.15%", ban: "—",
+    build: { starter: [1055, 2003], boots: [3006], core: [6672, 3031, 6673, 6333, 3026], situational: [3153, 3156, 3094] }, strong: [], weak: [],
+    tip: "Surveille ses fenêtres d'engage et son retour de E avant de considérer le trade gagné.",
+    playstyle: "Combattant mobile qui cherche les trades répétés puis l'all-in."
+  },
+  "Pantheon": {
+    wr: 51.84, tier: "A", rank: "#31/56", pick: "0.81%", ban: "—",
+    build: { starter: [1055, 2003], boots: [3158, 3047], core: [6692, 3142, 3071, 3161, 3814], situational: [6696, 3156, 3053, 3035] }, strong: [], weak: [],
+    tip: "Respecte son burst court et son bouclier avant de prolonger un échange.",
+    playstyle: "Lane bully qui veut gagner les premiers trades et créer des actions avec son ultime."
+  },
+  "Talon": {
+    wr: 49.88, tier: "A", rank: "#32/56", pick: "1.89%", ban: "—",
+    build: { starter: [1036, 2003], boots: [3158], core: [3142, 6697, 3035, 3814, 6694], situational: [6692, 6696, 3156] }, strong: [], weak: [],
+    tip: "Garde la vision sur les côtés : sa mobilité lui permet de transformer un avantage de lane en roam.",
+    playstyle: "Assassin orienté roam qui cherche à quitter la lane et créer des supériorités numériques."
+  },
+  "Vel'Koz": {
+    wr: 51.17, tier: "A", rank: "#33/56", pick: "0.94%", ban: "—",
+    build: { starter: [1056, 2003], boots: [3020, 3158], core: [6655, 4645, 3089, 3135, 3157], situational: [3118, 3102, 3137] }, strong: [], weak: [],
+    tip: "Respecte son poke et ses zones de contrôle avant de chercher un all-in.",
+    playstyle: "Mage poke/artillerie qui veut garder ses adversaires à distance."
+  },
+  "Kennen": {
+    wr: 54.44, tier: "A", rank: "#26/101", pick: "0.39%", ban: "1.1%", color: ["#1A4A8C","#FFD432"],
+    build: { starter: [1056, 2003], boots: [3020], core: [3152, 4645, 3157, 3089, 3137], situational: [3151, 6655, 4637, 3165] },
+    strong: [{n:"Mel", r:"Statique, facile à marquer avec Q"}, {n:"Talon", r:"Ton range le punit au trade"}, {n:"Annie", r:"Tu peux harass sans entrer sa zone"}, {n:"Orianna", r:"Tu la hors range en permanence"}, {n:"Qiyana", r:"Fragile, prend tes stacks facilement"}, {n:"Ambessa", r:"Ton poke range la frustre en lane"}],
+    weak: [{n:"Gwen", r:"Te gap-close et annule tes marques"}, {n:"Nasus", r:"Te scale out et absorbe ton poke"}, {n:"Vladimir", r:"Pool évite ton stun, te sustain"}, {n:"Vex", r:"Son passif bloque tes dashes"}, {n:"Ekko", r:"Mobilité + burst avant ton stun"}, {n:"Zoe", r:"T'outrange et te punit hors-range"}],
+    tip: "Joue <strong>auto → Q → E → auto</strong> pour empiler tes marques proprement. Évite d'initier avec E avant d'avoir 2 marques posées. Niveaux 1-2, utilise uniquement tes autos (550 range) pour harass — ne cherche pas le trade actif. Avant niveau 6, wardez le flanc pour éviter le gank car ton E est souvent utilisé offensivement.",
+    playstyle: "Poke-engage hybride. Fort en teamfight, pousse bien la vague. Ton ulti R est ton win condition — garde-le pour des engages de teamfight, pas pour du kill en 1v1."
+  },
+  "Malzahar": {
+    wr: 52.52, tier: "B+", rank: "#44/101", pick: "5.5%", ban: "2%", color: ["#1A3C1E","#4ECC66"],
+    build: { starter: [1056, 2003], boots: [3158, 3020], core: [3118, 3116, 3151, 3157, 3137], situational: [3089, 3165, 4645] },
+    strong: [{n:"Ryze", r:"Suppression pointe-et-clique, pas de dash pour fuir"}, {n:"Mel", r:"Statique, facile à canaliser R dessus"}, {n:"Yasuo", r:"Suppression = Wall of Wind inutile"}, {n:"LeBlanc", r:"R la lock même avec ses blinks"}, {n:"Caitlyn", r:"Pas de dash pour éviter ta R"}, {n:"Ezreal", r:"Son E ne brise pas ta suppression"}],
+    weak: [{n:"Nasus", r:"Wither te ralentit, QSS naturel via items"}, {n:"Gwen", r:"Snip Snip annule ta zone, très mobile"}, {n:"Xerath", r:"T'outrange en permanence"}, {n:"Ziggs", r:"Waveclear + poke supérieur à ta zone"}, {n:"Zyra", r:"Racines à distance, plantes bloquent tes Q"}, {n:"Twitch", r:"Roam invisible imprévisible"}],
+    tip: "Garde ta <strong>suppression R</strong> pour les engages du jungler — seule, elle fait peu de dégâts. Pose tes <strong>voidlings E</strong> sous la vague pour le push automatique, puis roam ou contrôle objectives. Avec un QSS ennemi, ton pick potentiel est limité.",
+    playstyle: "Contrôle de zone + push + suppression. Idéal avec un jungler qui a un CC pour combo. Fort en macro, moins fort en 1v1 duel."
+  },
+  "Diana": {
+    wr: 52.09, tier: "A-", rank: "#32/101", pick: "3.1%", ban: "4%", color: ["#3C1A64","#A07AE6"],
+    build: { starter: [1056, 2003], boots: [3020], core: [3100, 6655, 4645, 3157, 3089], situational: [3115, 3137, 3152] },
+    strong: [{n:"Mel", r:"Tu la gap-close avant qu'elle réagisse"}, {n:"Naafiri", r:"Tu survives ses chiens, tu la burst"}, {n:"Orianna", r:"Tu entres sur elle facilement au 6"}, {n:"Tristana", r:"ADC fragile en mid, ton burst la one-shot"}, {n:"Kai'Sa", r:"Même logique, pas de sustain pour ton all-in"}, {n:"LeBlanc", r:"Tu absorbes ses retreats avec Q speed"}],
+    weak: [{n:"Nasus", r:"Wither annule ta vitesse, te tanke"}, {n:"Gwen", r:"Invulnérabilité bloque ton burst"}, {n:"Yasuo", r:"Wall bloque ton Q, te duel post-6"}, {n:"Galio", r:"Te tank tout, te CC en retour"}, {n:"Veigar", r:"Cage + burst si tu rates ton engage"}, {n:"Kassadin", r:"Outscale massif, immunité magic damage"}],
+    tip: "La règle d'or Diana : <strong>Q d'abord pour le speed boost</strong>, approche, <strong>auto E auto</strong> pour le burst. Si ton Q rate, N'ENGAGE PAS. Attends le prochain cycle. Au niveau 6, un combo propre Q→engage→R détruit tout carry fragile. Investis dans un <strong>Sorcerer's Shoes</strong> tôt pour maximiser ton burst.",
+    playstyle: "All-in assassin/burst. Win condition : être niveau 6 avant l'ennemi ou le tuer au 6. Fort dans les parties courtes."
+  },
+  "Brand": {
+    wr: 50.6, tier: "B", rank: "#65/101", pick: "0.7%", ban: "3%", color: ["#9C2810","#FF8C00"],
+    build: { starter: [1056, 2003], boots: [3020], core: [3151, 3116, 3137, 3157, 3089], situational: [3165, 4628, 3118] },
+    strong: [{n:"Galio", r:"Rebound des flammes dévaste ses alliés groupés"}, {n:"Yasuo", r:"E au sol empêche son dash, stun facile"}, {n:"Akali", r:"Ta zone le punit dans sa shroud"}, {n:"Mel", r:"Pas de mobilité pour éviter ton W"}, {n:"Ryze", r:"Statique, prend tout ton cycle"}, {n:"Swain", r:"Drains annulés par ton burst rapide"}],
+    weak: [{n:"Veigar", r:"Cage + Primordial Burst avant ton cycle"}, {n:"Kassadin", r:"Résistance magic + blink permanent"}, {n:"Ekko", r:"Rewind si tu rates, très mobile"}, {n:"Naafiri", r:"Assassin qui te burst avant ton combo"}, {n:"Aurelion Sol", r:"T'outrange massivement"}, {n:"Cassiopeia", r:"DPS constant pendant ton cast time"}],
+    tip: "Le vrai combo Brand mid : <strong>E au sol → W (stun garanti) → Q → R</strong>. Si tu poses E au sol (pas sur une cible), le W stun automatiquement quand tu enchaînes. Ne rate pas le W — sans stun, tes dégâts sont réduits. Joue les vagues lentes et punish les erreurs de positioning.",
+    playstyle: "Burst mage à condition. Très fort si le combo est complet, beaucoup plus faible si l'ennemi évite ton W."
+  },
+  "Ziggs": {
+    wr: 50.72, tier: "C+", rank: "#74/101", pick: "0.7%", ban: "1%", color: ["#5A4A10","#E8C820"],
+    build: { starter: [1056, 2003], boots: [3020, 3158], core: [6653, 4628, 4645, 3089, 3137], situational: [3151, 3157, 3165] },
+    strong: [{n:"Orianna", r:"T'outrange, la poke à mort"}, {n:"Veigar", r:"Même portée mais tu trades mieux"}, {n:"Malzahar", r:"Son push est ta force aussi, mais tu pokes mieux"}, {n:"Aurelion Sol", r:"Waveclear égal mais tu gères sa portée"}, {n:"Tristana", r:"Fragile en mid, prend ton poke"}, {n:"Qiyana", r:"Ton zoning la force à des trades défavorables"}],
+    weak: [{n:"LeBlanc", r:"Te burst avant ton premier Q"}, {n:"Twisted Fate", r:"Roam constant, tu ne peux pas suivre"}, {n:"Fizz", r:"Te dodge tout, te gap-close sous tes sorts"}, {n:"Ekko", r:"Mobile, absorbe ton poke et te punit"}, {n:"Diana", r:"Te all-in facilement sous tes sorts"}, {n:"Yone", r:"Immunité sort pendant E, te duel post-6"}],
+    tip: "Ziggs mid joue principalement le <strong>poke et le waveclear</strong>. Son W contre les tours est une arme macro : avec un bon timing tu peux détruire une tour seul sous 3 minutes. Contre les assassins, joue <strong>derrière la vague</strong> et utilise ton Zap W défensivement pour créer de la distance.",
+    playstyle: "Poke-waveclear. Meilleur en bot (73% des parties actuellement). En mid, value sur le macro et le split push plutôt que le kill pressure."
+  },
+  "Orianna": {
+    wr: 48.46, tier: "C-", rank: "#86/101", pick: "3.3%", ban: "1%", color: ["#1A506E","#00C8D4"],
+    build: { starter: [1056, 2003], boots: [3020], core: [6653, 4628, 4645, 3089, 3137], situational: [3003, 3157, 4637] },
+    strong: [{n:"Mel", r:"Ta balle te permet de harass hors de sa zone"}, {n:"Naafiri", r:"Tu la kites, ta balle bloque ses chiens"}, {n:"Malzahar", r:"Tu peux harass sans entrer sa zone voidling"}, {n:"Yasuo", r:"Ta balle passe dans son wind wall parfois"}, {n:"Tristana", r:"Ta portée de balle dépasse la sienne"}, {n:"Azir", r:"Même matchup de portée, tu joues mieux le trade court"}],
+    weak: [{n:"Lux", r:"T'outrange, te punit sur ta balle"}, {n:"Nasus", r:"Ignore ton poke, te scale out"}, {n:"Annie", r:"Burst instantané, son stun passif te tue"}, {n:"Diana", r:"Te all-in facilement, tu n'as pas d'escape"}, {n:"Kennen", r:"T'outrange en auto, te punit en permanence"}, {n:"Aurelion Sol", r:"T'outrange en late, meilleure teamfight"}],
+    tip: "La balle d'Orianna doit toujours être <strong>entre toi et l'ennemi</strong> — jamais posée loin de toi sans raison. En teamfight, place-toi en fond et envoie la balle sur le meilleur allié engage, pas directement en combat. Ton <strong>Shockwave R</strong> est une pièce de teamfight, pas un sort de burst 1v1.",
+    playstyle: "Contrôle zone + teamfight. Actuellement sous le méta. Forte valeur en compétitif mais moins en soloQ où les coordinations sont limitées."
+  },
+  "Lux": {
+    wr: 52.1, tier: "A-", rank: "#28/101", pick: "6.2%", ban: "3%", color: ["#2A1A6E","#FFD4F0"],
+    build: { starter: [1056, 2003], boots: [3020], core: [6653, 4628, 4645, 3089, 3137], situational: [3157, 3165, 6655] },
+    strong: [{n:"Orianna", r:"T'outrange massivement"}, {n:"Veigar", r:"Te poke avant qu'il place sa cage"}, {n:"Malzahar", r:"T'outrange sa zone de voidlings"}, {n:"Kennen", r:"Te root avant qu'il empile ses marques"}],
+    weak: [{n:"Zed", r:"Te all-in avant ton cycle"}, {n:"Fizz", r:"Te dodge ton E avec son E"}, {n:"Ekko", r:"Très mobile, absorbe et punit"}, {n:"Kassadin", r:"Te blink dessus après level 6"}],
+    tip: "Son root Q est sa pièce clé. Position latérale pour éviter un double-root.",
+    playstyle: "Poke + burst à longue portée. Fort en lane, fragile quand approach."
+  },
+  "Zed": {
+    wr: 50.2, tier: "B", rank: "#55/101", pick: "4.8%", ban: "8%", color: ["#0D0D0D","#FF3030"],
+    build: { starter: [1055, 2003], boots: [3158], core: [6692, 6696, 3035, 6694, 3814], situational: [3156, 6695, 3142] },
+    strong: [{n:"Orianna", r:"Te all-in avant qu'elle positionne sa balle"}, {n:"Lux", r:"Te gap-close son sort, la one-shot"}, {n:"Xerath", r:"Même poke mage immobile, te gap-close"}, {n:"Veigar", r:"Te burst avant sa cage"}],
+    weak: [{n:"Malzahar", r:"Suppression = tu mourras avec ton R"}, {n:"Lissandra", r:"Auto-CC sur ta ult, te survive"}, {n:"Diana", r:"Te melee-battle après ton engage"}, {n:"Gwen", r:"Te duel facilement en mêlée"}],
+    tip: "Contre Zed, achète Zhonya si tu joues un mage — active-la pendant son ult.",
+    playstyle: "Assassin physique. Fort en mid game, dépend du snowball."
+  },
+  "Akali": {
+    wr: 49.8, tier: "B-", rank: "#60/101", pick: "5.3%", ban: "6%", color: ["#1A0F2E","#CC44AA"],
+    build: { starter: [1054, 2003], boots: [3020], core: [3100, 4645, 3157, 3089, 3137], situational: [3152, 4633, 6655] },
+    strong: [{n:"Orianna", r:"Te all-in dans ta shroud"}, {n:"Lux", r:"Te dodge son E avec ta shroud"}, {n:"Veigar", r:"Shroud = cage manquée"}],
+    weak: [{n:"Diana", r:"Te melee en mêlée, te burst si tu shroud"}, {n:"Kennen", r:"T'outrange, te poke sans pouvoir répondre"}, {n:"Malzahar", r:"Suppression point-and-click passe shroud"}],
+    tip: "Shroud ne bloque pas la suppression de Malzahar ni le stun de Kennen.",
+    playstyle: "Assassin mixte physique/magique. Très forte en milieu/fin de partie."
+  },
+  "Ahri": {
+    wr: 51.4, tier: "A-", rank: "#35/101", pick: "7.1%", ban: "2%", color: ["#6E1A3C","#FF6EC7"],
+    build: { starter: [1056, 2003], boots: [3020], core: [6653, 4628, 3100, 3089, 3137], situational: [3118, 3157, 4645] },
+    strong: [{n:"Orianna", r:"Te gap-close facilement, te charm"}, {n:"Veigar", r:"Mobilité = cage difficile à placer"}],
+    weak: [{n:"Diana", r:"Te burst avant que tes dashes portent"}, {n:"Kassadin", r:"T'outscale massivement"}],
+    tip: "Son charm E est la clé — évite la frontale.",
+    playstyle: "Roam-assassin. Forte en split pressure et engages sélectifs."
+  },
+  "Yasuo": {
+    wr: 49.3, tier: "B-", rank: "#67/101", pick: "6.5%", ban: "5%", color: ["#1C3A2A","#78FFD6"],
+    build: { starter: [1055, 2003], boots: [3006], core: [6672, 3031, 6673, 6333, 3026], situational: [3153, 3156, 3094] },
+    strong: [{n:"Orianna", r:"Sa balle sur son E = combo R facile"}, {n:"Malzahar", r:"Wind Wall bloque E et Q"}],
+    weak: [{n:"Diana", r:"Te melee, ses dashes ne servent pas"}, {n:"Malzahar", r:"Suppression = pas d'escape"}, {n:"Kennen", r:"T'outrange, te poke"}],
+    tip: "Son Wind Wall W bloque les projectiles mais pas la suppression ni les zones.",
+    playstyle: "DPS continu. Très fort en teamfight avec knockup allié."
+  },
+  "Veigar": {
+    wr: 51.8, tier: "A-", rank: "#30/101", pick: "4.9%", ban: "4%", color: ["#1A0F3C","#C87AFF"],
+    build: { starter: [1056, 2003], boots: [3020, 3158], core: [6653, 4628, 3089, 3157, 3137], situational: [3003, 4645, 3165] },
+    strong: [{n:"Lux", r:"Sa cage arrive avant ton cycle"}, {n:"Brand", r:"Ta cage bloque son engagement"}],
+    weak: [{n:"Zed", r:"Te all-in avant ta cage"}, {n:"Fizz", r:"Te dodge E, gap-close instantané"}],
+    tip: "Sa cage E gain en puissance à mesure qu'il stack.",
+    playstyle: "Hypercarry late. Fragile en early, terrorise en mid/late game."
+  },
+  "LeBlanc": {
+    wr: 50.9, tier: "B+", rank: "#43/101", pick: "5.1%", ban: "7%", color: ["#2E1A0F","#FF9C3C"],
+    build: { starter: [1056, 2003], boots: [3020], core: [6653, 4645, 6655, 3089, 3135], situational: [3100, 3157, 3118] },
+    strong: [{n:"Orianna", r:"Te burst avant positionnement balle"}, {n:"Veigar", r:"Te blink sur lui avant sa cage"}],
+    weak: [{n:"Diana", r:"Te melee, te suivra dans ses blinks"}, {n:"Kennen", r:"T'outrange, te punit"}],
+    tip: "Sa chaîne W est toujours en direction de sa position d'origine.",
+    playstyle: "Assassin/burst. Pick fort en soloQ."
+  },
+  "Syndra": {
+    wr: 50.3, tier: "B", rank: "#52/101", pick: "3.2%", ban: "2%", color: ["#2A0F5A","#8844FF"],
+    build: { starter: [1056, 2003], boots: [3020], core: [6653, 4628, 4645, 3089, 3137], situational: [3157, 4637, 3165] },
+    strong: [{n:"Orianna", r:"T'outpush et t'outburst"}, {n:"Lux", r:"Burst instantané sur son root"}],
+    weak: [{n:"Zed", r:"Te all-in, tu n'as pas d'escape"}, {n:"Fizz", r:"Te dodge, te all-in"}],
+    tip: "Son ulti R One-shots avec les sphères accumulées.",
+    playstyle: "Burst mage. Forte en lane early, puissante en mid game."
+  },
+  "Kassadin": {
+    wr: 51.2, tier: "A-", rank: "#37/101", pick: "2.8%", ban: "3%", color: ["#0F1A3C","#4488FF"],
+    build: { starter: [1054, 2003], boots: [3020, 3111], core: [3027, 3003, 3118, 3157, 3089], situational: [3137, 3100, 4645] },
+    strong: [{n:"Diana", r:"Résistance magique, t'outscale"}, {n:"Orianna", r:"T'outscale et t'outmobile"}],
+    weak: [{n:"Zed", r:"Te punit en early avant ton power spike"}, {n:"Talon", r:"Physique, ta resist magic ne sert pas"}],
+    tip: "Kassadin est faible avant niveau 6. Punis-le tôt.",
+    playstyle: "Late carry. Contre spécifiquement les mages."
+  },
+  "Twisted Fate": {
+    wr: 50.5, tier: "B", rank: "#49/101", pick: "3.5%", ban: "2%", color: ["#3C1A0F","#FFAA00"],
+    build: { starter: [1056, 2003], boots: [3158, 3020], core: [3100, 3094, 3157, 3089, 3137], situational: [3027, 4628, 3165] },
+    strong: [{n:"Ziggs", r:"Roam constant que Ziggs ne peut pas suivre"}, {n:"Orianna", r:"Roam et contrôle d'objectifs"}],
+    weak: [{n:"Zed", r:"Te burst avant ton cycle"}, {n:"Diana", r:"Te melee facilement"}],
+    tip: "Son ulti R révèle la carte et permet des décalages puissants.",
+    playstyle: "Roam-control. Gagne par la pression globale."
+  },
+  "Fizz": {
+    wr: 50.8, tier: "B", rank: "#47/101", pick: "3.9%", ban: "5%", color: ["#0F2A3C","#00E5FF"],
+    build: { starter: [1056, 2003], boots: [3020], core: [3100, 6655, 3157, 4645, 3089], situational: [3135, 3041, 3152] },
+    strong: [{n:"Lux", r:"Te dodge son E avec ton E"}, {n:"Orianna", r:"Te all-in facilement"}],
+    weak: [{n:"Diana", r:"Te melee après ton E"}, {n:"Malzahar", r:"Suppression point-and-click"}],
+    tip: "Son E Playful/Trickster le rend intangible. Attends qu'il l'utilise.",
+    playstyle: "Assassin aquatique. Fort contre les mages immobiles."
+  },
+  "Viktor": {
+    wr: 51.5, tier: "A-", rank: "#33/101", pick: "2.6%", ban: "2%", color: ["#1A1A2E","#7788FF"],
+    build: { starter: [1056, 2003], boots: [3020], core: [6653, 3151, 4645, 3089, 3137], situational: [3157, 3100, 4637] },
+    strong: [{n:"Orianna", r:"T'outpush et t'outrange avec ton E"}, {n:"Malzahar", r:"Zone Q supprime ses voidlings"}],
+    weak: [{n:"Zed", r:"Te all-in avant ton item 1"}, {n:"LeBlanc", r:"Te burst avant ton cycle"}],
+    tip: "Son laser E amélioré offre un waveclear dévastateur.",
+    playstyle: "Mage DPS. Très fort en teamfight et late game."
+  },
+  "Galio": {
+    wr: 51.9, tier: "A-", rank: "#29/101", pick: "2.1%", ban: "1%", color: ["#1A2A4A","#8899DD"],
+    build: { starter: [1056, 2003], boots: [3111, 3020], core: [3152, 4633, 3157, 3151, 3137], situational: [3116, 3089, 3165] },
+    strong: [{n:"Brand", r:"Te tank ses rebonds, tu CC en retour"}, {n:"LeBlanc", r:"Te résiste magique, taunt anti-burst"}],
+    weak: [{n:"Zed", r:"Physique, ta resist magic ne compte pas"}, {n:"Kennen", r:"T'outrange avant ton engage"}],
+    tip: "Son R ultime téléporte sur un allié — idéal avec jungler.",
+    playstyle: "Tank-engage. Joue pour l'équipe."
+  },
+  "Xerath": {
+    wr: 51.3, tier: "A-", rank: "#36/101", pick: "1.8%", ban: "1%", color: ["#2A1A0A","#FFAA44"],
+    build: { starter: [1056, 2003], boots: [3020], core: [6653, 4628, 4645, 3089, 3135], situational: [3041, 3165, 3137] },
+    strong: [{n:"Malzahar", r:"T'outrange massivement"}, {n:"Orianna", r:"Poke constant hors de portée"}],
+    weak: [{n:"Zed", r:"Te gap-close instantanément"}, {n:"Fizz", r:"Te dodge avec son E"}],
+    tip: "Garde tes distances et punis les mages immobiles.",
+    playstyle: "Poke mage à ultra-longue portée."
+  },
+  "Aurelion Sol": {
+    wr: 52.8, tier: "A", rank: "#23/101", pick: "2.3%", ban: "3%", color: ["#050A1A","#5544CC"],
+    build: { starter: [1056, 2003], boots: [3020, 3009], core: [3116, 3151, 4633, 3137, 3089], situational: [3157, 3003, 4628] },
+    strong: [{n:"Orianna", r:"T'outrange massivement en late"}, {n:"Veigar", r:"Ta zone punit ses approches"}],
+    weak: [{n:"Zed", r:"Te punit avant ton power spike"}, {n:"Talon", r:"Te roam avant ta portée scaling"}],
+    tip: "Accumule des stardusts pour faire grandir la zone de ton R.",
+    playstyle: "Late hypercarry."
+  },
+  "Mel": {
+    wr: 48.2, tier: "C", rank: "#82/101", pick: "4.1%", ban: "8%", color: ["#3C2A0A","#FFD4A0"],
+    build: { starter: [1056, 2003], boots: [3020], core: [3118, 4628, 4645, 3089, 3137], situational: [3157, 3151, 3165] },
+    strong: [{n:"Orianna", r:"Reflect annule sa balle"}, {n:"Lux", r:"Reflect son rayon R"}],
+    weak: [{n:"Zed", r:"Physique, reflect moins efficace"}, {n:"Diana", r:"Te melee hors reflect"}],
+    tip: "Son E Reflect renvoie les sorts magiques ciblés.",
+    playstyle: "Counter-mage."
+  },
+  "Naafiri": {
+    wr: 51.0, tier: "B+", rank: "#42/101", pick: "2.7%", ban: "2%", color: ["#3C1A0A","#CC6622"],
+    build: { starter: [1055, 2003], boots: [3158], core: [6692, 6696, 3035, 6697, 3814], situational: [3156, 3026, 6695] },
+    strong: [{n:"Orianna", r:"Pack de chiens dépasse son kiting"}, {n:"Lux", r:"Te all-in avant son cycle"}],
+    weak: [{n:"Diana", r:"Te melee facilement"}, {n:"Brand", r:"Zone AoE détruit ses chiens"}],
+    tip: "Ses chiens meurent sous les dégâts de zone (AoE).",
+    playstyle: "Assassin physique."
+  },
+  "Ekko": {
+    wr: 51.6, tier: "A-", rank: "#31/101", pick: "3.4%", ban: "4%", color: ["#0A1A2E","#44DDFF"],
+    build: { starter: [1056, 2003], boots: [3020], core: [3100, 6655, 3157, 3089, 3137], situational: [3152, 4645, 3041] },
+    strong: [{n:"Orianna", r:"Te dash avant son positionnement balle"}, {n:"Brand", r:"Ta mobilité évite son combo"}],
+    weak: [{n:"Diana", r:"Te melee dès que tu approches"}, {n:"Gwen", r:"Te duel en mêlée"}],
+    tip: "Son ulti R le soigne et le téléporte sur son ombre.",
+    playstyle: "Burst/assassin hybride."
+  },
+  "Talon": {
+    wr: 50.4, tier: "B", rank: "#51/101", pick: "3.1%", ban: "3%", color: ["#1A0A0A","#DD3333"],
+    build: { starter: [1036, 2003], boots: [3158], core: [3142, 6697, 3035, 3814, 6694], situational: [6692, 6696, 3156] },
+    strong: [{n:"Lux", r:"Te gap-close avant son cycle"}, {n:"Orianna", r:"Te all-in rapide"}],
+    weak: [{n:"Diana", r:"Te melee et survit à ton burst"}, {n:"Malzahar", r:"Suppression avant ton escape"}],
+    tip: "Traverse les murs avec E pour surprendre les side-lanes.",
+    playstyle: "Roam-assassin physique."
+  }
+};
+
+let mode = 'mine';
+let poolFilter = 'all';
+let selected = null;
+
+function init() {
+  renderGrid(Object.keys(DATA));
+}
+
+function setMode(m) {
+  mode = m;
+  document.querySelectorAll('.tab-btn').forEach((b,i)=>b.classList.toggle('active',i===(m==='mine'?0:1)));
+  document.getElementById('search-label').textContent = m === 'mine'
+    ? 'Quel champion joues-tu ?'
+    : "Quel champion l'ennemi joue-t-il ?";
+  if (selected) showResult(selected);
+}
+
+function setPoolFilter(f) {
+  poolFilter = f;
+  document.getElementById('filter-all').classList.toggle('active', f === 'all');
+  document.getElementById('filter-pool').classList.toggle('active', f === 'pool');
+  filterChamps();
+}
+
+function filterChamps() {
+  let names = Object.keys(DATA);
+  if (poolFilter === 'pool') {
+    names = names.filter(n => MY_CHAMPS.includes(n));
+  }
+  renderGrid(names);
+}
+
+function getChampImgUrl(name) {
+  const ddName = DD_NAME_MAP[name] || name;
+  return `https://ddragon.leagueoflegends.com/cdn/14.24.1/img/champion/${ddName}.png`;
+}
+
+function renderGrid(names) {
+  const grid = document.getElementById('champs-grid');
+  grid.innerHTML = names.map(n => {
+    const d = DATA[n];
+    const isSelected = selected === n;
+    const isPool = MY_CHAMPS.includes(n);
+    const imgUrl = getChampImgUrl(n);
+    return `<div class="champ-pill${isSelected?' selected':''}${isPool?' is-pool':''}" onclick="selectChamp('${n}')">
+      <div class="champ-img-wrap">
+        <img src="${imgUrl}" alt="${n}" onerror="this.onerror=null; this.parentNode.innerHTML='<span style=\'font-size:0.65rem;font-weight:700;\'>${n.slice(0,2)}</span>'">
+      </div>
+      ${n}
+      <span class="role-badge">Mid ${d.wr.toFixed(1)}%</span>
+    </div>`;
+  }).join('');
+}
+
+function selectChamp(name) {
+  selected = name;
+  filterChamps();
+  showResult(name);
+}
+
+function mkIcon(name, size=28) {
+  const imgUrl = getChampImgUrl(name);
+  return `<div class="champ-img-wrap" style="width:${size}px;height:${size}px;">
+    <img src="${imgUrl}" alt="${name}" onerror="this.onerror=null; this.parentNode.innerHTML='<span style=\'font-size:0.6rem;font-weight:700;\'>${name.slice(0,2)}</span>'">
+  </div>`;
+}
+
+function ensureTooltipAtBody() {
+  const tt = document.getElementById('tooltip');
+  if (tt && tt.parentElement !== document.body) {
+    document.body.appendChild(tt);
+  }
+  return tt;
+}
+
+function showTooltip(e, id) {
+  const item = ITEMS[id];
+  if (!item) return;
+  const tt = ensureTooltipAtBody();
+  tt.innerHTML = `
+    <div class="tt-header">
+      <span class="tt-title">${item.n}</span>
+      ${item.g ? `<span class="tt-cost">${item.g} G</span>` : ''}
+    </div>
+    ${item.stats ? `<div class="tt-stats">${item.stats}</div>` : ''}
+    ${item.desc ? `<div class="tt-desc">${item.desc}</div>` : ''}
+  `;
+  tt.style.display = 'block';
+  moveTooltip(e);
+}
+
+function moveTooltip(e) {
+  const tt = ensureTooltipAtBody();
+  if (!tt || tt.style.display === 'none') return;
+
+  const pad = 16;
+  const edge = 8;
+  const w = tt.offsetWidth;
+  const h = tt.offsetHeight;
+
+  // Le tooltip reste toujours directement à côté du curseur,
+  // tout en évitant les bords de la fenêtre.
+  let x = e.clientX + pad;
+  let y = e.clientY + pad;
+
+  if (x + w > window.innerWidth - edge) {
+    x = e.clientX - w - pad;
+  }
+  if (y + h > window.innerHeight - edge) {
+    y = e.clientY - h - pad;
+  }
+
+  x = Math.max(edge, Math.min(x, window.innerWidth - w - edge));
+  y = Math.max(edge, Math.min(y, window.innerHeight - h - edge));
+
+  tt.style.left = `${x}px`;
+  tt.style.top = `${y}px`;
+}
+
+function hideTooltip() {
+  document.getElementById('tooltip').style.display = 'none';
+}
+
+function renderItemCard(id) {
+  const item = ITEMS[id] || { n: "Objet " + id, g: 0 };
+  const primaryUrl = `https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/${id}.png`;
+  const fallbackUrl = `https://ddragon.leagueoflegends.com/cdn/14.1.1/img/item/${id}.png`;
+  const goldHtml = item.g ? `<span class="item-gold">${item.g}g</span>` : '';
+  return `
+    <div class="item-card" onmouseenter="showTooltip(event, ${id})" onmousemove="moveTooltip(event)" onmouseleave="hideTooltip()">
+      <img src="${primaryUrl}" alt="${item.n}" class="item-img" onerror="this.onerror=null; this.src='${fallbackUrl}';">
+      <span class="item-name">${item.n}</span>
+      ${goldHtml}
+    </div>
+  `;
+}
+
+function showResult(name) {
+  const d = DATA[name];
+  if (!d) return;
+
+  document.getElementById('empty-state').style.display = 'none';
+  const panel = document.getElementById('result-panel');
+  panel.classList.remove('visible');
+  setTimeout(()=>{ panel.classList.add('visible'); }, 10);
+
+  const imgUrl = getChampImgUrl(name);
+  document.getElementById('res-icon').innerHTML = `<img src="${imgUrl}" alt="${name}">`;
+  document.getElementById('res-name').textContent = name.toUpperCase();
+
+  const wrVal = d.wr;
+  const wrClass = wrVal >= 52 ? 'wr' : '';
+  const tierClass = d.tier.startsWith('A') ? 'tier-A' : d.tier.startsWith('B') ? 'tier-B' : d.tier.startsWith('S') ? 'tier-S' : 'tier-C';
+
+  document.getElementById('res-meta').innerHTML = `
+    <span class="meta-badge ${wrClass}">⚔ ${d.wr}% victoire (mid)</span>
+    <span class="meta-badge ${tierClass}">Tier ${d.tier}</span>
+    <span class="meta-badge">Rang ${d.rank}</span>
+    <span class="meta-badge">Pick ${d.pick}</span>
+    <span class="meta-badge">Ban ${d.ban}</span>
+  `;
+
+  let body = '';
+
+  const strongList = getStrongList(name);
+  const weakList = getWeakList(name);
+
+  const buildHtml = d.build ? `
+    <div class="sect-title">Builds & Équipement recommandé</div>
+    <div class="build-section">
+      <div class="build-grid">
+        <div class="build-group">
+          <div class="build-title">🌱 Objets de départ</div>
+          <div class="item-list">
+            ${d.build.starter.map(id => renderItemCard(id)).join('')}
+          </div>
+        </div>
+
+        <div class="build-group">
+          <div class="build-title">👟 Bottes recommandées</div>
+          <div class="item-list">
+            ${d.build.boots.map(id => renderItemCard(id)).join('')}
+          </div>
+        </div>
+
+        <div class="build-group full-width">
+          <div class="build-title">⚔️ Build Principal (Ordre conseillé)</div>
+          <div class="item-list">
+            ${d.build.core.map((id, index) => `
+              ${renderItemCard(id)}
+              ${index < d.build.core.length - 1 ? '<span class="item-arrow">➔</span>' : ''}
+            `).join('')}
+          </div>
+        </div>
+
+        <div class="build-group full-width">
+          <div class="build-title">🛡️ Objets Situationnels / Adaptatifs</div>
+          <div class="item-list">
+            ${d.build.situational.map(id => renderItemCard(id)).join('')}
+          </div>
+        </div>
+      </div>
+    </div>
+  ` : `
+    <div class="sect-title">Build & équipement</div>
+    <div class="tip-box">
+      Les données de matchup de ce champion ont été ajoutées à la sélection Mid.
+      Le build détaillé local sera ajouté avec les données d'équipement correspondantes.
+    </div>
+  `;
+
+  if (mode === 'mine') {
+    body += `
+      ${buildHtml}
+      <div class="sect-title">Analyse de la lane</div>
+      <div class="tip-box">${d.tip}<br><br><strong>Style de jeu :</strong> ${d.playstyle}</div>
+      <div class="matchup-cols">
+        <div class="matchup-col">
+          <div class="col-header strong">✅ Fort contre</div>
+          <ul class="matchup-list">
+            ${strongList.map(m => `
+              <li onclick="selectChamp('${m.n}')">
+                ${mkIcon(m.n)}
+                <span class="mi-name">${m.n}</span>
+                <span class="mi-reason">${m.r}</span>
+              </li>`).join('')}
+          </ul>
+        </div>
+        <div class="matchup-col">
+          <div class="col-header weak">❌ Faible contre</div>
+          <ul class="matchup-list">
+            ${weakList.map(m => `
+              <li onclick="selectChamp('${m.n}')">
+                ${mkIcon(m.n)}
+                <span class="mi-name">${m.n}</span>
+                <span class="mi-reason">${m.r}</span>
+              </li>`).join('')}
+          </ul>
+        </div>
+      </div>
+    `;
+  } else {
+    const counters = findCounters(name);
+    const goodinto = findGoodInto(name);
+
+    body += `
+      ${buildHtml}
+      <div class="sect-title">L'ennemi joue ${name} — que faire ?</div>
+      <div class="tip-box">
+        <strong>Ce qu'il fait bien :</strong> ${d.playstyle}<br>
+        <strong>Sa faiblesse clé :</strong> ${weakList.slice(0,2).map(w=>w.n).join(', ') || "consulte les matchups disponibles"} le battent — cherche parmi ces types de champions.
+      </div>
+      <div class="matchup-cols">
+        <div class="matchup-col">
+          <div class="col-header countered-by">🎯 Contre lui avec ton Pool (6)</div>
+          <ul class="matchup-list">
+            ${counters.length ? counters.map(m => `
+              <li onclick="selectChamp('${m.name}')">
+                ${mkIcon(m.name)}
+                <span class="mi-name">${m.name}</span>
+                <span class="mi-reason">${m.reason}</span>
+              </li>`).join('') : `<li><span class="mi-reason" style="color:var(--text-dim)">Aucun counter direct parmi tes 6 champions.</span></li>`}
+          </ul>
+        </div>
+        <div class="matchup-col">
+          <div class="col-header synergy">⚡ Champions qui le battent (méta)</div>
+          <ul class="matchup-list">
+            ${goodinto.map(m => `
+              <li onclick="selectChamp('${m.n}')">
+                ${mkIcon(m.n)}
+                <span class="mi-name">${m.n}</span>
+                <span class="mi-reason">${m.r}</span>
+              </li>`).join('')}
+          </ul>
+        </div>
+      </div>
+    `;
+  }
+
+  document.getElementById('res-body').innerHTML = body;
+}
+
+function getDerivedMatchups(name) {
+  const strong = [];
+  const weak = [];
+
+  // Si un champion existant indique qu'il est faible contre "name",
+  // alors "name" est un matchup fort contre lui.
+  Object.entries(DATA).forEach(([otherName, other]) => {
+    if (!other || otherName === name) return;
+
+    if ((other.weak || []).some(m => m.n === name)) {
+      strong.push({
+        n: otherName,
+        r: "Matchup favorable selon les données locales."
+      });
+    }
+
+    if ((other.strong || []).some(m => m.n === name)) {
+      weak.push({
+        n: otherName,
+        r: "Matchup défavorable selon les données locales."
+      });
+    }
+  });
+
+  return { strong, weak };
+}
+
+function getStrongList(name) {
+  const d = DATA[name];
+  if (!d) return [];
+  return (d.strong && d.strong.length) ? d.strong : getDerivedMatchups(name).strong;
+}
+
+function getWeakList(name) {
+  const d = DATA[name];
+  if (!d) return [];
+  return (d.weak && d.weak.length) ? d.weak : getDerivedMatchups(name).weak;
+}
+
+function findCounters(enemyName) {
+  const enemyWeak = getWeakList(enemyName);
+
+  return MY_CHAMPS.flatMap(myChamp => {
+    const d = DATA[myChamp];
+    if (!d) return [];
+
+    // 1. Le champion joué dit explicitement qu'il est fort contre l'ennemi.
+    const strongMatch = (d.strong || []).find(s => s.n === enemyName);
+    if (strongMatch) {
+      return [{name: myChamp, reason: strongMatch.r}];
+    }
+
+    // 2. Le counter normal de l'ennemi contient notre champion.
+    //    C'est précisément le cas qui manquait auparavant.
+    const enemyMatch = enemyWeak.find(w => w.n === myChamp);
+    if (enemyMatch) {
+      return [{
+        name: myChamp,
+        reason: enemyMatch.r || "Counter identifié dans les matchups de l'ennemi."
+      }];
+    }
+
+    // 3. Fallback sur les relations croisées des données locales.
+    const derived = getDerivedMatchups(myChamp).strong.find(s => s.n === enemyName);
+    if (derived) {
+      return [{name: myChamp, reason: derived.r}];
+    }
+
+    return [];
+  }).filter((item, index, arr) =>
+    arr.findIndex(x => x.name === item.name) === index
+  );
+}
+
+function findGoodInto(enemyName) {
+  return getWeakList(enemyName).slice(0, 6);
+}
+
+init();
+
+
+</script>
+
+
+<!-- ══════════════════════════════════════════════════════════
+     LOL MID ORACLE — page overlay
+══════════════════════════════════════════════════════════ -->
+<div id="lol-page">
+  <div id="tooltip" class="item-tooltip"></div>
+
+<div class="wrap">
+
+  <!-- HEADER -->
+  <header>
+    <div class="logo-rune">
+      <svg viewBox="0 0 56 56" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <polygon points="28,3 53,16 53,40 28,53 3,40 3,16" fill="none" stroke="#C89B3C" stroke-width="1.5" opacity=".4"/>
+        <polygon points="28,8 48,19.5 48,36.5 28,48 8,36.5 8,19.5" fill="none" stroke="#C89B3C" stroke-width="1"/>
+        <circle cx="28" cy="28" r="8" fill="none" stroke="#C89B3C" stroke-width="1.5"/>
+        <circle cx="28" cy="28" r="3" fill="#C89B3C" opacity=".8"/>
+        <line x1="28" y1="8"  x2="28" y2="20" stroke="#C89B3C" stroke-width="1" opacity=".5"/>
+        <line x1="28" y1="36" x2="28" y2="48" stroke="#C89B3C" stroke-width="1" opacity=".5"/>
+        <line x1="8"  y1="19.5" x2="20" y2="26.5" stroke="#C89B3C" stroke-width="1" opacity=".5"/>
+        <line x1="36" y1="29.5" x2="48" y2="36.5" stroke="#C89B3C" stroke-width="1" opacity=".5"/>
+        <line x1="48" y1="19.5" x2="36" y2="26.5" stroke="#C89B3C" stroke-width="1" opacity=".5"/>
+        <line x1="20" y1="29.5" x2="8"  y2="36.5" stroke="#C89B3C" stroke-width="1" opacity=".5"/>
+      </svg>
+    </div>
+    <h1>Mid Lane<br>Matchup & Build Oracle</h1>
+    <p class="subtitle">Patch 16.16 · Emerald+ · Mid Lane</p>
+  </header>
+<!-- MODE TABS -->
+  <div class="mode-tabs">
+    <button class="tab-btn active" onclick="setMode('mine')">🗡 Je joue ce champion</button>
+    <button class="tab-btn" onclick="setMode('enemy')">🎯 L'ennemi joue ce champion</button>
+  </div>
+
+  <!-- POOL FILTER -->
+  <div class="pool-filter-bar">
+    <button class="filter-chip active" id="filter-all" onclick="setPoolFilter('all')">Tous les champions</button>
+    <button class="filter-chip" id="filter-pool" onclick="setPoolFilter('pool')">⭐ Mon Pool (6)</button>
+  </div>
+
+  <!-- CHAMPION PROMPT -->
+  <div class="champion-prompt" id="search-label">
+    Quel champion joues-tu ?
+  </div>
+
+  <!-- GRID -->
+  <div class="champions-grid" id="champs-grid"></div>
+
+  <!-- RESULTS -->
+  <div id="result-panel">
+    <div class="result-header">
+      <div class="result-champ-icon" id="res-icon"></div>
+      <div class="result-info">
+        <h2 id="res-name"></h2>
+        <div class="result-meta" id="res-meta"></div>
+      </div>
+    </div>
+    <div id="res-body"></div>
+  </div>
+
+  <!-- EMPTY STATE -->
+  <div class="empty-state" id="empty-state">
+    <div class="rune">⬡</div>
+    <p>Sélectionne un champion pour voir ses builds,<br>ses matchups et les conseils pour la lane.</p>
+  </div>
+
+</div>
+</div>
+
+<!-- Back button (outside lol-page so it's always on top) -->
+<button id="lol-back-btn" onclick="closeLolPage()">
+  ← Retour au Setup
+</button>
 
 </body>
 </html>
+
+<style>
+@media (max-width: 760px) {
+  #lol-page .wrap {
+    padding-left: 18px !important;
+    padding-right: 18px !important;
+  }
+
+  .mode-tabs {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+
+  .tab-btn {
+    min-height: 82px;
+    padding: 18px;
+  }
+
+  .champion-prompt::before,
+  .champion-prompt::after {
+    display: none;
+  }
+}
+</style>
+
+<style>
+/* ── COMPACTAGE HORIZONTAL FINAL (~30 %) ── */
+#lol-page .build-section,
+#lol-page .build-grid {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+#lol-page .build-group {
+  min-width: 0;
+}
+
+#lol-page .item-list {
+  box-sizing: border-box;
+  width: 100%;
+}
+
+@media (max-width: 760px) {
+  #lol-page .wrap {
+    padding-left: 14px !important;
+    padding-right: 14px !important;
+  }
+
+  .mode-tabs {
+    gap: 12px;
+  }
+}
+</style>
+
+<style>
+/* ═════════════════════════════════════════════════════════════
+   NAVIGATION DU SITE
+   ═════════════════════════════════════════════════════════════ */
+.site-nav {
+  width: min(960px, calc(100% - 28px));
+  margin: 0 auto 34px;
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  padding: 7px;
+  border: 1px solid rgba(200,155,60,.30);
+  border-radius: 12px;
+  background: rgba(8,15,27,.88);
+  box-shadow: 0 8px 24px rgba(0,0,0,.22);
+  backdrop-filter: blur(8px);
+  position: relative;
+  z-index: 20;
+}
+
+.site-nav button {
+  flex: 1;
+  min-height: 44px;
+  border: 1px solid rgba(200,155,60,.18);
+  border-radius: 8px;
+  background: transparent;
+  color: var(--text-dim);
+  font-family: 'Cinzel', serif;
+  font-size: .76rem;
+  font-weight: 700;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: .2s ease;
+}
+
+.site-nav button:hover {
+  color: var(--gold-glow);
+  border-color: rgba(200,155,60,.55);
+  background: rgba(200,155,60,.08);
+}
+
+.site-nav button.active {
+  color: var(--gold-glow);
+  border-color: var(--gold);
+  background: linear-gradient(135deg, rgba(200,155,60,.18), rgba(200,155,60,.06));
+  box-shadow: inset 0 0 18px rgba(200,155,60,.05);
+}
+
+@media (max-width: 760px) {
+  .site-nav {
+    width: calc(100% - 20px);
+    margin-bottom: 22px;
+  }
+
+  .site-nav button {
+    font-size: .65rem;
+    letter-spacing: .04em;
+  }
+}
+</style>
+
+<script>
+function goToSetupMenu() {
+  closeLolPage();
+  const setup = document.getElementById('setup-page');
+  if (setup) setup.classList.add('active');
+  window.scrollTo({top: 0, behavior: 'smooth'});
+}
+
+function goToMatchupMenu() {
+  const setup = document.getElementById('setup-page');
+  if (setup) setup.classList.remove('active');
+  openLolPage();
+  window.scrollTo({top: 0, behavior: 'smooth'});
+}
+</script>
+
+<style>
+#global-site-nav {
+  position: fixed;
+  top: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(920px, calc(100% - 28px));
+  z-index: 10000;
+  pointer-events: none;
+}
+.global-nav-inner {
+  pointer-events: auto;
+  display: grid;
+  grid-template-columns: 1fr 1.35fr 1.35fr;
+  align-items: center;
+  gap: 8px;
+  padding: 7px;
+  border: 1px solid rgba(200,155,60,.38);
+  border-radius: 13px;
+  background: rgba(6,12,22,.94);
+  box-shadow: 0 10px 35px rgba(0,0,0,.38), inset 0 0 24px rgba(200,155,60,.025);
+  backdrop-filter: blur(12px);
+}
+.global-nav-brand {
+  padding: 0 15px;
+  color: rgba(200,155,60,.82);
+  font-family: 'Cinzel', serif;
+  font-size: .72rem;
+  font-weight: 700;
+  letter-spacing: .14em;
+  text-align: center;
+  white-space: nowrap;
+}
+.global-nav-inner button {
+  min-height: 42px;
+  border: 1px solid rgba(200,155,60,.2);
+  border-radius: 8px;
+  background: transparent;
+  color: #91a7ca;
+  font-family: 'Cinzel', serif;
+  font-size: .73rem;
+  font-weight: 700;
+  letter-spacing: .08em;
+  cursor: pointer;
+  transition: all .2s ease;
+}
+.global-nav-inner button:hover {
+  color: #f1c75b;
+  border-color: rgba(200,155,60,.62);
+  background: rgba(200,155,60,.08);
+  transform: translateY(-1px);
+}
+.global-nav-inner button.active {
+  color: #f1c75b;
+  border-color: #c89b3c;
+  background: linear-gradient(135deg, rgba(200,155,60,.18), rgba(200,155,60,.045));
+}
+#setup-page { padding-top: 78px; }
+#lol-page .wrap { padding-top: 78px !important; }
+
+@media (max-width: 760px) {
+  #global-site-nav { top: 7px; width: calc(100% - 14px); }
+  .global-nav-inner { grid-template-columns: 1fr 1.2fr 1.2fr; gap: 5px; padding: 5px; }
+  .global-nav-brand { display: none; }
+  .global-nav-inner button { font-size: .63rem; min-height: 38px; letter-spacing: .04em; }
+}
+</style>
+
+<script>
+function updateGlobalNav(active) {
+  const setup = document.getElementById('nav-setup');
+  const matchup = document.getElementById('nav-matchup');
+  if (setup) setup.classList.toggle('active', active === 'setup');
+  if (matchup) matchup.classList.toggle('active', active === 'matchup');
+}
+
+function goToSetupMenu() {
+  closeLolPage();
+  const setup = document.getElementById('setup-page');
+  if (setup) setup.classList.add('active');
+  updateGlobalNav('setup');
+  window.scrollTo({top: 0, behavior: 'smooth'});
+}
+
+function goToMatchupMenu() {
+  const setup = document.getElementById('setup-page');
+  if (setup) setup.classList.remove('active');
+  openLolPage();
+  updateGlobalNav('matchup');
+  const lol = document.getElementById('lol-page');
+  if (lol) lol.scrollTop = 0;
+}
+
+document.addEventListener('DOMContentLoaded', () => updateGlobalNav('setup'));
+</script>
