@@ -6,6 +6,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Mon Setup</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400..900&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
   <style>
     :root {
       --bg: #07090e;
@@ -19,8 +22,15 @@
 
     * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; }
 
-    body {
+    /* Fond sur <html> (et non sur <body>) : le canvas étoilé a z-index:-1,
+       un fond opaque sur <body> le couvrait. Avec le fond sur <html>,
+       les étoiles sont peintes au-dessus du fond. */
+    html {
       background-color: var(--bg);
+    }
+
+    body {
+      background-color: transparent;
       color: var(--text);
       min-height: 100vh;
       overflow-x: hidden;
@@ -186,7 +196,7 @@
     /* Filtrage global pour éliminer le fond blanc sur tous les logos */
     .game-logo img.logo-img {
       position: relative;
-      z-index: 1;
+      z-index: 60; /* au-dessus des images personnages (z-index 50) : le logo reste visible */
       width: 100%;
       object-fit: contain;
       display: block;
@@ -212,7 +222,7 @@
     /* Containers personnages - placé au-dessus du logo (z-index: 50) */
     .chars-wrap {
       position: fixed;
-      left: 0;
+      left: 0; /* COLLÉ au bord GAUCHE de la page : les images commencent tout à gauche et touchent le bord */
       top: 0;
       width: 45vw;
       height: 100vh;
@@ -228,7 +238,7 @@
       height: 38vh;
       opacity: 0;
       transform: translateX(-120%);
-      transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.4s ease;
+      transition: transform 1.2s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.8s ease; /* ralenti de moitié */
       pointer-events: none;
     }
 
@@ -237,7 +247,7 @@
       height: 100%;
       object-fit: contain;
       object-position: left top;
-      filter: drop-shadow(6px 6px 18px rgba(0,0,0,0.85));
+      filter: drop-shadow(3px 3px 10px rgba(0,0,0,0.55));
     }
 
     .char:nth-child(1) { top: 2vh;   z-index: 1; }
@@ -245,16 +255,40 @@
     .char:nth-child(3) { top: 42vh;  z-index: 3; }
     .char:nth-child(4) { top: 62vh;  z-index: 4; }
 
-    /* Effet miroir et suppression de fond spécifique pour le 4ème perso LoL */
-    #gl-lol .char:nth-child(4) img {
-      transform: scaleX(-1);
-      filter: url(#remove-white) drop-shadow(6px 6px 18px rgba(0,0,0,0.85));
+    /* Effet miroir et suppression de fond spécifique pour Kennen (1ère image LoL) */
+    #gl-lol .char:nth-child(1) img {
+      object-position: right top;
+      transform: scaleX(-1) translateX(10%) translateY(-8%); /* miroir + décalé GAUCHE (touche le bord) + HAUT (touche le haut de la page) */
+      filter: url(#remove-white) drop-shadow(3px 3px 8px rgba(0,0,0,0.5));
     }
 
+    /* ── Layout LoL : Kennen + Vi à GAUCHE (Kennen devant, Vi jusqu'au bas de la page derrière Diana), Diana 2x devant, Riven à droite ── */
+    #gl-lol .chars-wrap { width: 95vw; }
+    /* Kennen DEVANT le logo LoL : le logo LoL passe sous les personnages (z 40 < wrap 50) */
+    #gl-lol img.logo-img { z-index: 40; }
+    /* Vi (slot 3) : à GAUCHE, RÉTRÉCIE de 30% (28vw), REMONTÉE de 5vh (15vh au total), ancrée en bas, passe derrière Diana */
+    #gl-lol .char:nth-child(3) { top: -13vh; left: 0;    width: 28vw; height: 92vh; z-index: 7; }
+    /* Vi : collée au bord GAUCHE (marge du PNG coupée) et au BAS de la page */
+    #gl-lol .char:nth-child(3) img { object-position: left bottom; transform: translateX(-12%); }
+    /* Kennen (slot 1) : HAUT-GAUCHE (top: 0, left: 0), +30% au total (37vw x 40.7vh), haut + gauche fixes, DERRIÈRE Vi (miroir conservé) */
+    #gl-lol .char:nth-child(1) { top: 0;    left: 0;    width: 37vw; height: 40.7vh; z-index: 5; }
+    /* Riven (slot 2) : 30% plus à GAUCHE (16vw), grossie de 40% au total (58.1vw x 63.8vh), HAUT FIXE (top 9vh) — grandit vers le bas */
+    #gl-lol .char:nth-child(2) { top: 9vh; left: 16vw; width: 58.1vw; height: 63.8vh; z-index: 6; }
+    /* Diana (slot 4) : DOUBLÉE (76vw x 74vh), ancrée en bas, devant les autres */
+    #gl-lol .char:nth-child(4) { top: 26vh; left: 0; width: 76vw; height: 74vh; z-index: 10; }
+    /* Diana : le PNG a une marge transparente à gauche → on décale l'image vers la gauche pour la couper : Diana TOUCHE le bord gauche de la page */
+    #gl-lol .char:nth-child(4) img { object-position: left top; transform: translateX(-22%); }
+
+    /* Ordre d'apparition LoL : Diana d'abord → Vi → Kennen → Riven (décalages doublés) */
+    #gl-lol:hover .chars-wrap .char:nth-child(4) { transition-delay: 0s; }
+    #gl-lol:hover .chars-wrap .char:nth-child(3) { transition-delay: 0.24s; }
+    #gl-lol:hover .chars-wrap .char:nth-child(1) { transition-delay: 0.48s; }
+    #gl-lol:hover .chars-wrap .char:nth-child(2) { transition-delay: 0.72s; }
+
     .game-logo:hover .chars-wrap .char:nth-child(1) { opacity: 1; transform: translateX(0%);   transition-delay: 0s;    }
-    .game-logo:hover .chars-wrap .char:nth-child(2) { opacity: 1; transform: translateX(6%);   transition-delay: 0.12s; }
-    .game-logo:hover .chars-wrap .char:nth-child(3) { opacity: 1; transform: translateX(12%);  transition-delay: 0.24s; }
-    .game-logo:hover .chars-wrap .char:nth-child(4) { opacity: 1; transform: translateX(18%);  transition-delay: 0.36s; }
+    .game-logo:hover .chars-wrap .char:nth-child(2) { opacity: 1; transform: translateX(6%);   transition-delay: 0.24s; }
+    .game-logo:hover .chars-wrap .char:nth-child(3) { opacity: 1; transform: translateX(12%);  transition-delay: 0.48s; }
+    .game-logo:hover .chars-wrap .char:nth-child(4) { opacity: 1; transform: translateX(18%);  transition-delay: 0.72s; }
 
     /* ── RIGHT-SIDE IMAGES ── */
     #gallery {
@@ -316,6 +350,23 @@
       0%,100% { opacity: 0.35; }
       50%      { opacity: 0.8; }
     }
+
+    #img-diag {
+      position: absolute;
+      bottom: 18px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 14px;
+      font-weight: 600;
+      letter-spacing: .04em;
+      color: rgba(255,255,255,.75);
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      pointer-events: none;
+      z-index: 16;
+      white-space: nowrap;
+    }
+    #img-diag .ok { color: #35e08a; }
+    #img-diag .ko { color: #ff6b6b; }
 
     /* ═══════════════════════════════════════
        MAIN SETUP PAGE
@@ -513,6 +564,9 @@
     .detail-badge { align-self:flex-start; font-size:.65rem; font-weight:800; text-transform:uppercase; color:#07090e; background:var(--accent); padding:3px 8px; border-radius:16px; letter-spacing:.8px; }
     .detail-title { font-size:1.15rem; font-weight:800; color:#fff; line-height:1.2; }
     .detail-description { font-size:.82rem; line-height:1.5; color:var(--text-muted); border-top:1px solid var(--card-border); padding-top:10px; }
+    .detail-description .hl { color:var(--accent); font-weight:700; }
+    .peripheral-info p { font-size:.82rem; line-height:1.55; color:var(--text-muted); }
+    .peripheral-info .hl { color:var(--accent); font-weight:600; }
 
     .peripheral-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(290px,1fr)); gap:18px; }
 
@@ -568,8 +622,11 @@
   text-align: center;
 }
 #lol-page .champions-grid {
-  margin-left: auto !important;
-  margin-right: auto !important;
+  /* La grille utilise la place à gauche et à droite de la page (8 cases par ligne) ; le reste de la page garde sa largeur d'origine */
+  width: 1500px;
+  max-width: calc(100vw - 40px);
+  margin-left: calc((100% - 1500px) / 2) !important;
+  margin-right: calc((100% - 1500px) / 2) !important;
 }
 #lol-page .mode-tabs,
 #lol-page .pool-filter-bar,
@@ -616,11 +673,11 @@
   to   { opacity:1; transform: translateY(0); }
 }
 
-/* ── Isolate gemini styles under #lol-page ── */
-#lol-page 
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+/* ── Isolate gemini styles under #lol-page ──
+   (réinitialisation globale déjà présente en tête de page : * { margin:0; padding:0; box-sizing:border-box }) */
 
-  :root {
+  /* Variables + texte scopés à la page LOL (ne plus écraser les variables globales du setup) */
+  #lol-page {
     --bg:        #050A12;
     --bg2:       #090F1A;
     --bg3:       #0D1525;
@@ -630,6 +687,7 @@
     --gold-dim:  #8A6A24;
     --gold-glow: #E8B84B;
     --blue:      #0BC4E3;
+    --blue-light:#9FDBFF;
     --blue-dim:  #0778A0;
     --red:       #C84B31;
     --red-dim:   #7A2A18;
@@ -639,18 +697,13 @@
     --text-dim:  #6B7FA0;
     --text-light:#E8D9B8;
     --white:     #F0EAD6;
-  }
-
-  html, body {
-    background: var(--bg);
     color: var(--text);
     font-family: 'Inter', sans-serif;
-    min-height: 100vh;
-    overflow-x: hidden;
   }
 
-  /* ── BACKGROUND ── */
-  body::before {
+  /* ── BACKGROUND : décor (halos + grille) UNIQUEMENT sur la page LOL,
+     plus du tout sur la page setup (le fond étoilé réapparaît) ── */
+  #lol-page::before {
     content: '';
     position: fixed; inset: 0; z-index: 0;
     background:
@@ -818,30 +871,34 @@
 
   /* ── GRID ── */
   .champions-grid {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 14px;
+    display: grid;
+    grid-template-columns: repeat(8, minmax(0, 1fr)); /* 8 champions par ligne */
+    gap: 10px;
     justify-content: center;
     max-width: 960px;
     margin: 0 auto 90px;
     padding: 0 10px 10px;
   }
+  @media(max-width: 700px) {
+    .champions-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  }
   .champ-pill {
     background: linear-gradient(145deg, rgba(17,28,46,.98), rgba(8,16,29,.98));
     border: 2px solid rgba(200,155,60,.42);
-    border-radius: 14px;
-    padding: 12px 16px;
+    border-radius: 12px;
+    padding: 10px 10px; /* forme rectangulaire conservée, case plus étroite */
     cursor: pointer;
     transition: all .18s;
     display: flex;
+    flex-direction: row;
     align-items: center;
-    gap: 10px;
-    font-size: .9rem;
+    gap: 8px;
+    font-size: .74rem;
     color: var(--text);
     user-select: none;
     position: relative;
     white-space: nowrap;
-    flex-shrink: 0;
+    min-width: 0;
   }
   .champ-pill:hover {
     border-color: var(--gold-dim);
@@ -858,16 +915,15 @@
     border-color: rgba(200,155,60,.4);
   }
   .champ-pill .role-badge {
-    font-size: .66rem;
+    font-size: .58rem;
     color: var(--text-dim);
     background: var(--bg3);
-    padding: 2px 6px;
+    padding: 2px 5px;
     border-radius: 3px;
-    margin-left: 2px;
-    flex-shrink: 0;
+    margin-left: 0;
   }
   .champ-img-wrap {
-    width: 46px; height: 46px;
+    width: 40px; height: 40px;
     border-radius: 50%;
     overflow: hidden;
     flex-shrink: 0;
@@ -1036,7 +1092,12 @@
   }
 
   /* ── HOVER TOOLTIP ── */
+  /* Variables redéfinies ici car le tooltip est déplacé hors de #lol-page (body) : sans ça les couleurs tombent en blanc */
   .item-tooltip {
+    --gold: #C89B3C;
+    --gold-glow: #E8B84B;
+    --blue-light: #9FDBFF;
+    --text-light: #E8D9B8;
     position: fixed;
     z-index: 2147483647;
     display: none;
@@ -1065,13 +1126,13 @@
   }
   .item-tooltip .tt-cost {
     font-size: 0.75rem;
-    color: var(--gold);
+    color: var(--gold-glow);
     font-weight: 600;
   }
   .item-tooltip .tt-stats {
-    font-size: 0.75rem;
-    color: var(--blue);
-    font-weight: 600;
+    font-size: 0.78rem;
+    color: var(--blue-light);
+    font-weight: 700;
     margin-bottom: 8px;
     line-height: 1.35;
   }
@@ -1198,7 +1259,6 @@
 
 <nav id="global-site-nav" aria-label="Navigation principale">
   <div class="global-nav-inner">
-    <div class="global-nav-brand">MID LANE</div>
     <button type="button" id="nav-setup" onclick="goToSetupMenu()">🖥 <span>MON SETUP</span></button>
     <button type="button" id="nav-matchup" onclick="goToMatchupMenu()">⚔ <span>MATCHUP &amp; BUILD</span></button>
   </div>
@@ -1213,6 +1273,10 @@
         0 1 0 0 0
         0 0 1 0 0
         -1 -1 -1 3 0" />
+      <!-- Courbe : efface les fonds blancs/gris clairs tout en gardant les couleurs saturées -->
+      <feComponentTransfer>
+        <feFuncA type="gamma" amplitude="1" exponent="2.5" offset="0"/>
+      </feComponentTransfer>
     </filter>
   </svg>
 
@@ -1255,34 +1319,34 @@
 
         <!-- League of Legends -->
         <a href="#" class="game-logo" id="gl-lol" style="top:5%;" onclick="event.stopPropagation(); openLolPage(); return false;">
-          <img class="logo-img" src="https://logos-world.net/wp-content/uploads/2023/02/LoL-Symbol.png" alt="League of Legends"/>
+          <img class="logo-img" src="https://logos-world.net/wp-content/uploads/2023/02/LoL-Symbol.png" data-wiki="leagueoflegends" data-file="League_of_Legends_logo.png" onerror="fbImg(this)" alt="League of Legends"/>
           <div class="chars-wrap">
-            <div class="char"><img src="https://static.wikia.nocookie.net/leagueoflegends/images/a/a6/Akali_Render.png/revision/latest" alt="Akali"/></div>
-            <div class="char"><img src="https://static.wikia.nocookie.net/leagueoflegends/images/8/88/Jinx_Render.png/revision/latest" alt="Jinx"/></div>
-            <div class="char"><img src="https://github.com/ejayz-hub/mon-setup/blob/main/poppy.png?raw=true" alt="Yasuo"/></div>
-            <div class="char"><img src="https://i.pinimg.com/originals/b3/46/ca/b346cabc59b0b84b1d7f797f7111183e.png" alt="LoL Character 4"/></div>
+            <div class="char"><img src="https://www.kindpng.com/picc/m/382-3820964_thumb-image-league-of-legends-kennen-png-transparent.png" onerror="fbImg(this)" alt="Kennen"/></div>
+            <div class="char"><img src="https://www.pngmart.com/files/22/League-Of-Legends-PNG-Background-Image.png" onerror="fbImg(this)" alt="Riven"/></div>
+            <div class="char"><img src="https://www.pngmart.com/files/22/League-Of-Legends-Transparent-PNG.png" onerror="fbImg(this)" alt="Vi"/></div>
+            <div class="char"><img src="https://www.pngmart.com/files/22/League-Of-Legends-PNG.png" onerror="fbImg(this)" alt="Diana"/></div>
           </div>
         </a>
 
         <!-- Valorant -->
         <a href="https://playvalorant.com/" target="_blank" rel="noopener noreferrer" class="game-logo" id="gl-val" style="top:28%;" onclick="event.stopPropagation();">
-          <img class="logo-img" src="https://toppng.com/uploads/preview/valorant-logo-black-11608280059ccj8cbjenx.png" alt="Valorant"/>
+          <img class="logo-img" src="https://toppng.com/uploads/preview/valorant-logo-black-11608280059ccj8cbjenx.png" data-wiki="valorant" data-file="Valorant_logo.png" onerror="fbImg(this)" alt="Valorant"/>
           <div class="chars-wrap">
-            <div class="char"><img src="https://static.wikia.nocookie.net/valorant/images/3/35/Jett_artwork.png/revision/latest" alt="Jett"/></div>
-            <div class="char"><img src="https://static.wikia.nocookie.net/valorant/images/1/14/Phoenix_artwork.png/revision/latest" alt="Phoenix"/></div>
-            <div class="char"><img src="https://static.wikia.nocookie.net/valorant/images/b/b0/Reyna_artwork.png/revision/latest" alt="Reyna"/></div>
-            <div class="char"><img src="https://static.wikia.nocookie.net/valorant/images/1/1e/Sage_artwork.png/revision/latest" alt="Sage"/></div>
+            <div class="char"><img src="https://static.wikia.nocookie.net/valorant/images/1/1e/Sage_artwork.png/revision/latest" onerror="fbImg(this)" alt="Sage"/></div>
+            <div class="char"><img src="https://static.wikia.nocookie.net/valorant/images/7/79/Jett_artwork.png/revision/latest" data-wiki="valorant" data-file="Jett_artwork.png" onerror="fbImg(this)" alt="Jett"/></div>
+            <div class="char"><img src="https://static.wikia.nocookie.net/valorant/images/f/fa/Phoenix_artwork.png/revision/latest?cb=20200602020246" data-wiki="valorant" data-file="Phoenix_artwork.png" onerror="fbImg(this)" alt="Phoenix"/></div>
+            <div class="char"><img src="https://static.wikia.nocookie.net/valorant/images/4/41/Reyna_artwork.png/revision/latest?cb=20200602020340" data-wiki="valorant" data-file="Reyna_artwork.png" onerror="fbImg(this)" alt="Reyna"/></div>
           </div>
         </a>
 
         <!-- StarCraft -->
         <a href="https://starcraft2.blizzard.com/fr-fr/" target="_blank" rel="noopener noreferrer" class="game-logo" id="gl-sc" style="top:50%;" onclick="event.stopPropagation();">
-          <img class="logo-img" src="https://cdn2.steamgriddb.com/file/sgdb-cdn/logo_thumb/4ccea3161064506dda8e0c9fd416d1ae.png" alt="StarCraft II"/>
+          <img class="logo-img" src="https://cdn2.steamgriddb.com/file/sgdb-cdn/logo_thumb/4ccea3161064506dda8e0c9fd416d1ae.png" data-wiki="starcraft" data-file="StarCraft_II_logo.png" onerror="fbImg(this)" alt="StarCraft II"/>
           <div class="chars-wrap">
-            <div class="char"><img src="https://static.wikia.nocookie.net/starcraft/images/d/d3/JimRaynor_SC2_Art1.png/revision/latest" alt="Terran"/></div>
-            <div class="char"><img src="https://static.wikia.nocookie.net/starcraft/images/e/e1/Kerrigan_SC2_Rend1.png/revision/latest" alt="Zerg"/></div>
-            <div class="char"><img src="https://static.wikia.nocookie.net/starcraft/images/4/41/Artanis_SC2-LotV_Rend1.png/revision/latest" alt="Protoss"/></div>
-            <div class="char"><img src="https://static.wikia.nocookie.net/starcraft/images/b/b6/NovaTerra_SC2-NCO_Rend1.png/revision/latest" alt="Nova"/></div>
+            <div class="char"><img src="https://tse1.mm.bing.net/th/id/OIP.1KvcPIpDQAkEChcIE5yYwAHaEM?r=0&pid=Api" onerror="fbImg(this)" alt="Terran"/></div>
+            <div class="char"><img src="https://w7.pngwing.com/pngs/944/523/png-transparent-starcraft-ii-wings-of-liberty-blizzcon-characters-of-starcraft-video-game-sarah-kerrigan-others-video-game-fictional-character-desktop-wallpaper.png" onerror="fbImg(this)" alt="Zerg"/></div>
+            <div class="char"><img src="https://static.wikia.nocookie.net/starcraft/images/4/41/Artanis_SC2-LotV_Rend1.png/revision/latest" onerror="fbImg(this)" alt="Protoss"/></div>
+            <div class="char"><img src="https://static.wikia.nocookie.net/starcraft/images/5/57/NovaTerra_SC2-NCO_Rend1.png/revision/latest?cb=20151202011514" onerror="fbImg(this)" alt="Nova"/></div>
           </div>
         </a>
 
@@ -1290,10 +1354,10 @@
         <a href="https://www.minecraft.net/" target="_blank" rel="noopener noreferrer" class="game-logo" id="gl-mc" style="top:74%;" onclick="event.stopPropagation();">
           <img class="logo-img" src="https://clipartcraft.com/images/minecraft-logo-png-2.png" alt="Minecraft"/>
           <div class="chars-wrap">
-            <div class="char"><img src="https://static.wikia.nocookie.net/minecraft_gamepedia/images/d/d4/Steve_JE4.png/revision/latest" alt="Steve"/></div>
-            <div class="char"><img src="https://static.wikia.nocookie.net/minecraft_gamepedia/images/a/a9/Alex_JE3.png/revision/latest" alt="Alex"/></div>
-            <div class="char"><img src="https://static.wikia.nocookie.net/minecraft_gamepedia/images/b/b9/Creeper_JE2_BE1.png/revision/latest" alt="Creeper"/></div>
-            <div class="char"><img src="https://static.wikia.nocookie.net/minecraft_gamepedia/images/d/d5/Enderman_JE2_BE2.png/revision/latest" alt="Enderman"/></div>
+            <div class="char"><img src="https://static.wikia.nocookie.net/minecraft_gamepedia/images/d/d4/Steve_JE4.png/revision/latest" onerror="fbImg(this)" alt="Steve"/></div>
+            <div class="char"><img src="https://static.wikia.nocookie.net/minecraft_gamepedia/images/a/a9/Alex_JE3.png/revision/latest" onerror="fbImg(this)" alt="Alex"/></div>
+            <div class="char"><img src="https://static.wikia.nocookie.net/minecraft_gamepedia/images/b/b9/Creeper_JE2_BE1.png/revision/latest" onerror="fbImg(this)" alt="Creeper"/></div>
+            <div class="char"><img src="https://static.wikia.nocookie.net/minecraft_gamepedia/images/d/d5/Enderman_JE2_BE2.png/revision/latest" onerror="fbImg(this)" alt="Enderman"/></div>
           </div>
         </a>
 
@@ -1302,19 +1366,19 @@
       <!-- Gallery images -->
       <div id="gallery">
         <div class="gal-img" id="gi0" style="top:0%;right:1%;width:68%;height:31%;">
-          <img src="https://github.com/ejayz-hub/mon-setup/blob/main/ordi1.png?raw=true" alt="Ordi 1" loading="lazy"/>
+          <img src="https://raw.githubusercontent.com/ejayz-hub/mon-setup/main/ordi1.png" alt="Ordi 1" loading="lazy"/>
         </div>
         <div class="gal-img" id="gi1" style="top:20%;right:10%;width:62%;height:31%;">
-          <img src="https://github.com/ejayz-hub/mon-setup/blob/main/ecran1.png?raw=true" alt="Ecran 1" loading="lazy"/>
+          <img src="https://raw.githubusercontent.com/ejayz-hub/mon-setup/main/ecran1.png" alt="Ecran 1" loading="lazy"/>
         </div>
         <div class="gal-img" id="gi2" style="top:40%;right:0%;width:68%;height:31%;">
-          <img src="https://github.com/ejayz-hub/mon-setup/blob/main/ordi2.png?raw=true" alt="Ordi 2" loading="lazy"/>
+          <img src="https://raw.githubusercontent.com/ejayz-hub/mon-setup/main/ordi2.png" alt="Ordi 2" loading="lazy"/>
         </div>
         <div class="gal-img" id="gi3" style="top:60%;right:10%;width:62%;height:31%;">
-          <img src="https://github.com/ejayz-hub/mon-setup/blob/main/ecran2.png?raw=true" alt="Ecran 2" loading="lazy"/>
+          <img src="https://raw.githubusercontent.com/ejayz-hub/mon-setup/main/ecran2.png" alt="Ecran 2" loading="lazy"/>
         </div>
         <div class="gal-img" id="gi4" style="top:74%;right:0%;width:68%;height:31%;">
-          <img src="https://github.com/ejayz-hub/mon-setup/blob/main/ordi3.png?raw=true" alt="Ordi 3" loading="lazy"/>
+          <img src="https://raw.githubusercontent.com/ejayz-hub/mon-setup/main/ordi3.png" alt="Ordi 3" loading="lazy"/>
         </div>
       </div>
 
@@ -1432,7 +1496,7 @@
           <div class="peripheral-info">
             <span class="peripheral-tag">Souris Ergonomique</span>
             <h3>Razer Pro Click V2 Vertical</h3>
-            <p>Souris ergonomique verticale à 6 boutons conçue pour une posture naturelle du poignet et une précision bureautique/créative maximale.</p>
+            <p>Souris ergonomique <span class="hl">verticale à 6 boutons</span> conçue pour une <span class="hl">posture naturelle du poignet</span> et une précision bureautique/créative maximale.</p>
           </div>
         </div>
         <div class="peripheral-card">
@@ -1442,7 +1506,7 @@
           <div class="peripheral-info">
             <span class="peripheral-tag">Clavier Gamer</span>
             <h3>ASUS ROG Low Profile Blanc</h3>
-            <p>Clavier mécanique compact au format Low Profile, finition blanche élégante pour s'accorder parfaitement avec la tour.</p>
+            <p>Clavier <span class="hl">mécanique</span> compact au format <span class="hl">Low Profile</span>, finition blanche élégante pour s'accorder parfaitement avec la tour.</p>
           </div>
         </div>
       </div>
@@ -1458,7 +1522,7 @@
         <div class="peripheral-info">
           <span class="peripheral-tag">Écran OLED 77"</span>
           <h3>LG OLED 77G26LA</h3>
-          <p>Écran géant OLED 77 pouces de série G2 avec résolution 4K, dalle ultra lumineuse et taux de rafraîchissement 120Hz.</p>
+          <p>Écran géant <span class="hl">OLED 77 pouces</span> de série G2 avec résolution <span class="hl">4K</span>, dalle ultra lumineuse et taux de rafraîchissement <span class="hl">120Hz</span>.</p>
         </div>
       </div>
     </div>
@@ -1474,7 +1538,7 @@
           <div class="peripheral-info">
             <span class="peripheral-tag">Microphone USB</span>
             <h3>Blue Yeti</h3>
-            <p>Microphone USB multi-directivité légendaire, parfait pour le streaming et la création de contenu.</p>
+            <p>Microphone USB <span class="hl">multi-directivité</span> légendaire, parfait pour le <span class="hl">streaming</span> et la création de contenu.</p>
           </div>
         </div>
         <div class="peripheral-card">
@@ -1484,7 +1548,7 @@
           <div class="peripheral-info">
             <span class="peripheral-tag">Enceintes Actives Haute Fidélité</span>
             <h3>KEF LS50 Wireless 2</h3>
-            <p>Système stéréophonique haut de gamme sans fil avec haut-parleurs Uni-Q de 12ème génération.</p>
+            <p>Système stéréophonique <span class="hl">haut de gamme</span> sans fil avec haut-parleurs <span class="hl">Uni-Q de 12ème génération</span>.</p>
           </div>
         </div>
         <div class="peripheral-card">
@@ -1494,7 +1558,7 @@
           <div class="peripheral-info">
             <span class="peripheral-tag">Caissons de Basse (x2)</span>
             <h3>KEF KC62</h3>
-            <p>Paires de caissons de graves ultra-compacts haute performance dotées de la technologie Uni-Core.</p>
+            <p>Paires de caissons de graves ultra-compacts <span class="hl">haute performance</span> dotées de la technologie <span class="hl">Uni-Core</span>.</p>
           </div>
         </div>
         <div class="peripheral-card">
@@ -1504,7 +1568,7 @@
           <div class="peripheral-info">
             <span class="peripheral-tag">Écouteurs Intra-Auriculaires</span>
             <h3>FiiO FH7</h3>
-            <p>Écouteurs hybrides haute résolution équipés d'un transducteur dynamique au béryllium et de 4 armatures Knowles.</p>
+            <p>Écouteurs hybrides <span class="hl">haute résolution</span> équipés d'un transducteur dynamique au <span class="hl">béryllium</span> et de <span class="hl">4 armatures Knowles</span>.</p>
           </div>
         </div>
       </div>
@@ -1537,6 +1601,117 @@
     for(let i=0;i<3;i++) shoots.push(new Shoot());
     function anim(){ requestAnimationFrame(anim); cx.fillStyle='#07090e'; cx.fillRect(0,0,cv.width,cv.height); stars.forEach(s=>s.update()); shoots.forEach(s=>s.update()); }
     anim();
+  })();
+
+  /* ─── IMAGE FALLBACK (personnages au survol des logos) ───
+      Si l'image principale échoue, essaie data-fb-next, sinon masque le slot. */
+  function fbImg(img){
+    const next = img.getAttribute('data-fb-next');
+    if(next){
+      img.removeAttribute('data-fb-next');
+      img.onerror = null;
+      img.src = next;
+      img.onerror = function(){ fbImg(img); };
+      return;
+    }
+    const wiki = img.getAttribute('data-wiki');
+    const file = img.getAttribute('data-file');
+    if(wiki && file){
+      img.removeAttribute('data-wiki');
+      img.removeAttribute('data-file');
+      fandomUrl(wiki, file, function(url){
+        if(url){
+          img.onerror = null;
+          img.src = url;
+          img.onerror = function(){ const s = img.closest('.char'); if(s) s.style.display = 'none'; };
+        } else {
+          const s = img.closest('.char');
+          if(s) s.style.display = 'none';
+        }
+      });
+      return;
+    }
+    const slot = img.closest('.char');
+    if(slot) slot.style.display = 'none';
+  }
+
+  /* ─── RÉSOLUTION D'IMAGE FANDOM (wiki) ───
+      Récupère l'URL correcte d'un fichier d'une wiki Fandom via son API. */
+  function fandomUrl(wiki, file, cb){
+    /* JSONP : fonctionne même si CORS est bloqué */
+    const n = (fandomUrl._n = (fandomUrl._n || 0) + 1);
+    const cbName = '__fandomCb' + n;
+    let done = false;
+    const sc = document.createElement('script');
+    const finish = function(u){
+      if(done) return;
+      done = true;
+      try { delete window[cbName]; } catch(e) { window[cbName] = undefined; }
+      if(sc && sc.parentNode) sc.parentNode.removeChild(sc);
+      cb(u);
+    };
+    window[cbName] = function(d){
+      const pg = d && d.query && d.query.pages && d.query.pages[0];
+      const u = pg && pg.imageinfo && pg.imageinfo[0] && pg.imageinfo[0].url;
+      finish(u || null);
+    };
+    sc.onerror = function(){ finish(null); };
+    sc.src = 'https://' + wiki + '.fandom.com/api.php?action=query&titles=' +
+      encodeURIComponent('File:' + file) + '&prop=imageinfo&iiprop=url&format=json&formatversion=2&callback=' + cbName;
+    document.body.appendChild(sc);
+    setTimeout(function(){ finish(null); }, 8000);
+  }
+
+  /* ─── DIAGNOSTIC CHARGEMENT DES IMAGES ───
+      Teste une image par source et affiche le résultat en bas du splash. */
+  (function(){
+    const tests = [
+      ['Internet', 'https://www.google.com/favicon.ico'],
+      ['LoL', 'https://www.pngmart.com/files/21/Ahri-League-of-Legends-Download-PNG-Image.png'],
+      ['Valorant', 'https://static.wikia.nocookie.net/valorant/images/7/79/Jett_artwork.png/revision/latest'],
+      ['StarCraft', 'https://static.wikia.nocookie.net/starcraft/images/d/d3/JimRaynor_SC2_Art1.png/revision/latest'],
+      ['Minecraft', 'https://static.wikia.nocookie.net/minecraft_gamepedia/images/d/d4/Steve_JE4.png/revision/latest']
+    ];
+    const results = [];
+    function render(final){
+      const el = document.getElementById('img-diag');
+      if(!el) return;
+      const html = results.map(function(r){
+        return '<span class="' + (r[1] ? 'ok' : 'ko') + '">' + r[0] + (r[1] ? ' ✔' : ' ✘') + '</span>';
+      }).join(' &nbsp; ');
+      el.innerHTML = 'V6 — ' + html + (final ? '' : ' …');
+    }
+    tests.forEach(function(pair){
+      const name = pair[0], url = pair[1];
+      const im = new Image();
+      let settled = false;
+      function finish(ok){
+        if(settled) return;
+        settled = true;
+        results.push([name, ok]);
+        render(results.length >= tests.length);
+      }
+      const timer = setTimeout(function(){ finish(false); }, 8000);
+      im.onload = function(){ clearTimeout(timer); finish(true); };
+      im.onerror = function(){ clearTimeout(timer); finish(false); };
+      im.src = url;
+    });
+  })();
+
+  /* ─── LISTE DES IMAGES DU REPO GITHUB (source qui marche chez l'utilisateur) ─── */
+  (function(){
+    try{
+      fetch('https://api.github.com/repos/ejayz-hub/mon-setup/contents/', { mode: 'cors' })
+        .then(function(r){ return r.json(); })
+        .then(function(d){
+          if(Array.isArray(d)){
+            const names = d.map(function(f){ return f.name; }).filter(function(n){ return /\.(png|jpg|jpeg|gif|webp)$/i.test(n); });
+            const el = document.getElementById('img-diag');
+            if(el) el.innerHTML += ' &nbsp;|&nbsp; <span class="ok">Repo : ' + (names.join(', ') || '(aucune image)') + '</span>';
+          }
+        })
+        .catch(function(){});
+    }catch(e){}
   })();
 
   /* ─── SPLASH SEQUENCE ─── */
@@ -1607,16 +1782,16 @@
 
   /* ─── SETUP PAGE LOGIC ─── */
   const componentsData = {
-    'psu':      { type:'Alimentation',        title:'HyperX PS-4122-2 1200W',                 img:'https://ejayz-hub.github.io/mon-setup/A.png', desc:'Bloc d\'alimentation modulaire 1200W platinium pour un apport électrique stable.' },
-    'case':     { type:'Boîtier',             title:'Corsair AIR 5400 RS Blanc',               images:['https://assets.corsair.com/image/upload/c_pad,q_85,h_1100,w_1100,f_auto/products/air-5400/RS-R-WHITE/gallery/AIR_5400_RS-R_ARGB_White_Artboard01_AA.webp','https://assets.corsair.com/image/upload/c_pad,q_85,h_1100,w_1100,f_auto/products/air-5400/RS-R-WHITE/gallery/AIR_5400_RS-R_ARGB_White_Artboard03_AA.webp'], desc:'Boîtier moyen-tour triple chambre avec panneau panoramique en verre trempé.' },
-    'fans-top': { type:'Ventilateurs Haut (x3)', title:'Corsair RS120 ARGB Blanc',             img:'https://assets.corsair.com/image/upload/c_pad,q_85,h_1100,w_1100,f_auto/products/Fans/base-rs-argb-series-config/gallery/120/triple/white/RS120_ARGB_WHT_TRPL_01.webp', desc:'3× ventilateurs 120mm PWM ARGB en extraction supérieure.' },
-    'aio':      { type:'Watercooling',        title:'Corsair 360 AIO Nautilus Blanc',          img:'https://assets.corsair.com/image/upload/c_pad,q_85,h_1100,w_1100,f_auto/products/Liquid-Cooling/nautilus/Gallery/CW-9060095-WW/CW-9060095-WW_01.webp', desc:'Système AIO radiateur 360mm haute performance silencieux.' },
-    'ram':      { type:'Mémoire RAM',         title:'32 Go DDR5 (2x16 Go HP60U40S8HA-16FRE)',  img:'https://ejayz-hub.github.io/mon-setup/R.png', desc:'Kit DDR5 haute fréquence pour débit maximal et stabilité.' },
-    'cpu':      { type:'Processeur',          title:'AMD Ryzen 7 9800X3D',                     img:'https://assets-prd.ignimgs.com/2024/11/05/9800x3d-3-1730839746205.jpg', desc:'Processeur gaming ultime avec 3D V-Cache 2ème génération.' },
-    'gpu':      { type:'Carte Graphique',     title:'NVIDIA RTX 5090 HP Omen',                 img:'https://blog.nbb.com/wp-content/uploads/2025/03/DSCF0586-Kopie.webp', desc:'Architecture Blackwell, 32 Go VRAM GDDR7, performance absolue.' },
-    'ssd':      { type:'Stockage (2x SSD)',   title:'2x SSD 2 To Gigabyte AORUS NVMe Gen4',    img:'https://ejayz-hub.github.io/mon-setup/S.PNG', desc:'2× 2 To M.2 NVMe PCIe 4.0 x4 avec dissipateurs thermiques cuivre.' },
-    'fans-bot': { type:'Ventilateurs Bas (x3)', title:'Corsair RS120 ARGB Reverse',            img:'https://assets.corsair.com/image/upload/c_pad,q_85,h_1100,w_1100,f_auto/products/Fans/base-rs-argb-config/Gallery/CO-9050197-WW/CO-9050197-WW_01.webp', desc:'3× ventilateurs 120mm pales inversées en intake inférieur.' },
-    'mobo':     { type:'Carte Mère',          title:'Gigabyte B850 AORUS Stealth Ice',          images:['https://static.gigabyte.com/StaticFile/Image/Global/ed71caf62ebb565841883f77562c5273/ProductRemoveBg/45267/webp/2000','https://ejayz-hub.github.io/mon-setup/MA.png'], desc:'AM5 blanche Stealth, PCIe 5.0, Wi-Fi 7, connecteurs arrière.' },
+    'psu':      { type:'Alimentation',        title:'HyperX PS-4122-2 1200W',                 img:'https://ejayz-hub.github.io/mon-setup/A.png', desc:'Bloc d\'alimentation <span class="hl">modulaire 1200W</span> platinium pour un apport électrique stable.' },
+    'case':     { type:'Boîtier',             title:'Corsair AIR 5400 RS Blanc',               images:['https://assets.corsair.com/image/upload/c_pad,q_85,h_1100,w_1100,f_auto/products/air-5400/RS-R-WHITE/gallery/AIR_5400_RS-R_ARGB_White_Artboard01_AA.webp','https://assets.corsair.com/image/upload/c_pad,q_85,h_1100,w_1100,f_auto/products/air-5400/RS-R-WHITE/gallery/AIR_5400_RS-R_ARGB_White_Artboard03_AA.webp'], desc:'Boîtier <span class="hl">moyen-tour triple chambre</span> avec panneau panoramique en <span class="hl">verre trempé</span>.' },
+    'fans-top': { type:'Ventilateurs Haut (x3)', title:'Corsair RS120 ARGB Blanc',             img:'https://assets.corsair.com/image/upload/c_pad,q_85,h_1100,w_1100,f_auto/products/Fans/base-rs-argb-series-config/gallery/120/triple/white/RS120_ARGB_WHT_TRPL_01.webp', desc:'<span class="hl">3× ventilateurs 120mm</span> <span class="hl">PWM ARGB</span> en extraction supérieure.' },
+    'aio':      { type:'Watercooling',        title:'Corsair 360 AIO Nautilus Blanc',          img:'https://assets.corsair.com/image/upload/c_pad,q_85,h_1100,w_1100,f_auto/products/Liquid-Cooling/nautilus/Gallery/CW-9060095-WW/CW-9060095-WW_01.webp', desc:'Système AIO <span class="hl">radiateur 360mm</span> haute performance silencieux.' },
+    'ram':      { type:'Mémoire RAM',         title:'32 Go DDR5 (2x16 Go HP60U40S8HA-16FRE)',  img:'https://ejayz-hub.github.io/mon-setup/R.png', desc:'Kit <span class="hl">DDR5</span> haute fréquence pour <span class="hl">débit maximal</span> et stabilité.' },
+    'cpu':      { type:'Processeur',          title:'AMD Ryzen 7 9800X3D',                     img:'https://assets-prd.ignimgs.com/2024/11/05/9800x3d-3-1730839746205.jpg', desc:'Processeur gaming ultime avec <span class="hl">3D V-Cache 2ème génération</span>.' },
+    'gpu':      { type:'Carte Graphique',     title:'NVIDIA RTX 5090 HP Omen',                 img:'https://blog.nbb.com/wp-content/uploads/2025/03/DSCF0586-Kopie.webp', desc:'Architecture <span class="hl">Blackwell</span>, <span class="hl">32 Go VRAM GDDR7</span>, performance absolue.' },
+    'ssd':      { type:'Stockage (2x SSD)',   title:'2x SSD 2 To Gigabyte AORUS NVMe Gen4',    img:'https://ejayz-hub.github.io/mon-setup/S.PNG', desc:'<span class="hl">2× 2 To</span> M.2 <span class="hl">NVMe PCIe 4.0</span> x4 avec dissipateurs thermiques cuivre.' },
+    'fans-bot': { type:'Ventilateurs Bas (x3)', title:'Corsair RS120 ARGB Reverse',            img:'https://assets.corsair.com/image/upload/c_pad,q_85,h_1100,w_1100,f_auto/products/Fans/base-rs-argb-config/Gallery/CO-9050197-WW/CO-9050197-WW_01.webp', desc:'<span class="hl">3× ventilateurs 120mm</span> <span class="hl">pales inversées</span> en intake inférieur.' },
+    'mobo':     { type:'Carte Mère',          title:'Gigabyte B850 AORUS Stealth Ice',          images:['https://static.gigabyte.com/StaticFile/Image/Global/ed71caf62ebb565841883f77562c5273/ProductRemoveBg/45267/webp/2000','https://ejayz-hub.github.io/mon-setup/MA.png'], desc:'<span class="hl">AM5</span> blanche Stealth, <span class="hl">PCIe 5.0</span>, <span class="hl">Wi-Fi 7</span>, connecteurs arrière.' },
   };
 
   const cards     = document.querySelectorAll('.component-card');
@@ -1661,7 +1836,7 @@
     setTimeout(()=>{
       document.getElementById('detail-type').textContent=data.type;
       document.getElementById('detail-title').textContent=data.title;
-      document.getElementById('detail-desc').textContent=data.desc;
+      document.getElementById('detail-desc').innerHTML=data.desc;
       di.src=currentCompImages[0]; di.classList.remove('zoom-subwoofer');
       di.style.opacity='1'; di.style.transform='scale(1)';
     },150);
@@ -1767,127 +1942,170 @@ const ITEMS = {
   6673: { n: "Arc-bouclier immortel", g: 3000, stats: "+55 AD · +25% Crit", desc: "Subir des dégâts critiques mortels déclenche un bouclier physique massif pendant 3 secondes." },
   6333: { n: "Danse de la mort", g: 3200, stats: "+60 AD · +45 Armure · +15 Hâte", desc: "Diffère 30% des dégâts subis sous forme de saignement sur 3s, effacé instantanément lors d'un kill." },
   3026: { n: "Ange gardien", g: 3200, stats: "+55 AD · +45 Armure", desc: "Lors de dégâts mortels, vous ramène à la vie avec 50% de vos PV de base et 30% de Mana après 4s." },
-  3094: { n: "Canon rapide", g: 3000, stats: "+35 AD · +30% Vitesse d'attaque · +25% Crit · +5% Vitesse", desc: "Se déplacer génère de l'Énergie. À 100 charges, votre prochaine attaque a sa portée augmentée de 35%." }
+  3094: { n: "Canon rapide", g: 3000, stats: "+35 AD · +30% Vitesse d'attaque · +25% Crit · +5% Vitesse", desc: "Se déplacer génère de l'Énergie. À 100 charges, votre prochaine attaque a sa portée augmentée de 35%." },
+  /* ── Items manquants ajoutés (présents dans les builds mais non définis) ── */
+  1082: { n: "Charme de la fée", g: 400, stats: "+45 Mana", desc: "Restaure 2 points de mana par seconde. Idéal en début de partie pour les mages." },
+  3078: { n: "Épée B.F.", g: 1300, stats: "+15 AD", desc: "Composant offensif de base pour augmenter les dégâts d'attaque des champions AD." },
+  3040: { n: "Visage d'esprit", g: 1000, stats: "+20 AP · +15% Hâte · +250 Mana", desc: "Régénère 6% du mana manquant chaque seconde. Excellent pour le sustain en lane." },
+  3110: { n: "Sandales mercurielles", g: 1100, stats: "+45 RM · +45 Vitesse", desc: "Actif : purge tous les effets de contrôle subis (stun, ralentissement, enchaînement, etc.)." },
+  3053: { n: "Sceptre de Sterak", g: 3400, stats: "+15 AD · +10% Crit · +10% Vitesse d'attaque", desc: "Actif : si votre vie descend sous 40%, gagnez un bouclier massif pendant 5 secondes." },
+  3065: { n: "Glaive noir", g: 3000, stats: "+55 AD · +50% Vitesse d'attaque", desc: "Les attaques de base infligent 8% des PV actuels de la cible en dégâts bonus (12% au-dessus de 55% de PV)." },
+  3071: { n: "Armure du gardien", g: 1000, stats: "+30 Armure · +30 RM", desc: "Octroie de l'armure et de la résistance magique bonus aux alliés proches." },
+  3161: { n: "Force de la nature", g: 900, stats: "+25 RM", desc: "Après avoir subi des dégâts, la prochaine compétence ennemie n'inflige aucun dégât (bouclier)." },
+  3742: { n: "Force de trinité", g: 3200, stats: "+20 AD · +15% Crit · +15% Vitesse d'attaque · +15% Vitesse", desc: "Après avoir lancé un sort, la prochaine attaque inflige des dégâts bonus et accorde un burst de vitesse." },
+  4401: { n: "Marteau du gardien", g: 900, stats: "+15 AD · +7,5 Armure", desc: "Après avoir subi des dégâts d'un champion, votre prochain coup de base inflige des dégâts bonus basés sur les PV perdus." }
 };
 
 const DATA = {
 
   "Nasus": {
     wr: 53.18, tier: "A", rank: "#2/56", pick: "2.41%", ban: "—",
-    build: { starter: [1054, 2003], boots: [3158, 3009], core: [3078, 3047, 3053, 3742, 3065], situational: [3111, 4401, 3110, 6333] }, strong: [], weak: [],
+    build: { starter: [1054, 2003], boots: [3158, 3009], core: [3078, 3047, 3053, 3742, 3065], situational: [3111, 4401, 3110, 6333] },
+    strong: [{n:"Malzahar", r:"Ton sustain et ton push le punit en late"}, {n:"Annie", r:"Burst early, puis tu scales au-delà"}, {n:"Orianna", r:"Tu outpushes et tu outlasts sa balle"}, {n:"Viktor", r:"Ton ulti en late le surclasse"}, {n:"Xerath", r:"Tu te rapproches et il n'a plus de sortie"}, {n:"Aurelion Sol", r:"Ton farm rapide outscale sa zone"}],
+    weak: [{n:"Diana", r:"Te burst avant ton scaling"}, {n:"Zed", r:"Te punit en early, tu ne peux pas suivre"}, {n:"Kassadin", r:"T'outscale et te résiste magique"}, {n:"LeBlanc", r:"Te pressure en early et te roam"}, {n:"Ahri", r:"Te dodge et te punit en early"}, {n:"Yasuo", r:"Te duel en post-6"}],
     tip: "Champion de scaling et de pression de lane à gérer selon la distance et les fenêtres de farm.",
     playstyle: "Il cherche à sécuriser son farm et à devenir très difficile à arrêter en milieu et fin de partie."
   },
   "Katarina": {
     wr: 50.68, tier: "A", rank: "#7/56", pick: "7.26%", ban: "—",
-    build: { starter: [1082, 2003], boots: [3020, 3111], core: [3100, 4645, 3157, 3089, 3135], situational: [3041, 3152, 3137] }, strong: [], weak: [],
+    build: { starter: [1082, 2003], boots: [3020, 3111], core: [3100, 4645, 3157, 3089, 3135], situational: [3041, 3152, 3137] },
+    strong: [{n:"Orianna", r:"Ta mobilité te gap-close et te burst"}, {n:"Lux", r:"Tu es hors de son cycle"}, {n:"Xerath", r:"Tu le burstes avant son poke"}, {n:"Veigar", r:"Tes resets te dodge sa cage"}, {n:"Annie", r:"Te burstes avant son ulti"}, {n:"Aurelion Sol", r:"Tu es hors de sa zone"}],
+    weak: [{n:"Malzahar", r:"Suppression = pas de reset possible"}, {n:"Kennen", r:"T'outrange en auto"}, {n:"Diana", r:"Te melee-burst en post-6"}, {n:"Gwen", r:"Te duel et te survive"}, {n:"Zoé", r:"T'outrange et te punit"}, {n:"Ziggs", r:"Te pokes derrière la vague"}],
     tip: "Surveille ses dagues et ses resets : éviter de lui offrir des éliminations faciles est prioritaire.",
     playstyle: "Très mobile, elle cherche les resets et les escarmouches autour des dagues."
   },
   "Lissandra": {
     wr: 51.18, tier: "A", rank: "#10/56", pick: "5.36%", ban: "—",
-    build: { starter: [1056, 2003], boots: [3020, 3158], core: [6653, 3116, 3157, 3089, 3135], situational: [4645, 3102, 3137] }, strong: [], weak: [],
+    build: { starter: [1056, 2003], boots: [3020, 3158], core: [6653, 3116, 3157, 3089, 3135], situational: [4645, 3102, 3137] },
+    strong: [{n:"Orianna", r:"Ta zone neutralise sa balle"}, {n:"Lux", r:"Ton engage te burst"}, {n:"Xerath", r:"Tu l'engages avant son poke"}, {n:"Annie", r:"Ta zone te lock"}, {n:"Veigar", r:"Tu bloques sa cage"}, {n:"Aurelion Sol", r:"Ton engage le punit"}],
+    weak: [{n:"Malzahar", r:"Suppression passe ta zone"}, {n:"Kennen", r:"T'outrange en auto"}, {n:"Yasuo", r:"Wall bloque ton engage"}, {n:"Zoé", r:"T'outrange et te punit"}, {n:"Ziggs", r:"Te poke hors de ta zone"}, {n:"Diana", r:"Te burst en post-6"}],
     tip: "Respecte son contrôle de zone et son potentiel d'engage avant de prendre un trade prolongé.",
     playstyle: "Elle privilégie le contrôle, le setup et les engagements fiables."
   },
   "Vex": {
     wr: 52.15, tier: "A", rank: "#11/56", pick: "2.69%", ban: "—",
-    build: { starter: [1056, 2003], boots: [3020], core: [6655, 4645, 3089, 3157, 3135], situational: [3102, 3137, 3116] }, strong: [], weak: [],
+    build: { starter: [1056, 2003], boots: [3020], core: [6655, 4645, 3089, 3157, 3135], situational: [3102, 3137, 3116] },
+    strong: [{n:"Orianna", r:"Ton passif bloque sa balle"}, {n:"Lux", r:"Te poke avant son cycle"}, {n:"Xerath", r:"Ton passif punit son poke"}, {n:"Annie", r:"Tu la burstes sur son stun"}, {n:"Veigar", r:"Te poke hors de sa cage"}, {n:"Aurelion Sol", r:"Ton burst le punit"}],
+    weak: [{n:"Malzahar", r:"Suppression = pas de dodge possible"}, {n:"Yasuo", r:"Wall + mobilité te punit"}, {n:"Gwen", r:"Te gap-close et te survive"}, {n:"Zoé", r:"T'outrange avec son E"}, {n:"Ziggs", r:"Te waveclear derrière la vague"}, {n:"Diana", r:"Te burst en post-6"}],
     tip: "Évite de lui donner gratuitement plusieurs déclenchements de son passif et respecte son burst.",
     playstyle: "Elle punit les champions qui dashent et cherche à convertir ses contrôles en burst."
   },
   "Hwei": {
     wr: 51.07, tier: "A", rank: "#12/56", pick: "4.35%", ban: "—",
-    build: { starter: [1056, 2003], boots: [3020, 3158], core: [3118, 6653, 4645, 3089, 3157], situational: [3135, 3137, 3102] }, strong: [], weak: [],
+    build: { starter: [1056, 2003], boots: [3020, 3158], core: [3118, 6653, 4645, 3089, 3157], situational: [3135, 3137, 3102] },
+    strong: [{n:"Orianna", r:"Te outranges en lane"}, {n:"Lux", r:"Ton poke le punit"}, {n:"Xerath", r:"Même logique, tu gères mieux la distance"}, {n:"Annie", r:"Te burstes avant son scaling"}, {n:"Veigar", r:"Te poke hors de sa cage"}, {n:"Aurelion Sol", r:"Ton range le force à des trades défavorables"}],
+    weak: [{n:"Malzahar", r:"Suppression te lock"}, {n:"Yasuo", r:"Te gap-close et te punit"}, {n:"Gwen", r:"Te duel en mêlée"}, {n:"Zoé", r:"T'outrange avec son E"}, {n:"Ziggs", r:"Te pokes derrière la vague"}, {n:"Diana", r:"Te burst en post-6"}],
     tip: "Joue autour de ses temps de récupération et de la portée de ses sorts.",
     playstyle: "Mage à longue portée qui veut contrôler la zone et les vagues."
   },
   "Locke": {
     wr: 49.54, tier: "A", rank: "#13/56", pick: "6.34%", ban: "—",
-    build: { starter: [1056, 2003], boots: [3020], core: [3100, 4645, 3089, 3157, 3135], situational: [6655, 3118, 3102] }, strong: [], weak: [],
+    build: { starter: [1056, 2003], boots: [3020], core: [3100, 4645, 3089, 3157, 3135], situational: [6655, 3118, 3102] },
+    strong: [{n:"Orianna", r:"Te burstes avant son positionnement"}, {n:"Lux", r:"Te gap-close son cycle"}, {n:"Xerath", r:"Tu le burstes avant son poke"}, {n:"Annie", r:"Te burstes sur son stun"}, {n:"Veigar", r:"Te dodge sa cage"}, {n:"Aurelion Sol", r:"Te burstes hors de sa zone"}],
+    weak: [{n:"Malzahar", r:"Suppression = pas d'escape"}, {n:"Kennen", r:"T'outrange en auto"}, {n:"Diana", r:"Te melee-burst"}, {n:"Gwen", r:"Te survive et te duel"}, {n:"Zoé", r:"T'outrange et te punit"}, {n:"Ziggs", r:"Te poke derrière la vague"}],
     tip: "Évite de lui offrir des trades gratuits et exploite ses fenêtres de récupération.",
     playstyle: "Assassin/mage de lane qui cherche à prendre l'avantage rapidement puis à snowball."
   },
   "Sylas": {
     wr: 49.30, tier: "A", rank: "#16/56", pick: "7.17%", ban: "—",
-    build: { starter: [1056, 2003], boots: [3020, 3158], core: [3152, 4633, 3157, 4645, 3089], situational: [3100, 3135, 3118] }, strong: [], weak: [],
+    build: { starter: [1056, 2003], boots: [3020, 3158], core: [3152, 4633, 3157, 4645, 3089], situational: [3100, 3135, 3118] },
+    strong: [{n:"Orianna", r:"Tu la burstes avec ton ulti volé"}, {n:"Lux", r:"Ta mobilité te punit"}, {n:"Xerath", r:"Tu le punit en teamfight"}, {n:"Annie", r:"Tu la burstes sur son stun"}, {n:"Veigar", r:"Tu punit sa cage"}, {n:"Aurelion Sol", r:"Tu le punit en teamfight"}],
+    weak: [{n:"Malzahar", r:"Suppression te lock"}, {n:"Yasuo", r:"Wall bloque ton engage"}, {n:"Gwen", r:"Te duel en mêlée"}, {n:"Zoé", r:"T'outrange"}, {n:"Ziggs", r:"Te poke hors de portée"}, {n:"Diana", r:"Te burst en post-6"}],
     tip: "Pense à la valeur de son soin et de son ultime volé avant de forcer un combat.",
     playstyle: "Combattant AP mobile qui veut prolonger les échanges et exploiter les ultimes adverses."
   },
   "Vladimir": {
     wr: 50.18, tier: "A", rank: "#21/56", pick: "3.91%", ban: "—",
-    build: { starter: [1056, 2003], boots: [3020], core: [4633, 4628, 3089, 3157, 3135], situational: [3100, 3116, 4645] }, strong: [], weak: [],
+    build: { starter: [1056, 2003], boots: [3020], core: [4633, 4628, 3089, 3157, 3135], situational: [3100, 3116, 4645] },
+    strong: [{n:"Orianna", r:"Ton sustain la punit"}, {n:"Lux", r:"Te sustain contre son cycle"}, {n:"Xerath", r:"Tu le burstes en late"}, {n:"Annie", r:"Ton sustain outscale son burst"}, {n:"Veigar", r:"Te sustain contre sa cage"}, {n:"Aurelion Sol", r:"Ton scaling le surclasse"}],
+    weak: [{n:"Malzahar", r:"Suppression te lock"}, {n:"Kennen", r:"T'outrange en auto"}, {n:"Diana", r:"Te burst avant ton sustain"}, {n:"Gwen", r:"Te duel en mêlée"}, {n:"Zoé", r:"T'outrange et te punit"}, {n:"Ziggs", r:"Te poke hors de portée"}],
     tip: "Profite de son début de partie plus vulnérable avant qu'il ne devienne très difficile à tuer.",
     playstyle: "Il cherche à survivre, scaler et devenir extrêmement fort dans les combats prolongés."
   },
   "Gwen": {
     wr: 52.43, tier: "A", rank: "#22/56", pick: "1.25%", ban: "—",
-    build: { starter: [1056, 2003], boots: [3020, 3047], core: [4633, 3115, 4645, 3089, 3157], situational: [4628, 3135, 3116] }, strong: [], weak: [],
+    build: { starter: [1056, 2003], boots: [3020, 3047], core: [4633, 3115, 4645, 3089, 3157], situational: [4628, 3135, 3116] },
+    strong: [{n:"Orianna", r:"Tu la gap-close et ton Snip Snip casse sa balle"}, {n:"Lux", r:"Tu rentres sur elle avant son cycle"}, {n:"Annie", r:"Ton bouclier W absorbe son burst, tu la duel"}, {n:"Viktor", r:"En mêlée, ton sustain la surclasse"}, {n:"Mel", r:"Tu la kites hors de sa zone, ton E la punit"}, {n:"Naafiri", r:"Ton W bloque son engage, tu la burst"}],
+    weak: [{n:"Kennen", r:"T'outrange, son stun bloque ton escape"}, {n:"Vex", r:"Son passif te punit sur tes dashes"}, {n:"Zoé", r:"T'outrange et te pick à distance"}, {n:"Ziggs", r:"Te poke derrière la vague, hors de ta portée"}, {n:"Malzahar", r:"Suppression = pas d'escape"}, {n:"Diana", r:"Te burst en post-6 avant que tu scales"}],
     tip: "Respecte son potentiel de duel et sa zone de brume pendant les échanges.",
     playstyle: "Combattante qui devient dangereuse dans les échanges prolongés et les combats rapprochés."
   },
   "Zoé": {
     wr: 50.47, tier: "A", rank: "#24/56", pick: "2.70%", ban: "—",
-    build: { starter: [1056, 2003], boots: [3020], core: [6655, 4645, 3089, 3157, 3135], situational: [3100, 3118, 3137] }, strong: [], weak: [],
+    build: { starter: [1056, 2003], boots: [3020], core: [6655, 4645, 3089, 3157, 3135], situational: [3100, 3118, 3137] },
+    strong: [{n:"Annie", r:"Tu la outranges, ton E la lock"}, {n:"Orianna", r:"Ton poke la punit avant sa balle"}, {n:"Viktor", r:"Tu la outranges en lane"}, {n:"Mel", r:"Ton E la pick, elle n'a pas de dash"}, {n:"Naafiri", r:"Ton range la punit à l'approche"}, {n:"Ahri", r:"Ton poke la harcèle, ton E la lock"}],
+    weak: [{n:"Zed", r:"Te all-in avant ton cycle"}, {n:"Diana", r:"Te burst en post-6"}, {n:"Kennen", r:"T'outrange, te root avant ton E"}, {n:"Yasuo", r:"Son Wall bloque ton E, te gap-close"}, {n:"Veigar", r:"Te outrange en late, sa cage te lock"}, {n:"Ziggs", r:"Te poke hors de portée"}],
     tip: "Joue autour de sa portée et surtout de son E : une erreur de positionnement peut coûter très cher.",
     playstyle: "Mage poke qui cherche à créer des picks à longue distance."
   },
   "Annie": {
     wr: 50.98, tier: "A", rank: "#27/56", pick: "1.83%", ban: "—",
-    build: { starter: [1056, 2003], boots: [3158, 3020], core: [6655, 4645, 3089, 3157, 3135], situational: [3100, 3118, 3137] }, strong: [], weak: [],
+    build: { starter: [1056, 2003], boots: [3158, 3020], core: [6655, 4645, 3089, 3157, 3135], situational: [3100, 3118, 3137] },
+    strong: [{n:"Viktor", r:"Ton burst la punit avant son scaling"}, {n:"Mel", r:"Aucun dash pour éviter ton combo"}, {n:"Orianna", r:"Ton burst arrive avant sa balle"}, {n:"Naafiri", r:"Ton stun + burst la one-shot"}, {n:"Ahri", r:"Ton stun passif la lock, ton R la finit"}, {n:"Syndra", r:"Pas d'escape, ton combo la tue"}],
+    weak: [{n:"Zed", r:"Te all-in avant ton combo"}, {n:"LeBlanc", r:"Te burst et s'échappe dans ses blinks"}, {n:"Diana", r:"Te all-in en post-6"}, {n:"Fizz", r:"Son E te dodge, te gap-close"}, {n:"Veigar", r:"Sa cage + Primordial Burst te lock"}, {n:"Ekko", r:"Très mobile, te punit sur chaque erreur"}],
     tip: "Compte son passif avant de t'engager : son stun peut transformer instantanément un trade.",
     playstyle: "Mage burst simple et fiable qui cherche une ouverture pour son combo."
   },
   "Anivia": {
     wr: 50.17, tier: "A", rank: "#28/56", pick: "2.39%", ban: "—",
-    build: { starter: [1056, 2003], boots: [3020, 3009], core: [3070, 3110, 3040, 3157, 6653], situational: [3089, 3135, 3118] }, strong: [], weak: [],
+    build: { starter: [1056, 2003], boots: [3020, 3009], core: [3070, 3110, 3040, 3157, 6653], situational: [3089, 3135, 3118] },
+    strong: [{n:"Orianna", r:"Ton mur + burst gagnent les trades early"}, {n:"Viktor", r:"Ton contrôle la punit en early"}, {n:"Mel", r:"Ton mur bloque ses sorts, tu la duel"}, {n:"Lux", r:"Ton burst gagne le trade court en early"}, {n:"Annie", r:"Ton contrôle la punit, tu scales"}, {n:"Aurelion Sol", r:"Ton early le punit avant sa zone"}],
+    weak: [{n:"Zed", r:"Te gap-close, ton mur ne le bloque pas"}, {n:"Diana", r:"Te all-in en post-6"}, {n:"Kassadin", r:"Te résiste magique et t'outscale"}, {n:"Ziggs", r:"Te poke derrière ton mur"}, {n:"Ekko", r:"Te punit sur tes longs cooldowns"}, {n:"LeBlanc", r:"Te dodge et te burst entre ses blinks"}],
     tip: "Punissez ses longs cooldowns et évitez de vous battre dans une zone qu'elle contrôle.",
     playstyle: "Mage de contrôle qui excelle dans le waveclear et la défense de zone."
   },
   "Yone": {
     wr: 48.00, tier: "B", rank: "#30/56", pick: "6.15%", ban: "—",
-    build: { starter: [1055, 2003], boots: [3006], core: [6672, 3031, 6673, 6333, 3026], situational: [3153, 3156, 3094] }, strong: [], weak: [],
+    build: { starter: [1055, 2003], boots: [3006], core: [6672, 3031, 6673, 6333, 3026], situational: [3153, 3156, 3094] },
+    strong: [{n:"Orianna", r:"Ton E t'immunise, tu la burst en mêlée"}, {n:"Lux", r:"Ton all-in la one-shot"}, {n:"Annie", r:"Ton E absorbe son burst, tu la duel"}, {n:"Viktor", r:"En mêlée, ton sustain la surclasse"}, {n:"Mel", r:"Ton E bloque son reflect, tu la duel"}, {n:"Aurelion Sol", r:"Ton E te sort de sa zone, tu la duel"}],
+    weak: [{n:"Kennen", r:"T'outrange, son stun te lock"}, {n:"Vex", r:"Son passif te punit sur tes dashes"}, {n:"Zoé", r:"T'outrange et te pick"}, {n:"Ziggs", r:"Te poke hors de ta portée"}, {n:"Malzahar", r:"Suppression = pas d'escape"}, {n:"Diana", r:"Te burst avant ton power spike"}],
     tip: "Surveille ses fenêtres d'engage et son retour de E avant de considérer le trade gagné.",
     playstyle: "Combattant mobile qui cherche les trades répétés puis l'all-in."
   },
   "Pantheon": {
     wr: 51.84, tier: "A", rank: "#31/56", pick: "0.81%", ban: "—",
-    build: { starter: [1055, 2003], boots: [3158, 3047], core: [6692, 3142, 3071, 3161, 3814], situational: [6696, 3156, 3053, 3035] }, strong: [], weak: [],
+    build: { starter: [1055, 2003], boots: [3158, 3047], core: [6692, 3142, 3071, 3161, 3814], situational: [6696, 3156, 3053, 3035] },
+    strong: [{n:"Orianna", r:"Ton early bully la punit avant sa balle"}, {n:"Annie", r:"Ton W + Q gagnent les trades early"}, {n:"Viktor", r:"Ton early la punit avant son scaling"}, {n:"Mel", r:"Ton burst court la one-shot en early"}, {n:"Naafiri", r:"Ton W absorbe son engage"}, {n:"Ahri", r:"Ton burst gagne le trade en early"}],
+    weak: [{n:"Zed", r:"Te punit sur tes erreurs, très mobile"}, {n:"Diana", r:"Te duel en post-6"}, {n:"Yasuo", r:"Son Wall + sustain te punit"}, {n:"Kennen", r:"T'outrange, te punit en permanence"}, {n:"Kassadin", r:"Te résiste magique, t'outscale"}, {n:"Ziggs", r:"Te poke hors de ta portée"}],
     tip: "Respecte son burst court et son bouclier avant de prolonger un échange.",
     playstyle: "Lane bully qui veut gagner les premiers trades et créer des actions avec son ultime."
   },
   "Talon": {
-    wr: 49.88, tier: "A", rank: "#32/56", pick: "1.89%", ban: "—",
-    build: { starter: [1036, 2003], boots: [3158], core: [3142, 6697, 3035, 3814, 6694], situational: [6692, 6696, 3156] }, strong: [], weak: [],
+    wr: 49.88, tier: "A", rank: "#32/56", pick: "1.89%", ban: "—", color: ["#1A0A0A","#DD3333"],
+    build: { starter: [1036, 2003], boots: [3158], core: [3142, 6697, 3035, 3814, 6694], situational: [6692, 6696, 3156] },
+    strong: [{n:"Orianna", r:"Te all-in avant qu'elle positionne sa balle"}, {n:"Lux", r:"Te gap-close, la one-shot"}, {n:"Viktor", r:"Te burst avant ton scaling"}, {n:"Xerath", r:"Mage immobile, te gap-close"}, {n:"Mel", r:"Ton burst la one-shot"}, {n:"Annie", r:"Ton all-in la tue avant son combo"}],
+    weak: [{n:"Diana", r:"Te survive en mêlée, te counter-all-in"}, {n:"Malzahar", r:"Suppression = tu meurs avec ton R"}, {n:"Kennen", r:"T'outrange, te poke sans fin"}, {n:"Lissandra", r:"Te lock dans sa zone"}, {n:"Ekko", r:"Très mobile, te punit sur chaque reset"}, {n:"Zed", r:"Te punit en early, ton all-in rate"}],
     tip: "Garde la vision sur les côtés : sa mobilité lui permet de transformer un avantage de lane en roam.",
     playstyle: "Assassin orienté roam qui cherche à quitter la lane et créer des supériorités numériques."
   },
   "Vel'Koz": {
     wr: 51.17, tier: "A", rank: "#33/56", pick: "0.94%", ban: "—",
-    build: { starter: [1056, 2003], boots: [3020, 3158], core: [6655, 4645, 3089, 3135, 3157], situational: [3118, 3102, 3137] }, strong: [], weak: [],
+    build: { starter: [1056, 2003], boots: [3020, 3158], core: [6655, 4645, 3089, 3135, 3157], situational: [3118, 3102, 3137] },
+    strong: [{n:"Orianna", r:"Tu la outranges en lane"}, {n:"Viktor", r:"Ton range te punit à distance"}, {n:"Mel", r:"Ton poke la punit, ton E la lock"}, {n:"Annie", r:"Tu la outranges en early"}, {n:"Naafiri", r:"Ton range la punit à l'approche"}, {n:"Ahri", r:"Ton poke la harcèle hors de portée"}],
+    weak: [{n:"Zed", r:"Te all-in avant ton cycle"}, {n:"Diana", r:"Te burst en post-6"}, {n:"Yasuo", r:"Te gap-close, son Wall bloque ton Q"}, {n:"Veigar", r:"Te outrange en late, te cage"}, {n:"Ekko", r:"Te dodge et te punit"}, {n:"Kennen", r:"T'outrange, te root"}],
     tip: "Respecte son poke et ses zones de contrôle avant de chercher un all-in.",
     playstyle: "Mage poke/artillerie qui veut garder ses adversaires à distance."
   },
   "Kennen": {
     wr: 54.44, tier: "A", rank: "#26/101", pick: "0.39%", ban: "1.1%", color: ["#1A4A8C","#FFD432"],
     build: { starter: [1056, 2003], boots: [3020], core: [3152, 4645, 3157, 3089, 3137], situational: [3151, 6655, 4637, 3165] },
-    strong: [{n:"Mel", r:"Statique, facile à marquer avec Q"}, {n:"Talon", r:"Ton range le punit au trade"}, {n:"Annie", r:"Tu peux harass sans entrer sa zone"}, {n:"Orianna", r:"Tu la hors range en permanence"}, {n:"Qiyana", r:"Fragile, prend tes stacks facilement"}, {n:"Ambessa", r:"Ton poke range la frustre en lane"}],
-    weak: [{n:"Gwen", r:"Te gap-close et annule tes marques"}, {n:"Nasus", r:"Te scale out et absorbe ton poke"}, {n:"Vladimir", r:"Pool évite ton stun, te sustain"}, {n:"Vex", r:"Son passif bloque tes dashes"}, {n:"Ekko", r:"Mobilité + burst avant ton stun"}, {n:"Zoe", r:"T'outrange et te punit hors-range"}],
+    strong: [{n:"Mel", r:"Statique, facile à marquer avec Q"}, {n:"Talon", r:"Ton range le punit au trade"}, {n:"Annie", r:"Tu peux harass sans entrer sa zone"}, {n:"Orianna", r:"Tu la hors range en permanence"}, {n:"Lissandra", r:"Pas de dash, tes marques la burstent"}, {n:"Viktor", r:"Statique, tes marques le punit en permanence"}],
+    weak: [{n:"Gwen", r:"Te gap-close et annule tes marques"}, {n:"Nasus", r:"Te scale out et absorbe ton poke"}, {n:"Vladimir", r:"Pool évite ton stun, te sustain"}, {n:"Vex", r:"Son passif bloque tes dashes"}, {n:"Ekko", r:"Mobilité + burst avant ton stun"}, {n:"Zoé", r:"T'outrange et te punit hors-range"}],
     tip: "Joue <strong>auto → Q → E → auto</strong> pour empiler tes marques proprement. Évite d'initier avec E avant d'avoir 2 marques posées. Niveaux 1-2, utilise uniquement tes autos (550 range) pour harass — ne cherche pas le trade actif. Avant niveau 6, wardez le flanc pour éviter le gank car ton E est souvent utilisé offensivement.",
     playstyle: "Poke-engage hybride. Fort en teamfight, pousse bien la vague. Ton ulti R est ton win condition — garde-le pour des engages de teamfight, pas pour du kill en 1v1."
   },
   "Malzahar": {
     wr: 52.52, tier: "B+", rank: "#44/101", pick: "5.5%", ban: "2%", color: ["#1A3C1E","#4ECC66"],
     build: { starter: [1056, 2003], boots: [3158, 3020], core: [3118, 3116, 3151, 3157, 3137], situational: [3089, 3165, 4645] },
-    strong: [{n:"Ryze", r:"Suppression pointe-et-clique, pas de dash pour fuir"}, {n:"Mel", r:"Statique, facile à canaliser R dessus"}, {n:"Yasuo", r:"Suppression = Wall of Wind inutile"}, {n:"LeBlanc", r:"R la lock même avec ses blinks"}, {n:"Caitlyn", r:"Pas de dash pour éviter ta R"}, {n:"Ezreal", r:"Son E ne brise pas ta suppression"}],
-    weak: [{n:"Nasus", r:"Wither te ralentit, QSS naturel via items"}, {n:"Gwen", r:"Snip Snip annule ta zone, très mobile"}, {n:"Xerath", r:"T'outrange en permanence"}, {n:"Ziggs", r:"Waveclear + poke supérieur à ta zone"}, {n:"Zyra", r:"Racines à distance, plantes bloquent tes Q"}, {n:"Twitch", r:"Roam invisible imprévisible"}],
+    strong: [{n:"Annie", r:"Pas d'escape, ta suppression la lock"}, {n:"Mel", r:"Statique, facile à canaliser R dessus"}, {n:"Yasuo", r:"Suppression = Wall of Wind inutile"}, {n:"LeBlanc", r:"R la lock même avec ses blinks"}, {n:"Anivia", r:"Lente et statique, ta suppression la finit"}, {n:"Lissandra", r:"Pas de dash, ta suppression la lock"}],
+    weak: [{n:"Nasus", r:"Wither te ralentit, QSS naturel via items"}, {n:"Gwen", r:"Snip Snip annule ta zone, très mobile"}, {n:"Xerath", r:"T'outrange en permanence"}, {n:"Ziggs", r:"Waveclear + poke supérieur à ta zone"}, {n:"Talon", r:"Te gap-close, te burst avant ta suppression"}, {n:"Naafiri", r:"Te punit en early, te burst avant ton scaling"}],
     tip: "Garde ta <strong>suppression R</strong> pour les engages du jungler — seule, elle fait peu de dégâts. Pose tes <strong>voidlings E</strong> sous la vague pour le push automatique, puis roam ou contrôle objectives. Avec un QSS ennemi, ton pick potentiel est limité.",
     playstyle: "Contrôle de zone + push + suppression. Idéal avec un jungler qui a un CC pour combo. Fort en macro, moins fort en 1v1 duel."
   },
   "Diana": {
     wr: 52.09, tier: "A-", rank: "#32/101", pick: "3.1%", ban: "4%", color: ["#3C1A64","#A07AE6"],
     build: { starter: [1056, 2003], boots: [3020], core: [3100, 6655, 4645, 3157, 3089], situational: [3115, 3137, 3152] },
-    strong: [{n:"Mel", r:"Tu la gap-close avant qu'elle réagisse"}, {n:"Naafiri", r:"Tu survives ses chiens, tu la burst"}, {n:"Orianna", r:"Tu entres sur elle facilement au 6"}, {n:"Tristana", r:"ADC fragile en mid, ton burst la one-shot"}, {n:"Kai'Sa", r:"Même logique, pas de sustain pour ton all-in"}, {n:"LeBlanc", r:"Tu absorbes ses retreats avec Q speed"}],
+    strong: [{n:"Mel", r:"Tu la gap-close avant qu'elle réagisse"}, {n:"Naafiri", r:"Tu survives ses chiens, tu la burst"}, {n:"Orianna", r:"Tu entres sur elle facilement au 6"}, {n:"Annie", r:"Fragile, ton burst post-6 la one-shot"}, {n:"Xerath", r:"Statique en fond, ton engage le surprend"}, {n:"LeBlanc", r:"Tu absorbes ses retreats avec Q speed"}],
     weak: [{n:"Nasus", r:"Wither annule ta vitesse, te tanke"}, {n:"Gwen", r:"Invulnérabilité bloque ton burst"}, {n:"Yasuo", r:"Wall bloque ton Q, te duel post-6"}, {n:"Galio", r:"Te tank tout, te CC en retour"}, {n:"Veigar", r:"Cage + burst si tu rates ton engage"}, {n:"Kassadin", r:"Outscale massif, immunité magic damage"}],
     tip: "La règle d'or Diana : <strong>Q d'abord pour le speed boost</strong>, approche, <strong>auto E auto</strong> pour le burst. Si ton Q rate, N'ENGAGE PAS. Attends le prochain cycle. Au niveau 6, un combo propre Q→engage→R détruit tout carry fragile. Investis dans un <strong>Sorcerer's Shoes</strong> tôt pour maximiser ton burst.",
     playstyle: "All-in assassin/burst. Win condition : être niveau 6 avant l'ennemi ou le tuer au 6. Fort dans les parties courtes."
@@ -1895,15 +2113,15 @@ const DATA = {
   "Brand": {
     wr: 50.6, tier: "B", rank: "#65/101", pick: "0.7%", ban: "3%", color: ["#9C2810","#FF8C00"],
     build: { starter: [1056, 2003], boots: [3020], core: [3151, 3116, 3137, 3157, 3089], situational: [3165, 4628, 3118] },
-    strong: [{n:"Galio", r:"Rebound des flammes dévaste ses alliés groupés"}, {n:"Yasuo", r:"E au sol empêche son dash, stun facile"}, {n:"Akali", r:"Ta zone le punit dans sa shroud"}, {n:"Mel", r:"Pas de mobilité pour éviter ton W"}, {n:"Ryze", r:"Statique, prend tout ton cycle"}, {n:"Swain", r:"Drains annulés par ton burst rapide"}],
-    weak: [{n:"Veigar", r:"Cage + Primordial Burst avant ton cycle"}, {n:"Kassadin", r:"Résistance magic + blink permanent"}, {n:"Ekko", r:"Rewind si tu rates, très mobile"}, {n:"Naafiri", r:"Assassin qui te burst avant ton combo"}, {n:"Aurelion Sol", r:"T'outrange massivement"}, {n:"Cassiopeia", r:"DPS constant pendant ton cast time"}],
+    strong: [{n:"Galio", r:"Rebound des flammes dévaste ses alliés groupés"}, {n:"Yasuo", r:"E au sol empêche son dash, stun facile"}, {n:"Akali", r:"Ta zone le punit dans sa shroud"}, {n:"Mel", r:"Pas de mobilité pour éviter ton W"}, {n:"Viktor", r:"Statique, prend tout ton cycle de flammes"}, {n:"Lissandra", r:"Pas de dash, ton combo la lock"}],
+    weak: [{n:"Veigar", r:"Cage + Primordial Burst avant ton cycle"}, {n:"Kassadin", r:"Résistance magic + blink permanent"}, {n:"Ekko", r:"Rewind si tu rates, très mobile"}, {n:"Naafiri", r:"Assassin qui te burst avant ton combo"}, {n:"Aurelion Sol", r:"T'outrange massivement"}, {n:"Fizz", r:"Te dodge ton W avec son E, te burst en retour"}],
     tip: "Le vrai combo Brand mid : <strong>E au sol → W (stun garanti) → Q → R</strong>. Si tu poses E au sol (pas sur une cible), le W stun automatiquement quand tu enchaînes. Ne rate pas le W — sans stun, tes dégâts sont réduits. Joue les vagues lentes et punish les erreurs de positioning.",
     playstyle: "Burst mage à condition. Très fort si le combo est complet, beaucoup plus faible si l'ennemi évite ton W."
   },
   "Ziggs": {
     wr: 50.72, tier: "C+", rank: "#74/101", pick: "0.7%", ban: "1%", color: ["#5A4A10","#E8C820"],
     build: { starter: [1056, 2003], boots: [3020, 3158], core: [6653, 4628, 4645, 3089, 3137], situational: [3151, 3157, 3165] },
-    strong: [{n:"Orianna", r:"T'outrange, la poke à mort"}, {n:"Veigar", r:"Même portée mais tu trades mieux"}, {n:"Malzahar", r:"Son push est ta force aussi, mais tu pokes mieux"}, {n:"Aurelion Sol", r:"Waveclear égal mais tu gères sa portée"}, {n:"Tristana", r:"Fragile en mid, prend ton poke"}, {n:"Qiyana", r:"Ton zoning la force à des trades défavorables"}],
+    strong: [{n:"Orianna", r:"T'outrange, la poke à mort"}, {n:"Veigar", r:"Même portée mais tu trades mieux"}, {n:"Malzahar", r:"Son push est ta force aussi, mais tu pokes mieux"}, {n:"Aurelion Sol", r:"Waveclear égal mais tu gères sa portée"}, {n:"Xerath", r:"T'outrange, ton poke le punit sans risque"}, {n:"Annie", r:"Fragile en mid, ton poke la harcèle à mort"}],
     weak: [{n:"LeBlanc", r:"Te burst avant ton premier Q"}, {n:"Twisted Fate", r:"Roam constant, tu ne peux pas suivre"}, {n:"Fizz", r:"Te dodge tout, te gap-close sous tes sorts"}, {n:"Ekko", r:"Mobile, absorbe ton poke et te punit"}, {n:"Diana", r:"Te all-in facilement sous tes sorts"}, {n:"Yone", r:"Immunité sort pendant E, te duel post-6"}],
     tip: "Ziggs mid joue principalement le <strong>poke et le waveclear</strong>. Son W contre les tours est une arme macro : avec un bon timing tu peux détruire une tour seul sous 3 minutes. Contre les assassins, joue <strong>derrière la vague</strong> et utilise ton Zap W défensivement pour créer de la distance.",
     playstyle: "Poke-waveclear. Meilleur en bot (73% des parties actuellement). En mid, value sur le macro et le split push plutôt que le kill pressure."
@@ -1911,7 +2129,7 @@ const DATA = {
   "Orianna": {
     wr: 48.46, tier: "C-", rank: "#86/101", pick: "3.3%", ban: "1%", color: ["#1A506E","#00C8D4"],
     build: { starter: [1056, 2003], boots: [3020], core: [6653, 4628, 4645, 3089, 3137], situational: [3003, 3157, 4637] },
-    strong: [{n:"Mel", r:"Ta balle te permet de harass hors de sa zone"}, {n:"Naafiri", r:"Tu la kites, ta balle bloque ses chiens"}, {n:"Malzahar", r:"Tu peux harass sans entrer sa zone voidling"}, {n:"Yasuo", r:"Ta balle passe dans son wind wall parfois"}, {n:"Tristana", r:"Ta portée de balle dépasse la sienne"}, {n:"Azir", r:"Même matchup de portée, tu joues mieux le trade court"}],
+    strong: [{n:"Mel", r:"Ta balle te permet de harass hors de sa zone"}, {n:"Naafiri", r:"Tu la kites, ta balle bloque ses chiens"}, {n:"Malzahar", r:"Tu peux harass sans entrer sa zone voidling"}, {n:"Yasuo", r:"Ta balle passe dans son wind wall parfois"}, {n:"Veigar", r:"Ta balle le lock, ton R le finit avant sa cage"}, {n:"Galio", r:"Ta balle le lock, ton R le punit en groupe"}],
     weak: [{n:"Lux", r:"T'outrange, te punit sur ta balle"}, {n:"Nasus", r:"Ignore ton poke, te scale out"}, {n:"Annie", r:"Burst instantané, son stun passif te tue"}, {n:"Diana", r:"Te all-in facilement, tu n'as pas d'escape"}, {n:"Kennen", r:"T'outrange en auto, te punit en permanence"}, {n:"Aurelion Sol", r:"T'outrange en late, meilleure teamfight"}],
     tip: "La balle d'Orianna doit toujours être <strong>entre toi et l'ennemi</strong> — jamais posée loin de toi sans raison. En teamfight, place-toi en fond et envoie la balle sur le meilleur allié engage, pas directement en combat. Ton <strong>Shockwave R</strong> est une pièce de teamfight, pas un sort de burst 1v1.",
     playstyle: "Contrôle zone + teamfight. Actuellement sous le méta. Forte valeur en compétitif mais moins en soloQ où les coordinations sont limitées."
@@ -1919,154 +2137,146 @@ const DATA = {
   "Lux": {
     wr: 52.1, tier: "A-", rank: "#28/101", pick: "6.2%", ban: "3%", color: ["#2A1A6E","#FFD4F0"],
     build: { starter: [1056, 2003], boots: [3020], core: [6653, 4628, 4645, 3089, 3137], situational: [3157, 3165, 6655] },
-    strong: [{n:"Orianna", r:"T'outrange massivement"}, {n:"Veigar", r:"Te poke avant qu'il place sa cage"}, {n:"Malzahar", r:"T'outrange sa zone de voidlings"}, {n:"Kennen", r:"Te root avant qu'il empile ses marques"}],
-    weak: [{n:"Zed", r:"Te all-in avant ton cycle"}, {n:"Fizz", r:"Te dodge ton E avec son E"}, {n:"Ekko", r:"Très mobile, absorbe et punit"}, {n:"Kassadin", r:"Te blink dessus après level 6"}],
+    strong: [{n:"Orianna", r:"T'outrange massivement"}, {n:"Veigar", r:"Te poke avant qu'il place sa cage"}, {n:"Malzahar", r:"T'outrange sa zone de voidlings"}, {n:"Kennen", r:"Te root avant qu'il empile ses marques"}, {n:"Annie", r:"Ton root Q la lock, ton burst arrive avant le sien"}, {n:"Xerath", r:"Tu le outranges, ton root le punit avant son poke"}],
+    weak: [{n:"Zed", r:"Te all-in avant ton cycle"}, {n:"Fizz", r:"Te dodge ton E avec son E"}, {n:"Ekko", r:"Très mobile, absorbe et punit"}, {n:"Kassadin", r:"Te blink dessus après level 6"}, {n:"Diana", r:"Te burst en post-6, tu n'as pas d'escape"}, {n:"Gwen", r:"Te gap-close, ton root rate sur ses dashes"}],
     tip: "Son root Q est sa pièce clé. Position latérale pour éviter un double-root.",
     playstyle: "Poke + burst à longue portée. Fort en lane, fragile quand approach."
   },
   "Zed": {
     wr: 50.2, tier: "B", rank: "#55/101", pick: "4.8%", ban: "8%", color: ["#0D0D0D","#FF3030"],
     build: { starter: [1055, 2003], boots: [3158], core: [6692, 6696, 3035, 6694, 3814], situational: [3156, 6695, 3142] },
-    strong: [{n:"Orianna", r:"Te all-in avant qu'elle positionne sa balle"}, {n:"Lux", r:"Te gap-close son sort, la one-shot"}, {n:"Xerath", r:"Même poke mage immobile, te gap-close"}, {n:"Veigar", r:"Te burst avant sa cage"}],
-    weak: [{n:"Malzahar", r:"Suppression = tu mourras avec ton R"}, {n:"Lissandra", r:"Auto-CC sur ta ult, te survive"}, {n:"Diana", r:"Te melee-battle après ton engage"}, {n:"Gwen", r:"Te duel facilement en mêlée"}],
+    strong: [{n:"Orianna", r:"Te all-in avant qu'elle positionne sa balle"}, {n:"Lux", r:"Te gap-close son sort, la one-shot"}, {n:"Xerath", r:"Même poke mage immobile, te gap-close"}, {n:"Veigar", r:"Te burst avant sa cage"}, {n:"Annie", r:"Te all-in avant son scaling, tu la burstes"}, {n:"Mel", r:"Pas de dash pour esquiver ton combo"}],
+    weak: [{n:"Malzahar", r:"Suppression = tu mourras avec ton R"}, {n:"Lissandra", r:"Auto-CC sur ta ult, te survive"}, {n:"Diana", r:"Te melee-battle après ton engage"}, {n:"Gwen", r:"Te duel facilement en mêlée"}, {n:"Yasuo", r:"Wall bloque ton E, te duel en post-6"}, {n:"Kassadin", r:"T'outscale, te résiste magique"}],
     tip: "Contre Zed, achète Zhonya si tu joues un mage — active-la pendant son ult.",
     playstyle: "Assassin physique. Fort en mid game, dépend du snowball."
   },
   "Akali": {
     wr: 49.8, tier: "B-", rank: "#60/101", pick: "5.3%", ban: "6%", color: ["#1A0F2E","#CC44AA"],
     build: { starter: [1054, 2003], boots: [3020], core: [3100, 4645, 3157, 3089, 3137], situational: [3152, 4633, 6655] },
-    strong: [{n:"Orianna", r:"Te all-in dans ta shroud"}, {n:"Lux", r:"Te dodge son E avec ta shroud"}, {n:"Veigar", r:"Shroud = cage manquée"}],
-    weak: [{n:"Diana", r:"Te melee en mêlée, te burst si tu shroud"}, {n:"Kennen", r:"T'outrange, te poke sans pouvoir répondre"}, {n:"Malzahar", r:"Suppression point-and-click passe shroud"}],
+    strong: [{n:"Orianna", r:"Te all-in dans ta shroud"}, {n:"Lux", r:"Te dodge son E avec ta shroud"}, {n:"Veigar", r:"Shroud = cage manquée"}, {n:"Annie", r:"Ta shroud bloque son burst, tu la punit"}, {n:"Mel", r:"Pas de dash, ta shroud + burst la finit"}, {n:"Zoé", r:"Ton shroud bloque son charm, tu la burstes"}],
+    weak: [{n:"Diana", r:"Te melee en mêlée, te burst si tu shroud"}, {n:"Kennen", r:"T'outrange, te poke sans pouvoir répondre"}, {n:"Malzahar", r:"Suppression point-and-click passe shroud"}, {n:"Yasuo", r:"Wall bloque ta Q, te punit en post-6"}, {n:"Lissandra", r:"Sa zone te CC, tu rates ton reset"}, {n:"Kassadin", r:"T'outscale massivement"}],
     tip: "Shroud ne bloque pas la suppression de Malzahar ni le stun de Kennen.",
     playstyle: "Assassin mixte physique/magique. Très forte en milieu/fin de partie."
   },
   "Ahri": {
     wr: 51.4, tier: "A-", rank: "#35/101", pick: "7.1%", ban: "2%", color: ["#6E1A3C","#FF6EC7"],
     build: { starter: [1056, 2003], boots: [3020], core: [6653, 4628, 3100, 3089, 3137], situational: [3118, 3157, 4645] },
-    strong: [{n:"Orianna", r:"Te gap-close facilement, te charm"}, {n:"Veigar", r:"Mobilité = cage difficile à placer"}],
-    weak: [{n:"Diana", r:"Te burst avant que tes dashes portent"}, {n:"Kassadin", r:"T'outscale massivement"}],
+    strong: [{n:"Orianna", r:"Te gap-close facilement, te charm"}, {n:"Veigar", r:"Mobilité = cage difficile à placer"}, {n:"Annie", r:"Ton charm la lock, ton R la finit"}, {n:"Mel", r:"Pas de dash, ton combo la one-shot"}, {n:"Zoé", r:"Ton charm la pick, tu la burst"}, {n:"Anivia", r:"Ton dash te sort de ses zones, tu la kites"}],
+    weak: [{n:"Diana", r:"Te burst avant que tes dashes portent"}, {n:"Kassadin", r:"T'outscale massivement"}, {n:"Yasuo", r:"Wall bloque ton Q, te duel en post-6"}, {n:"Lissandra", r:"Sa zone te CC, te survive à ton burst"}, {n:"Kennen", r:"T'outrange, te root avant ton charm"}, {n:"Viktor", r:"T'outrange, te résiste magique"}],
     tip: "Son charm E est la clé — évite la frontale.",
     playstyle: "Roam-assassin. Forte en split pressure et engages sélectifs."
   },
   "Yasuo": {
     wr: 49.3, tier: "B-", rank: "#67/101", pick: "6.5%", ban: "5%", color: ["#1C3A2A","#78FFD6"],
     build: { starter: [1055, 2003], boots: [3006], core: [6672, 3031, 6673, 6333, 3026], situational: [3153, 3156, 3094] },
-    strong: [{n:"Orianna", r:"Sa balle sur son E = combo R facile"}, {n:"Malzahar", r:"Wind Wall bloque E et Q"}],
-    weak: [{n:"Diana", r:"Te melee, ses dashes ne servent pas"}, {n:"Malzahar", r:"Suppression = pas d'escape"}, {n:"Kennen", r:"T'outrange, te poke"}],
+    strong: [{n:"Orianna", r:"Sa balle sur son E = combo R facile"}, {n:"Lux", r:"Ton wall bloque son E, te punit sur son root"}, {n:"Annie", r:"Ton wall bloque ses projectiles, tu la kites"}, {n:"Zoé", r:"Ton wall bloque son E, tu la punit"}, {n:"Anivia", r:"Ton wall bloque ses sorts, tu la kites"}, {n:"Mel", r:"Ton wall bloque ses projectiles, tu la punit"}],
+    weak: [{n:"Diana", r:"Te melee, ses dashes ne servent pas"}, {n:"Malzahar", r:"Suppression = pas d'escape"}, {n:"Kennen", r:"T'outrange, te poke"}, {n:"Kassadin", r:"T'outscale, te résiste magique"}, {n:"Viktor", r:"T'outrange, te résiste magique"}, {n:"Ziggs", r:"Te poke derrière la vague, hors de ta portée"}],
     tip: "Son Wind Wall W bloque les projectiles mais pas la suppression ni les zones.",
     playstyle: "DPS continu. Très fort en teamfight avec knockup allié."
   },
   "Veigar": {
     wr: 51.8, tier: "A-", rank: "#30/101", pick: "4.9%", ban: "4%", color: ["#1A0F3C","#C87AFF"],
     build: { starter: [1056, 2003], boots: [3020, 3158], core: [6653, 4628, 3089, 3157, 3137], situational: [3003, 4645, 3165] },
-    strong: [{n:"Lux", r:"Sa cage arrive avant ton cycle"}, {n:"Brand", r:"Ta cage bloque son engagement"}],
-    weak: [{n:"Zed", r:"Te all-in avant ta cage"}, {n:"Fizz", r:"Te dodge E, gap-close instantané"}],
+    strong: [{n:"Lux", r:"Sa cage arrive avant ton cycle"}, {n:"Brand", r:"Ta cage bloque son engagement"}, {n:"Annie", r:"Sa cage la lock, ton burst la finit"}, {n:"Xerath", r:"Sa cage le lock, ton late le surclasse"}, {n:"Zoé", r:"Sa cage la lock, ton scaling la punit"}, {n:"Anivia", r:"Sa cage bloque son engage, tu scales au-dessus"}],
+    weak: [{n:"Zed", r:"Te all-in avant ta cage"}, {n:"Fizz", r:"Te dodge E, gap-close instantané"}, {n:"Diana", r:"Te melee-burst en post-6, te punit sur ton engage"}, {n:"Kennen", r:"T'outrange, te root avant ta cage"}, {n:"Kassadin", r:"T'outscale massivement, te résiste"}, {n:"Lissandra", r:"Sa zone te CC, te survive à ton burst"}],
     tip: "Sa cage E gain en puissance à mesure qu'il stack.",
     playstyle: "Hypercarry late. Fragile en early, terrorise en mid/late game."
   },
   "LeBlanc": {
     wr: 50.9, tier: "B+", rank: "#43/101", pick: "5.1%", ban: "7%", color: ["#2E1A0F","#FF9C3C"],
     build: { starter: [1056, 2003], boots: [3020], core: [6653, 4645, 6655, 3089, 3135], situational: [3100, 3157, 3118] },
-    strong: [{n:"Orianna", r:"Te burst avant positionnement balle"}, {n:"Veigar", r:"Te blink sur lui avant sa cage"}],
-    weak: [{n:"Diana", r:"Te melee, te suivra dans ses blinks"}, {n:"Kennen", r:"T'outrange, te punit"}],
+    strong: [{n:"Orianna", r:"Te burst avant positionnement balle"}, {n:"Veigar", r:"Te blink sur lui avant sa cage"}, {n:"Annie", r:"Te burstes dans tes blinks, tu la finis"}, {n:"Lux", r:"Ton burst arrive avant son cycle"}, {n:"Xerath", r:"Te punit avant son poke, tu t'échappes"}, {n:"Mel", r:"Ton combo la one-shot, ses reflect ratent"}],
+    weak: [{n:"Diana", r:"Te melee, te suivra dans ses blinks"}, {n:"Kennen", r:"T'outrange, te punit"}, {n:"Lissandra", r:"Sa zone te CC, tu rates ton reset"}, {n:"Kassadin", r:"Te résiste magique, te blink dessus"}, {n:"Viktor", r:"T'outrange, te résiste magique"}, {n:"Ziggs", r:"Te poke derrière la vague, sans risque"}],
     tip: "Sa chaîne W est toujours en direction de sa position d'origine.",
     playstyle: "Assassin/burst. Pick fort en soloQ."
   },
   "Syndra": {
     wr: 50.3, tier: "B", rank: "#52/101", pick: "3.2%", ban: "2%", color: ["#2A0F5A","#8844FF"],
     build: { starter: [1056, 2003], boots: [3020], core: [6653, 4628, 4645, 3089, 3137], situational: [3157, 4637, 3165] },
-    strong: [{n:"Orianna", r:"T'outpush et t'outburst"}, {n:"Lux", r:"Burst instantané sur son root"}],
-    weak: [{n:"Zed", r:"Te all-in, tu n'as pas d'escape"}, {n:"Fizz", r:"Te dodge, te all-in"}],
+    strong: [{n:"Orianna", r:"T'outpush et t'outburst"}, {n:"Lux", r:"Burst instantané sur son root"}, {n:"Annie", r:"Ton pull la lock, ton burst la finit"}, {n:"Mel", r:"Ton pull la lock, pas de dash pour fuir"}, {n:"Zoé", r:"Ton burst la one-shot sur son engage"}, {n:"Anivia", r:"Ton pull bloque son engage, tu la burstes"}],
+    weak: [{n:"Zed", r:"Te all-in, tu n'as pas d'escape"}, {n:"Fizz", r:"Te dodge, te all-in"}, {n:"Diana", r:"Te melee-burst, tu n'as pas d'escape"}, {n:"Kennen", r:"T'outrange, te root avant ton combo"}, {n:"Kassadin", r:"T'outscale massivement, te résiste"}, {n:"Lissandra", r:"Sa zone te CC, te survive à ton pull"}],
     tip: "Son ulti R One-shots avec les sphères accumulées.",
     playstyle: "Burst mage. Forte en lane early, puissante en mid game."
   },
   "Kassadin": {
     wr: 51.2, tier: "A-", rank: "#37/101", pick: "2.8%", ban: "3%", color: ["#0F1A3C","#4488FF"],
     build: { starter: [1054, 2003], boots: [3020, 3111], core: [3027, 3003, 3118, 3157, 3089], situational: [3137, 3100, 4645] },
-    strong: [{n:"Diana", r:"Résistance magique, t'outscale"}, {n:"Orianna", r:"T'outscale et t'outmobile"}],
-    weak: [{n:"Zed", r:"Te punit en early avant ton power spike"}, {n:"Talon", r:"Physique, ta resist magic ne sert pas"}],
+    strong: [{n:"Diana", r:"Résistance magique, t'outscale"}, {n:"Orianna", r:"T'outscale et t'outmobile"}, {n:"Viktor", r:"T'outscale, tu le résistes magique"}, {n:"Xerath", r:"T'outscale, tu le résistes magique"}, {n:"Aurelion Sol", r:"T'outscale sa zone, tu le résistes"}, {n:"Annie", r:"T'outscale son burst, tu le résistes"}],
+    weak: [{n:"Zed", r:"Te punit en early avant ton power spike"}, {n:"Talon", r:"Physique, ta resist magic ne sert pas"}, {n:"Fizz", r:"Te dodge, te burst avant ton scaling"}, {n:"Kennen", r:"T'outrange, te root en early"}, {n:"Lissandra", r:"Sa zone te CC avant ton power spike"}, {n:"Yasuo", r:"Te punit en early, ton scaling arrive tard"}],
     tip: "Kassadin est faible avant niveau 6. Punis-le tôt.",
     playstyle: "Late carry. Contre spécifiquement les mages."
   },
   "Twisted Fate": {
     wr: 50.5, tier: "B", rank: "#49/101", pick: "3.5%", ban: "2%", color: ["#3C1A0F","#FFAA00"],
     build: { starter: [1056, 2003], boots: [3158, 3020], core: [3100, 3094, 3157, 3089, 3137], situational: [3027, 4628, 3165] },
-    strong: [{n:"Ziggs", r:"Roam constant que Ziggs ne peut pas suivre"}, {n:"Orianna", r:"Roam et contrôle d'objectifs"}],
-    weak: [{n:"Zed", r:"Te burst avant ton cycle"}, {n:"Diana", r:"Te melee facilement"}],
+    strong: [{n:"Ziggs", r:"Roam constant que Ziggs ne peut pas suivre"}, {n:"Orianna", r:"Roam et contrôle d'objectifs"}, {n:"Annie", r:"Ton roam la punit avant son scaling"}, {n:"Viktor", r:"Ton roam + burst le punit avant son scaling"}, {n:"Xerath", r:"Ton ulti te sort de ses sorts, tu le punit"}, {n:"Zoé", r:"Ton roam la punit, ton burst la one-shot"}],
+    weak: [{n:"Zed", r:"Te burst avant ton cycle"}, {n:"Diana", r:"Te melee facilement"}, {n:"Fizz", r:"Te dodge, te gap-close sous tes sorts"}, {n:"Kennen", r:"T'outrange, te root sans fin"}, {n:"Kassadin", r:"Te résiste magique, te punit sur tes erreurs"}, {n:"Veigar", r:"Te outrange en late, te cage"}],
     tip: "Son ulti R révèle la carte et permet des décalages puissants.",
     playstyle: "Roam-control. Gagne par la pression globale."
   },
   "Fizz": {
     wr: 50.8, tier: "B", rank: "#47/101", pick: "3.9%", ban: "5%", color: ["#0F2A3C","#00E5FF"],
     build: { starter: [1056, 2003], boots: [3020], core: [3100, 6655, 3157, 4645, 3089], situational: [3135, 3041, 3152] },
-    strong: [{n:"Lux", r:"Te dodge son E avec ton E"}, {n:"Orianna", r:"Te all-in facilement"}],
-    weak: [{n:"Diana", r:"Te melee après ton E"}, {n:"Malzahar", r:"Suppression point-and-click"}],
+    strong: [{n:"Lux", r:"Te dodge son E avec ton E"}, {n:"Orianna", r:"Te all-in facilement"}, {n:"Annie", r:"Ton E te sort de son burst, tu la punit"}, {n:"Viktor", r:"Ton E te dodge ses sorts, tu le burstes"}, {n:"Xerath", r:"Ton E te dodge, tu le gap-close"}, {n:"Zoé", r:"Ton E te dodge son engage, tu la burstes"}],
+    weak: [{n:"Diana", r:"Te melee après ton E"}, {n:"Malzahar", r:"Suppression point-and-click"}, {n:"Kennen", r:"T'outrange, te root avant ton E"}, {n:"Kassadin", r:"Te résiste magique, t'outscale"}, {n:"Lissandra", r:"Sa zone te CC, te survive à ton E"}, {n:"Yasuo", r:"Wall bloque tes sorts, te punit en post-6"}],
     tip: "Son E Playful/Trickster le rend intangible. Attends qu'il l'utilise.",
     playstyle: "Assassin aquatique. Fort contre les mages immobiles."
   },
   "Viktor": {
     wr: 51.5, tier: "A-", rank: "#33/101", pick: "2.6%", ban: "2%", color: ["#1A1A2E","#7788FF"],
     build: { starter: [1056, 2003], boots: [3020], core: [6653, 3151, 4645, 3089, 3137], situational: [3157, 3100, 4637] },
-    strong: [{n:"Orianna", r:"T'outpush et t'outrange avec ton E"}, {n:"Malzahar", r:"Zone Q supprime ses voidlings"}],
-    weak: [{n:"Zed", r:"Te all-in avant ton item 1"}, {n:"LeBlanc", r:"Te burst avant ton cycle"}],
+    strong: [{n:"Orianna", r:"T'outpush et t'outrange avec ton E"}, {n:"Malzahar", r:"Zone Q supprime ses voidlings"}, {n:"Annie", r:"Ton burst la punit avant son scaling"}, {n:"Xerath", r:"Même logique, tu trades mieux"}, {n:"Zoé", r:"Ton control la punit, ton burst la finit"}, {n:"Anivia", r:"Ton burst la punit sur ses zones"}],
+    weak: [{n:"Zed", r:"Te all-in avant ton item 1"}, {n:"LeBlanc", r:"Te burst avant ton cycle"}, {n:"Diana", r:"Te melee-burst en post-6, te punit sur ton cast"}, {n:"Kennen", r:"T'outrange, te root avant ton cast"}, {n:"Fizz", r:"Te dodge, te burst avant ton scaling"}, {n:"Kassadin", r:"Te résiste magique, t'outscale"}],
     tip: "Son laser E amélioré offre un waveclear dévastateur.",
     playstyle: "Mage DPS. Très fort en teamfight et late game."
   },
   "Galio": {
     wr: 51.9, tier: "A-", rank: "#29/101", pick: "2.1%", ban: "1%", color: ["#1A2A4A","#8899DD"],
     build: { starter: [1056, 2003], boots: [3111, 3020], core: [3152, 4633, 3157, 3151, 3137], situational: [3116, 3089, 3165] },
-    strong: [{n:"Brand", r:"Te tank ses rebonds, tu CC en retour"}, {n:"LeBlanc", r:"Te résiste magique, taunt anti-burst"}],
-    weak: [{n:"Zed", r:"Physique, ta resist magic ne compte pas"}, {n:"Kennen", r:"T'outrange avant ton engage"}],
+    strong: [{n:"Brand", r:"Te tank ses rebonds, tu CC en retour"}, {n:"LeBlanc", r:"Te résiste magique, taunt anti-burst"}, {n:"Annie", r:"Ton taunt la lock, tu CC en retour"}, {n:"Viktor", r:"Ton taunt le punit, tu le résistes magique"}, {n:"Xerath", r:"Ton taunt le punit, tu le résistes magique"}, {n:"Anivia", r:"Ton taunt la punit, tu résistes ses zones"}],
+    weak: [{n:"Zed", r:"Physique, ta resist magic ne compte pas"}, {n:"Kennen", r:"T'outrange avant ton engage"}, {n:"Fizz", r:"Te dodge ton taunt avec son E, te burst"}, {n:"Lissandra", r:"Sa zone te CC, ton engage rate"}, {n:"Veigar", r:"Te cage, te burst avant ton taunt"}, {n:"Diana", r:"Te melee-burst après ton taunt"}],
     tip: "Son R ultime téléporte sur un allié — idéal avec jungler.",
     playstyle: "Tank-engage. Joue pour l'équipe."
   },
   "Xerath": {
     wr: 51.3, tier: "A-", rank: "#36/101", pick: "1.8%", ban: "1%", color: ["#2A1A0A","#FFAA44"],
     build: { starter: [1056, 2003], boots: [3020], core: [6653, 4628, 4645, 3089, 3135], situational: [3041, 3165, 3137] },
-    strong: [{n:"Malzahar", r:"T'outrange massivement"}, {n:"Orianna", r:"Poke constant hors de portée"}],
-    weak: [{n:"Zed", r:"Te gap-close instantanément"}, {n:"Fizz", r:"Te dodge avec son E"}],
+    strong: [{n:"Malzahar", r:"T'outrange massivement"}, {n:"Orianna", r:"Poke constant hors de portée"}, {n:"Annie", r:"T'outranges, ton poke la punit avant son scaling"}, {n:"Viktor", r:"Même logique, tu trades mieux"}, {n:"Zoé", r:"T'outranges, ton poke la punit"}, {n:"Anivia", r:"T'outranges, ton poke la punit avant sa zone"}],
+    weak: [{n:"Zed", r:"Te gap-close instantanément"}, {n:"Fizz", r:"Te dodge avec son E"}, {n:"Diana", r:"Te melee-burst, tu n'as pas d'escape"}, {n:"Kennen", r:"T'outrange, te root avant ton cast"}, {n:"LeBlanc", r:"Te burst, tu n'as pas d'escape"}, {n:"Kassadin", r:"Te résiste magique, te blink dessus"}],
     tip: "Garde tes distances et punis les mages immobiles.",
     playstyle: "Poke mage à ultra-longue portée."
   },
   "Aurelion Sol": {
     wr: 52.8, tier: "A", rank: "#23/101", pick: "2.3%", ban: "3%", color: ["#050A1A","#5544CC"],
     build: { starter: [1056, 2003], boots: [3020, 3009], core: [3116, 3151, 4633, 3137, 3089], situational: [3157, 3003, 4628] },
-    strong: [{n:"Orianna", r:"T'outrange massivement en late"}, {n:"Veigar", r:"Ta zone punit ses approches"}],
-    weak: [{n:"Zed", r:"Te punit avant ton power spike"}, {n:"Talon", r:"Te roam avant ta portée scaling"}],
+    strong: [{n:"Orianna", r:"T'outrange massivement en late"}, {n:"Veigar", r:"Ta zone punit ses approches"}, {n:"Annie", r:"Ta zone la punit, ton scaling la surclasse"}, {n:"Viktor", r:"Ta zone le punit, ton late le surclasse"}, {n:"Anivia", r:"Ta zone la punit, tu la résistes"}, {n:"Mel", r:"Ta zone la punit avant son reflect"}],
+    weak: [{n:"Zed", r:"Te punit avant ton power spike"}, {n:"Talon", r:"Te roam avant ta portée scaling"}, {n:"Diana", r:"Te burst en early avant ton power spike"}, {n:"Kennen", r:"T'outrange, te punit en early"}, {n:"Fizz", r:"Te dodge ta zone, te burst en early"}, {n:"Kassadin", r:"Te résiste magique, t'outscale"}],
     tip: "Accumule des stardusts pour faire grandir la zone de ton R.",
     playstyle: "Late hypercarry."
   },
   "Mel": {
     wr: 48.2, tier: "C", rank: "#82/101", pick: "4.1%", ban: "8%", color: ["#3C2A0A","#FFD4A0"],
     build: { starter: [1056, 2003], boots: [3020], core: [3118, 4628, 4645, 3089, 3137], situational: [3157, 3151, 3165] },
-    strong: [{n:"Orianna", r:"Reflect annule sa balle"}, {n:"Lux", r:"Reflect son rayon R"}],
-    weak: [{n:"Zed", r:"Physique, reflect moins efficace"}, {n:"Diana", r:"Te melee hors reflect"}],
+    strong: [{n:"Orianna", r:"Reflect annule sa balle"}, {n:"Lux", r:"Reflect son rayon R"}, {n:"Annie", r:"Ton reflect bloque ses sorts, tu la punit"}, {n:"Viktor", r:"Ton reflect ses sorts, tu la punit avant son burst"}, {n:"Zoé", r:"Ton reflect ses sorts, tu la punit"}, {n:"Anivia", r:"Ton reflect ses zones, tu la punit"}],
+    weak: [{n:"Zed", r:"Physique, reflect moins efficace"}, {n:"Diana", r:"Te melee hors reflect"}, {n:"Kennen", r:"T'outrange, te root avant ton reflect"}, {n:"Kassadin", r:"Te résiste, te punit sur tes erreurs"}, {n:"Fizz", r:"Te dodge ton reflect, te burst"}, {n:"Lissandra", r:"Sa zone te CC, te survive à ton reflect"}],
     tip: "Son E Reflect renvoie les sorts magiques ciblés.",
     playstyle: "Counter-mage."
   },
   "Naafiri": {
     wr: 51.0, tier: "B+", rank: "#42/101", pick: "2.7%", ban: "2%", color: ["#3C1A0A","#CC6622"],
     build: { starter: [1055, 2003], boots: [3158], core: [6692, 6696, 3035, 6697, 3814], situational: [3156, 3026, 6695] },
-    strong: [{n:"Orianna", r:"Pack de chiens dépasse son kiting"}, {n:"Lux", r:"Te all-in avant son cycle"}],
-    weak: [{n:"Diana", r:"Te melee facilement"}, {n:"Brand", r:"Zone AoE détruit ses chiens"}],
+    strong: [{n:"Orianna", r:"Pack de chiens dépasse son kiting"}, {n:"Lux", r:"Te all-in avant son cycle"}, {n:"Annie", r:"Ton engage la punit avant son burst"}, {n:"Mel", r:"Ton engage la punit avant qu'elle réagisse"}, {n:"Zoé", r:"Ton engage la punit, tu la burst"}, {n:"Anivia", r:"Ton engage la punit, ton burst la finit"}],
+    weak: [{n:"Diana", r:"Te melee facilement"}, {n:"Brand", r:"Zone AoE détruit ses chiens"}, {n:"Kennen", r:"T'outrange, te root avant ton engage"}, {n:"Lissandra", r:"Sa zone te CC, te survive à ton engage"}, {n:"Ziggs", r:"Te poke derrière la vague, hors de ta portée"}, {n:"Kassadin", r:"Te résiste, te punit sur tes erreurs"}],
     tip: "Ses chiens meurent sous les dégâts de zone (AoE).",
     playstyle: "Assassin physique."
   },
   "Ekko": {
     wr: 51.6, tier: "A-", rank: "#31/101", pick: "3.4%", ban: "4%", color: ["#0A1A2E","#44DDFF"],
     build: { starter: [1056, 2003], boots: [3020], core: [3100, 6655, 3157, 3089, 3137], situational: [3152, 4645, 3041] },
-    strong: [{n:"Orianna", r:"Te dash avant son positionnement balle"}, {n:"Brand", r:"Ta mobilité évite son combo"}],
-    weak: [{n:"Diana", r:"Te melee dès que tu approches"}, {n:"Gwen", r:"Te duel en mêlée"}],
+    strong: [{n:"Orianna", r:"Te dash avant son positionnement balle"}, {n:"Brand", r:"Ta mobilité évite son combo"}, {n:"Annie", r:"Ton dash te sort de son burst, tu la punit"}, {n:"Viktor", r:"Ton dash te dodge, tu le burstes"}, {n:"Lux", r:"Ton dash te dodge son E, tu la punit"}, {n:"Anivia", r:"Ton dash te dodge ses zones, tu la kites"}],
+    weak: [{n:"Diana", r:"Te melee dès que tu approches"}, {n:"Gwen", r:"Te duel en mêlée"}, {n:"Kennen", r:"T'outrange, te root avant ton dash"}, {n:"Kassadin", r:"Te résiste magique, t'outscale"}, {n:"Fizz", r:"Te dodge, te burst avant ton rewind"}, {n:"Lissandra", r:"Sa zone te CC, te survive à ton dash"}],
     tip: "Son ulti R le soigne et le téléporte sur son ombre.",
     playstyle: "Burst/assassin hybride."
-  },
-  "Talon": {
-    wr: 50.4, tier: "B", rank: "#51/101", pick: "3.1%", ban: "3%", color: ["#1A0A0A","#DD3333"],
-    build: { starter: [1036, 2003], boots: [3158], core: [3142, 6697, 3035, 3814, 6694], situational: [6692, 6696, 3156] },
-    strong: [{n:"Lux", r:"Te gap-close avant son cycle"}, {n:"Orianna", r:"Te all-in rapide"}],
-    weak: [{n:"Diana", r:"Te melee et survit à ton burst"}, {n:"Malzahar", r:"Suppression avant ton escape"}],
-    tip: "Traverse les murs avec E pour surprendre les side-lanes.",
-    playstyle: "Roam-assassin physique."
   }
 };
 
@@ -2430,7 +2640,8 @@ function findGoodInto(enemyName) {
   return getWeakList(enemyName).slice(0, 6);
 }
 
-init();
+/* NB : init() est appelé dans openLolPage() une fois que #lol-page existe dans le DOM.
+   Ne plus l'appeler au chargement (la grille n'existe pas encore à ce moment-là). */
 
 
 </script>
@@ -2508,9 +2719,6 @@ init();
 <button id="lol-back-btn" onclick="closeLolPage()">
   ← Retour au Setup
 </button>
-
-</body>
-</html>
 
 <style>
 @media (max-width: 760px) {
@@ -2627,87 +2835,58 @@ init();
 }
 </style>
 
-<script>
-function goToSetupMenu() {
-  closeLolPage();
-  const setup = document.getElementById('setup-page');
-  if (setup) setup.classList.add('active');
-  window.scrollTo({top: 0, behavior: 'smooth'});
-}
-
-function goToMatchupMenu() {
-  const setup = document.getElementById('setup-page');
-  if (setup) setup.classList.remove('active');
-  openLolPage();
-  window.scrollTo({top: 0, behavior: 'smooth'});
-}
-</script>
-
 <style>
 #global-site-nav {
   position: fixed;
-  top: 12px;
+  top: 8px;
   left: 50%;
   transform: translateX(-50%);
-  width: min(920px, calc(100% - 28px));
+  width: min(540px, calc(100% - 24px));
   z-index: 10000;
   pointer-events: none;
 }
 .global-nav-inner {
   pointer-events: auto;
   display: grid;
-  grid-template-columns: 1fr 1.35fr 1.35fr;
+  grid-template-columns: 1fr 1fr;
   align-items: center;
-  gap: 8px;
-  padding: 7px;
-  border: 1px solid rgba(200,155,60,.38);
-  border-radius: 13px;
-  background: rgba(6,12,22,.94);
-  box-shadow: 0 10px 35px rgba(0,0,0,.38), inset 0 0 24px rgba(200,155,60,.025);
-  backdrop-filter: blur(12px);
-}
-.global-nav-brand {
-  padding: 0 15px;
-  color: rgba(200,155,60,.82);
-  font-family: 'Cinzel', serif;
-  font-size: .72rem;
-  font-weight: 700;
-  letter-spacing: .14em;
-  text-align: center;
-  white-space: nowrap;
+  gap: 6px;
+  padding: 4px;
+  border-radius: 8px;
+  background: rgba(6,12,22,.8);
+  box-shadow: 0 4px 18px rgba(0,0,0,.3);
+  backdrop-filter: blur(10px);
 }
 .global-nav-inner button {
-  min-height: 42px;
-  border: 1px solid rgba(200,155,60,.2);
-  border-radius: 8px;
+  min-height: 28px;
+  border: 1px solid transparent;
+  border-radius: 6px;
   background: transparent;
-  color: #91a7ca;
+  color: #7f95b5;
   font-family: 'Cinzel', serif;
-  font-size: .73rem;
+  font-size: .6rem;
   font-weight: 700;
-  letter-spacing: .08em;
+  letter-spacing: .06em;
   cursor: pointer;
   transition: all .2s ease;
 }
 .global-nav-inner button:hover {
   color: #f1c75b;
-  border-color: rgba(200,155,60,.62);
-  background: rgba(200,155,60,.08);
-  transform: translateY(-1px);
+  border-color: rgba(200,155,60,.4);
+  background: rgba(200,155,60,.07);
 }
 .global-nav-inner button.active {
   color: #f1c75b;
-  border-color: #c89b3c;
-  background: linear-gradient(135deg, rgba(200,155,60,.18), rgba(200,155,60,.045));
+  border-color: rgba(200,155,60,.5);
+  background: rgba(200,155,60,.1);
 }
-#setup-page { padding-top: 78px; }
-#lol-page .wrap { padding-top: 78px !important; }
+#setup-page { padding-top: 54px; }
+#lol-page .wrap { padding-top: 54px !important; }
 
 @media (max-width: 760px) {
-  #global-site-nav { top: 7px; width: calc(100% - 14px); }
-  .global-nav-inner { grid-template-columns: 1fr 1.2fr 1.2fr; gap: 5px; padding: 5px; }
-  .global-nav-brand { display: none; }
-  .global-nav-inner button { font-size: .63rem; min-height: 38px; letter-spacing: .04em; }
+  #global-site-nav { top: 6px; width: calc(100% - 16px); }
+  .global-nav-inner { grid-template-columns: 1fr 1fr; gap: 4px; padding: 3px; }
+  .global-nav-inner button { font-size: .56rem; min-height: 26px; letter-spacing: .04em; }
 }
 </style>
 
@@ -2738,3 +2917,6 @@ function goToMatchupMenu() {
 
 document.addEventListener('DOMContentLoaded', () => updateGlobalNav('setup'));
 </script>
+
+</body>
+</html>
