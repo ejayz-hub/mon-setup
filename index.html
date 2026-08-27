@@ -2773,11 +2773,11 @@ function lmSectionHtml(champ) {
   const entries = lmEntriesFor(champ);
   if (!entries.length) return '';
   const TIERS = [
-    { key: 'hard',  num: '8-9', name: 'DUR',            cls: 't-hard',  test: wr => wr < 45 },
-    { key: 'unfav', num: '6-7', name: 'Désavantagé',    cls: 't-unfav', test: wr => wr >= 45 && wr < 49 },
-    { key: 'skill', num: '5',   name: 'Match de skill', cls: 't-skill', test: wr => wr >= 49 && wr <= 51 },
-    { key: 'fav',   num: '3-4', name: 'Favorable',      cls: 't-fav',   test: wr => wr > 51 && wr <= 55 },
-    { key: 'easy',  num: '1-2', name: 'Facile',         cls: 't-easy',  test: wr => wr > 55 }
+    { key: 'hard',  num: '5', name: 'DUR',            cls: 't-hard',  test: wr => wr < 45 },
+    { key: 'unfav', num: '4', name: 'Désavantagé',    cls: 't-unfav', test: wr => wr >= 45 && wr < 49 },
+    { key: 'skill', num: '3', name: 'Match de skill', cls: 't-skill', test: wr => wr >= 49 && wr <= 51 },
+    { key: 'fav',   num: '2', name: 'Favorable',      cls: 't-fav',   test: wr => wr > 51 && wr <= 55 },
+    { key: 'easy',  num: '1', name: 'Facile',         cls: 't-easy',  test: wr > 55 }
   ];
   const rows = TIERS.map(t => {
     const list = entries.filter(e => t.test(e.m.wr)).sort((a, b) => (b.inPool - a.inPool) || (b.m.g - a.m.g));
